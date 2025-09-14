@@ -571,4 +571,18 @@ class DonationController extends Controller
             'message' => "Processed {$processedCount} recurring donations."
         ]);
     }
+
+    /**
+     * Download receipt PDF.
+     */
+    public function downloadReceipt(Donation $donation)
+    {
+        if (!$donation->receipt_number) {
+            $donation->generateReceiptNumber();
+        }
+
+        // For now, return a simple receipt view that can be printed
+        // In the future, this could generate a proper PDF using packages like DomPDF or Snappy
+        return view('donations.receipt', compact('donation'));
+    }
 }

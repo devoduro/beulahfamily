@@ -45,6 +45,17 @@ class DashboardController extends Controller
             'total_donations_this_year' => \App\Models\Donation::confirmed()
                 ->whereYear('donation_date', now()->year)
                 ->sum('amount'),
+            // Birthday statistics
+            'total_birthdays' => \App\Models\Member::whereNotNull('date_of_birth')->count(),
+            'birthdays_this_month' => \App\Models\Member::whereNotNull('date_of_birth')
+                ->whereRaw('MONTH(date_of_birth) = ?', [now()->month])
+                ->count(),
+            // Payment statistics  
+            'total_payments' => \App\Models\Donation::confirmed()->count(),
+            'payments_this_month' => \App\Models\Donation::confirmed()
+                ->whereYear('donation_date', now()->year)
+                ->whereMonth('donation_date', now()->month)
+                ->count(),
         ];
         
         // Get legacy document management statistics (still available)

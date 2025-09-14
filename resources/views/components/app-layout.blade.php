@@ -172,11 +172,53 @@
                         <span>Announcements</span>
                     </a>
                     
-                    <a href="{{ route('sms.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-violet-50 hover:text-violet-600 rounded-xl {{ request()->routeIs('sms.*') ? 'bg-violet-50 text-violet-600 font-medium shadow-sm' : '' }}">
+                    <a href="{{ route('sms.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-violet-50 hover:text-violet-600 rounded-xl {{ request()->routeIs('sms.*') && !request()->routeIs('sms.templates.*') && !request()->routeIs('sms.credits.*') ? 'bg-violet-50 text-violet-600 font-medium shadow-sm' : '' }}">
                         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
                             <i class="fas fa-sms text-white text-sm"></i>
                         </div>
                         <span>Bulk SMS</span>
+                    </a>
+                    
+                    <a href="{{ route('message.templates.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-pink-50 hover:text-pink-600 rounded-xl {{ request()->routeIs('message.templates.*') || request()->routeIs('sms.templates.*') ? 'bg-pink-50 text-pink-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
+                            <i class="fas fa-file-alt text-white text-sm"></i>
+                        </div>
+                        <span>SMS Templates</span>
+                    </a>
+                    
+                    <a href="{{ route('message.credits.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl {{ request()->routeIs('message.credits.*') || request()->routeIs('sms.credits.*') ? 'bg-emerald-50 text-emerald-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center">
+                            <i class="fas fa-credit-card text-white text-sm"></i>
+                        </div>
+                        <span>SMS Credits</span>
+                    </a>
+                </div>
+
+                <!-- Finance Management Section -->
+                <div class="mb-6">
+                    <div class="px-2 mb-3">
+                        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Finance</h3>
+                    </div>
+                    
+                    <a href="{{ route('finance.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 rounded-xl {{ request()->routeIs('finance.*') ? 'bg-blue-50 text-blue-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                            <i class="fas fa-chart-line text-white text-sm"></i>
+                        </div>
+                        <span>Finance Dashboard</span>
+                    </a>
+                    
+                    <a href="{{ route('finance.transactions') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-purple-50 hover:text-purple-600 rounded-xl {{ request()->routeIs('finance.transactions') ? 'bg-purple-50 text-purple-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                            <i class="fas fa-exchange-alt text-white text-sm"></i>
+                        </div>
+                        <span>Transactions</span>
+                    </a>
+                    
+                    <a href="{{ route('member-payments.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-green-50 hover:text-green-600 rounded-xl {{ request()->routeIs('member-payments.*') ? 'bg-green-50 text-green-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+                            <i class="fas fa-hand-holding-usd text-white text-sm"></i>
+                        </div>
+                        <span>Member Payments</span>
                     </a>
                 </div>
 
@@ -200,11 +242,18 @@
                         <span>Documents</span>
                     </a>
                     
-                    <a href="{{ route('settings.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-zinc-50 hover:text-zinc-600 rounded-xl {{ request()->routeIs('settings.*') ? 'bg-zinc-50 text-zinc-600 font-medium shadow-sm' : '' }}">
+                    <a href="{{ route('settings.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-zinc-50 hover:text-zinc-600 rounded-xl {{ request()->routeIs('settings.*') && !request()->routeIs('settings.gateways.*') ? 'bg-zinc-50 text-zinc-600 font-medium shadow-sm' : '' }}">
                         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-zinc-500 to-zinc-600 flex items-center justify-center">
                             <i class="fas fa-cog text-white text-sm"></i>
                         </div>
                         <span>Settings</span>
+                    </a>
+                    
+                    <a href="{{ route('settings.gateways.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-orange-50 hover:text-orange-600 rounded-xl {{ request()->routeIs('settings.gateways.*') ? 'bg-orange-50 text-orange-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+                            <i class="fas fa-plug text-white text-sm"></i>
+                        </div>
+                        <span>Gateway Settings</span>
                     </a>
                     
                     <a href="{{ route('activity-logs.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-stone-50 hover:text-stone-600 rounded-xl {{ request()->routeIs('activity-logs.*') ? 'bg-stone-50 text-stone-600 font-medium shadow-sm' : '' }}">

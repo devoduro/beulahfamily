@@ -121,6 +121,41 @@
         </div>
     </div>
 
+    <!-- Birthday and Payment Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Birthday Statistics -->
+        <div class="card-hover bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 mb-1">No. of Birthdays</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $churchStats['total_birthdays'] ?? 0 }}</p>
+                    <div class="flex items-center mt-2">
+                        <span class="text-xs text-pink-600 font-medium">{{ $churchStats['birthdays_this_month'] ?? 0 }} this month</span>
+                    </div>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-birthday-cake text-white text-lg"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Statistics -->
+        <div class="card-hover bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 mb-1">No. of Payments</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $churchStats['total_payments'] ?? 0 }}</p>
+                    <div class="flex items-center mt-2">
+                        <span class="text-xs text-indigo-600 font-medium">{{ $churchStats['payments_this_month'] ?? 0 }} this month</span>
+                    </div>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-credit-card text-white text-lg"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Recent Church Activities -->

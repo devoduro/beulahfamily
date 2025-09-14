@@ -57,24 +57,123 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 // Donation routes
-Route::get('/donations', [DonationController::class, 'index'])->name('donations.index');
-Route::get('/donations/create', [DonationController::class, 'create'])->name('donations.create');
-Route::post('/donations/initialize', [DonationController::class, 'initialize'])->name('donations.initialize');
-Route::get('/donations/verify', [DonationController::class, 'verify'])->name('donations.verify');
-Route::get('/donations/success/{donation}', [DonationController::class, 'success'])->name('donations.success');
-Route::get('/donations/stats', [DonationController::class, 'stats'])->name('donations.stats');
-Route::get('/donations/export', [DonationController::class, 'export'])->name('donations.export');
-Route::get('/donations/top-donors', [DonationController::class, 'topDonors'])->name('donations.top-donors');
+Route::get('/donations', [\App\Http\Controllers\DonationController::class, 'index'])->name('donations.index');
+Route::get('/donations/create', [\App\Http\Controllers\DonationController::class, 'create'])->name('donations.create');
+Route::post('/donations/initialize', [\App\Http\Controllers\DonationController::class, 'initialize'])->name('donations.initialize');
+Route::get('/donations/verify', [\App\Http\Controllers\DonationController::class, 'verify'])->name('donations.verify');
+Route::get('/donations/success/{donation}', [\App\Http\Controllers\DonationController::class, 'success'])->name('donations.success');
+Route::get('/donations/stats', [\App\Http\Controllers\DonationController::class, 'stats'])->name('donations.stats');
+Route::get('/donations/export', [\App\Http\Controllers\DonationController::class, 'export'])->name('donations.export');
+Route::get('/donations/top-donors', [\App\Http\Controllers\DonationController::class, 'topDonors'])->name('donations.top-donors');
 
 // SMS routes
-Route::get('/sms', [App\Http\Controllers\SmsController::class, 'index'])->name('sms.index');
-Route::get('/sms/create', [App\Http\Controllers\SmsController::class, 'create'])->name('sms.create');
-Route::post('/sms', [App\Http\Controllers\SmsController::class, 'store'])->name('sms.store');
-Route::get('/sms/{id}', [App\Http\Controllers\SmsController::class, 'show'])->name('sms.show');
-Route::post('/sms/{id}/cancel', [App\Http\Controllers\SmsController::class, 'cancel'])->name('sms.cancel');
-Route::get('/sms/{id}/delivery-report', [App\Http\Controllers\SmsController::class, 'deliveryReport'])->name('sms.delivery-report');
-Route::get('/sms/stats', [App\Http\Controllers\SmsController::class, 'stats'])->name('sms.stats');
-Route::post('/sms/process-scheduled', [App\Http\Controllers\SmsController::class, 'processScheduled'])->name('sms.process-scheduled');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/sms', [App\Http\Controllers\SmsController::class, 'index'])->name('sms.index');
+    Route::get('/sms/create', [App\Http\Controllers\SmsController::class, 'create'])->name('sms.create');
+    Route::post('/sms', [App\Http\Controllers\SmsController::class, 'store'])->name('sms.store');
+    Route::get('/sms/{id}', [App\Http\Controllers\SmsController::class, 'show'])->name('sms.show');
+    Route::post('/sms/{id}/cancel', [App\Http\Controllers\SmsController::class, 'cancel'])->name('sms.cancel');
+    Route::get('/sms/{id}/delivery-report', [App\Http\Controllers\SmsController::class, 'deliveryReport'])->name('sms.delivery-report');
+    Route::get('/sms/stats', [App\Http\Controllers\SmsController::class, 'stats'])->name('sms.stats');
+    Route::post('/sms/process-scheduled', [App\Http\Controllers\SmsController::class, 'processScheduled'])->name('sms.process-scheduled');
+});
+
+// SMS Templates routes (Alternative path)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/message-templates', [App\Http\Controllers\SmsTemplateController::class, 'index'])->name('message.templates.index');
+    Route::get('/message-templates/create', [App\Http\Controllers\SmsTemplateController::class, 'create'])->name('message.templates.create');
+    Route::post('/message-templates', [App\Http\Controllers\SmsTemplateController::class, 'store'])->name('message.templates.store');
+    Route::get('/message-templates/{template}', [App\Http\Controllers\SmsTemplateController::class, 'show'])->name('message.templates.show');
+    Route::get('/message-templates/{template}/edit', [App\Http\Controllers\SmsTemplateController::class, 'edit'])->name('message.templates.edit');
+    Route::put('/message-templates/{template}', [App\Http\Controllers\SmsTemplateController::class, 'update'])->name('message.templates.update');
+    Route::delete('/message-templates/{template}', [App\Http\Controllers\SmsTemplateController::class, 'destroy'])->name('message.templates.destroy');
+    Route::post('/message-templates/{template}/toggle-status', [App\Http\Controllers\SmsTemplateController::class, 'toggleStatus'])->name('message.templates.toggle-status');
+    Route::post('/message-templates/{template}/duplicate', [App\Http\Controllers\SmsTemplateController::class, 'duplicate'])->name('message.templates.duplicate');
+    Route::post('/message-templates/{template}/preview', [App\Http\Controllers\SmsTemplateController::class, 'preview'])->name('message.templates.preview');
+});
+
+// SMS Templates routes (Original path - keep for backward compatibility)
+Route::prefix('sms/templates')->middleware(['auth'])->group(function () {
+    Route::get('/', [App\Http\Controllers\SmsTemplateController::class, 'index'])->name('sms.templates.index');
+    Route::get('/create', [App\Http\Controllers\SmsTemplateController::class, 'create'])->name('sms.templates.create');
+    Route::post('/', [App\Http\Controllers\SmsTemplateController::class, 'store'])->name('sms.templates.store');
+    Route::get('/{template}', [App\Http\Controllers\SmsTemplateController::class, 'show'])->name('sms.templates.show');
+    Route::get('/{template}/edit', [App\Http\Controllers\SmsTemplateController::class, 'edit'])->name('sms.templates.edit');
+    Route::put('/{template}', [App\Http\Controllers\SmsTemplateController::class, 'update'])->name('sms.templates.update');
+    Route::delete('/{template}', [App\Http\Controllers\SmsTemplateController::class, 'destroy'])->name('sms.templates.destroy');
+    Route::post('/{template}/toggle-status', [App\Http\Controllers\SmsTemplateController::class, 'toggleStatus'])->name('sms.templates.toggle-status');
+    Route::post('/{template}/duplicate', [App\Http\Controllers\SmsTemplateController::class, 'duplicate'])->name('sms.templates.duplicate');
+    Route::post('/{template}/preview', [App\Http\Controllers\SmsTemplateController::class, 'preview'])->name('sms.templates.preview');
+});
+
+// SMS Credits routes (Alternative path)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/message-credits', [App\Http\Controllers\SmsCreditController::class, 'index'])->name('message.credits.index');
+    Route::get('/message-credits/purchase', [App\Http\Controllers\SmsCreditController::class, 'purchase'])->name('message.credits.purchase');
+    Route::post('/message-credits/initialize', [App\Http\Controllers\SmsCreditController::class, 'initialize'])->name('message.credits.initialize');
+    Route::get('/message-credits/verify', [App\Http\Controllers\SmsCreditController::class, 'verify'])->name('message.credits.verify');
+    Route::get('/message-credits/transactions', [App\Http\Controllers\SmsCreditController::class, 'transactions'])->name('message.credits.transactions');
+    Route::get('/message-credits/balance', [App\Http\Controllers\SmsCreditController::class, 'balance'])->name('message.credits.balance');
+    Route::post('/message-credits/add-credits', [App\Http\Controllers\SmsCreditController::class, 'addCredits'])->middleware(['admin'])->name('message.credits.add');
+});
+
+// SMS Credits routes (Original path - keep for backward compatibility)
+Route::prefix('sms/credits')->middleware(['auth'])->group(function () {
+    Route::get('/', [App\Http\Controllers\SmsCreditController::class, 'index'])->name('sms.credits.index');
+    Route::get('/purchase', [App\Http\Controllers\SmsCreditController::class, 'purchase'])->name('sms.credits.purchase');
+    Route::post('/initialize', [App\Http\Controllers\SmsCreditController::class, 'initialize'])->name('sms.credits.initialize');
+    Route::get('/verify', [App\Http\Controllers\SmsCreditController::class, 'verify'])->name('sms.credits.verify');
+    Route::get('/transactions', [App\Http\Controllers\SmsCreditController::class, 'transactions'])->name('sms.credits.transactions');
+    Route::get('/balance', [App\Http\Controllers\SmsCreditController::class, 'balance'])->name('sms.credits.balance');
+    Route::post('/add-credits', [App\Http\Controllers\SmsCreditController::class, 'addCredits'])->middleware(['admin'])->name('sms.credits.add');
+});
+
+// Finance Management Routes
+Route::prefix('finance')->name('finance.')->middleware(['auth'])->group(function () {
+    Route::get('/', [App\Http\Controllers\FinanceController::class, 'index'])->name('index');
+    Route::get('/transactions', [App\Http\Controllers\FinanceController::class, 'transactions'])->name('transactions');
+    Route::get('/create', [App\Http\Controllers\FinanceController::class, 'create'])->name('create');
+    Route::post('/store', [App\Http\Controllers\FinanceController::class, 'store'])->name('store');
+    Route::get('/{transaction}', [App\Http\Controllers\FinanceController::class, 'show'])->name('show');
+    Route::post('/{transaction}/approve', [App\Http\Controllers\FinanceController::class, 'approve'])->name('approve');
+    Route::post('/{transaction}/reject', [App\Http\Controllers\FinanceController::class, 'reject'])->name('reject');
+    
+    // Finance Categories Routes
+    Route::prefix('categories')->name('categories.')->group(function () {
+        Route::get('/', [App\Http\Controllers\FinanceCategoryController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\FinanceCategoryController::class, 'create'])->name('create');
+        Route::post('/store', [App\Http\Controllers\FinanceCategoryController::class, 'store'])->name('store');
+        Route::get('/{category}', [App\Http\Controllers\FinanceCategoryController::class, 'show'])->name('show');
+        Route::get('/{category}/edit', [App\Http\Controllers\FinanceCategoryController::class, 'edit'])->name('edit');
+        Route::put('/{category}', [App\Http\Controllers\FinanceCategoryController::class, 'update'])->name('update');
+        Route::delete('/{category}', [App\Http\Controllers\FinanceCategoryController::class, 'destroy'])->name('destroy');
+        Route::patch('/{category}/toggle', [App\Http\Controllers\FinanceCategoryController::class, 'toggle'])->name('toggle');
+    });
+});
+
+// Member Payments Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/member-payments', [App\Http\Controllers\MemberPaymentController::class, 'index'])->name('member-payments.index');
+    Route::get('/member-payments/create', [App\Http\Controllers\MemberPaymentController::class, 'create'])->name('member-payments.create');
+    Route::post('/member-payments', [App\Http\Controllers\MemberPaymentController::class, 'store'])->name('member-payments.store');
+    Route::get('/member-payments/{payment}', [App\Http\Controllers\MemberPaymentController::class, 'show'])->name('member-payments.show');
+    Route::get('/member-payments/{payment}/edit', [App\Http\Controllers\MemberPaymentController::class, 'edit'])->name('member-payments.edit');
+    Route::put('/member-payments/{payment}', [App\Http\Controllers\MemberPaymentController::class, 'update'])->name('member-payments.update');
+    Route::delete('/member-payments/{payment}', [App\Http\Controllers\MemberPaymentController::class, 'destroy'])->name('member-payments.destroy');
+    Route::post('/member-payments/{payment}/resend-sms', [App\Http\Controllers\MemberPaymentController::class, 'resendSms'])->name('member-payments.resend-sms');
+    Route::get('/member-payments-export', [App\Http\Controllers\MemberPaymentController::class, 'export'])->name('member-payments.export');
+});
+
+// Gateway Settings Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/settings/gateways', [App\Http\Controllers\GatewaySettingController::class, 'index'])->name('settings.gateways.index');
+    Route::get('/settings/gateways/create', [App\Http\Controllers\GatewaySettingController::class, 'create'])->name('settings.gateways.create');
+    Route::post('/settings/gateways', [App\Http\Controllers\GatewaySettingController::class, 'store'])->name('settings.gateways.store');
+    Route::get('/settings/gateways/{gateway}/edit', [App\Http\Controllers\GatewaySettingController::class, 'edit'])->name('settings.gateways.edit');
+    Route::put('/settings/gateways/{gateway}', [App\Http\Controllers\GatewaySettingController::class, 'update'])->name('settings.gateways.update');
+    Route::delete('/settings/gateways/{gateway}', [App\Http\Controllers\GatewaySettingController::class, 'destroy'])->name('settings.gateways.destroy');
+    Route::post('/settings/gateways/{gateway}/toggle', [App\Http\Controllers\GatewaySettingController::class, 'toggle'])->name('settings.gateways.toggle');
+});
 
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
@@ -162,6 +261,8 @@ Route::middleware(['auth'])->group(function () {
         // Donations Management (Admin Only)
         Route::resource('donations', \App\Http\Controllers\DonationController::class);
         Route::post('/donations/{donation}/send-receipt', [\App\Http\Controllers\DonationController::class, 'sendReceipt'])->name('donations.send-receipt');
+        Route::post('/donations/{donation}/generate-receipt', [\App\Http\Controllers\DonationController::class, 'generateReceipt'])->name('donations.generate-receipt');
+        Route::get('/donations/{donation}/receipt/download', [\App\Http\Controllers\DonationController::class, 'downloadReceipt'])->name('donations.receipt.download');
         
         // Announcements Management (Admin Only)
         Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->except(['index', 'show']);
