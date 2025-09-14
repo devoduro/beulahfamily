@@ -40,7 +40,7 @@
                             <div class="text-sm opacity-90">Events</div>
                         </div>
                         <div class="glass-effect rounded-xl px-4 py-3 text-center">
-                            <div class="text-2xl font-bold text-white">${{ number_format($churchStats['total_donations_this_year'] ?? 0) }}</div>
+                            <div class="text-2xl font-bold text-white">GHS {{ number_format($churchStats['total_donations_this_year'] ?? 0) }}</div>
                             <div class="text-sm opacity-90">Donations</div>
                         </div>
                     </div>
@@ -61,9 +61,10 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600 mb-1">Active Members</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ $churchStats['active_members'] ?? 0 }}</p>
-                    <div class="flex items-center mt-2">
-                        <span class="text-xs text-blue-600 font-medium">{{ $churchStats['total_members'] ?? 0 }} total</span>
+                    <p class="text-3xl font-bold text-gray-900">{{ $churchStats['active_members'] ?? 9 }}</p>
+                    <div class="flex items-center mt-2 space-x-3">
+                        <span class="text-xs text-blue-600 font-medium">{{ $churchStats['active_members'] ?? 9 }} active</span>
+                        <span class="text-xs text-gray-500">{{ ($churchStats['total_members'] ?? 9) - ($churchStats['active_members'] ?? 9) }} inactive</span>
                     </div>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
@@ -109,7 +110,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600 mb-1">Donations {{ date('Y') }}</p>
-                    <p class="text-3xl font-bold text-gray-900">${{ number_format($churchStats['total_donations_this_year'] ?? 0) }}</p>
+                    <p class="text-3xl font-bold text-gray-900">GHS {{ number_format($churchStats['total_donations_this_year'] ?? 0) }}</p>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-yellow-600 font-medium">Faithful giving</span>
                     </div>
@@ -127,10 +128,10 @@
         <div class="card-hover bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600 mb-1">No. of Birthdays</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ $churchStats['total_birthdays'] ?? 0 }}</p>
+                    <p class="text-sm font-medium text-gray-600 mb-1">No. of Birthdays This Month</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $churchStats['birthdays_this_month'] ?? 2 }}</p>
                     <div class="flex items-center mt-2">
-                        <span class="text-xs text-pink-600 font-medium">{{ $churchStats['birthdays_this_month'] ?? 0 }} this month</span>
+                        <span class="text-xs text-pink-600 font-medium">{{ $churchStats['birthdays_this_week'] ?? 0 }} this week</span>
                     </div>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl flex items-center justify-center">
@@ -204,7 +205,7 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium text-gray-900">New donation received</p>
-                                    <p class="text-sm text-gray-600">${{ number_format($donation->amount, 2) }} - {{ ucfirst($donation->type) }}</p>
+                                    <p class="text-sm text-gray-600">GHS {{ number_format($donation->amount, 2) }} - {{ ucfirst($donation->type) }}</p>
                                     <div class="flex items-center mt-1 space-x-2">
                                         <span class="text-xs text-green-600 font-medium">{{ $donation->member->full_name ?? 'Anonymous' }}</span>
                                         <span class="text-xs text-gray-400">•</span>

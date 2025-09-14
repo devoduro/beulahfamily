@@ -42,7 +42,7 @@
 
         <!-- Form -->
         <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100/50 p-8">
-            <form method="POST" action="{{ route('families.store') }}" class="space-y-8">
+            <form method="POST" action="{{ route('family.store') }}" class="space-y-8">
                 @csrf
 
                 <!-- Basic Information -->

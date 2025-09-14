@@ -142,7 +142,7 @@ Route::prefix('finance')->name('finance.')->middleware(['auth'])->group(function
     Route::prefix('categories')->name('categories.')->group(function () {
         Route::get('/', [App\Http\Controllers\FinanceCategoryController::class, 'index'])->name('index');
         Route::get('/create', [App\Http\Controllers\FinanceCategoryController::class, 'create'])->name('create');
-        Route::post('/store', [App\Http\Controllers\FinanceCategoryController::class, 'store'])->name('store');
+        Route::post('/', [App\Http\Controllers\FinanceCategoryController::class, 'store'])->name('store');
         Route::get('/{category}', [App\Http\Controllers\FinanceCategoryController::class, 'show'])->name('show');
         Route::get('/{category}/edit', [App\Http\Controllers\FinanceCategoryController::class, 'edit'])->name('edit');
         Route::put('/{category}', [App\Http\Controllers\FinanceCategoryController::class, 'update'])->name('update');
@@ -164,15 +164,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/member-payments-export', [App\Http\Controllers\MemberPaymentController::class, 'export'])->name('member-payments.export');
 });
 
-// Gateway Settings Routes
+// System Configuration Routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/settings/gateways', [App\Http\Controllers\GatewaySettingController::class, 'index'])->name('settings.gateways.index');
-    Route::get('/settings/gateways/create', [App\Http\Controllers\GatewaySettingController::class, 'create'])->name('settings.gateways.create');
-    Route::post('/settings/gateways', [App\Http\Controllers\GatewaySettingController::class, 'store'])->name('settings.gateways.store');
-    Route::get('/settings/gateways/{gateway}/edit', [App\Http\Controllers\GatewaySettingController::class, 'edit'])->name('settings.gateways.edit');
-    Route::put('/settings/gateways/{gateway}', [App\Http\Controllers\GatewaySettingController::class, 'update'])->name('settings.gateways.update');
-    Route::delete('/settings/gateways/{gateway}', [App\Http\Controllers\GatewaySettingController::class, 'destroy'])->name('settings.gateways.destroy');
-    Route::post('/settings/gateways/{gateway}/toggle', [App\Http\Controllers\GatewaySettingController::class, 'toggle'])->name('settings.gateways.toggle');
+    Route::get('/system-config', [App\Http\Controllers\GatewaySettingController::class, 'index'])->name('system.config.index');
+    Route::put('/system-config/{gateway}', [App\Http\Controllers\GatewaySettingController::class, 'update'])->name('system.config.update');
+    Route::post('/system-config/{gateway}/test', [App\Http\Controllers\GatewaySettingController::class, 'test'])->name('system.config.test');
 });
 
 // Protected Routes
@@ -250,6 +246,16 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('families', \App\Http\Controllers\FamilyController::class)->except(['index', 'show']);
         Route::post('families/bulk-action', [\App\Http\Controllers\FamilyController::class, 'bulkAction'])->name('families.bulk-action');
         Route::get('families/export', [\App\Http\Controllers\FamilyController::class, 'export'])->name('families.export');
+        
+        // Alternative family creation route
+        Route::get('family/new', [\App\Http\Controllers\FamilyController::class, 'create'])->name('family.new');
+        Route::post('family/new', [\App\Http\Controllers\FamilyController::class, 'store'])->name('family.store');
+        
+        // Family member management API routes
+        Route::get('/api/families/{family}/members', [\App\Http\Controllers\FamilyController::class, 'getFamilyMembers']);
+        Route::post('/api/families/{family}/members', [\App\Http\Controllers\FamilyController::class, 'addMemberToFamily']);
+        Route::delete('/api/families/{family}/members/{member}', [\App\Http\Controllers\FamilyController::class, 'removeMemberFromFamily']);
+        Route::get('/api/members/available', [\App\Http\Controllers\FamilyController::class, 'getAvailableMembers']);
         
         // Ministries Management (Admin Only)
         Route::resource('ministries', \App\Http\Controllers\MinistryController::class)->except(['index', 'show']);

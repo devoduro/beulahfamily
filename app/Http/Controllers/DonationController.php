@@ -411,6 +411,10 @@ class DonationController extends Controller
                 'amount' => $request->amount,
                 'reference' => $donation->paystack_reference,
                 'callback_url' => route('donations.verify'),
+                'donor_name' => $donorInfo['name'],
+                'donor_phone' => $donorInfo['phone'] ?? null,
+                'purpose' => $request->purpose,
+                'donation_type' => $request->donation_type,
                 'metadata' => [
                     'donation_id' => $donation->id,
                     'donor_name' => $donorInfo['name'],

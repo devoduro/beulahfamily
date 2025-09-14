@@ -87,7 +87,7 @@
                 </button>
             </div>
             <div class="flex items-center space-x-3">
-                <a href="{{ route('families.create') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white font-bold rounded-xl hover:from-emerald-700 hover:via-green-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                <a href="{{ route('family.new') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white font-bold rounded-xl hover:from-emerald-700 hover:via-green-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
                     <i class="fas fa-home mr-3"></i>
                     Add New Family
                 </a>
@@ -210,29 +210,59 @@
                             </div>
                         </div>
 
-                        <!-- Family Head Information -->
-                        @if($family->head)
-                        <div class="mb-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-100">
-                            <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                                <i class="fas fa-crown text-yellow-500 mr-2"></i>
-                                Family Head
-                            </h4>
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center overflow-hidden">
-                                    @if($family->head->photo_path)
-                                        <img src="{{ asset('storage/' . $family->head->photo_path) }}" alt="{{ $family->head->full_name }}" class="w-full h-full object-cover">
-                                    @else
-                                        <i class="fas fa-user text-white"></i>
+                        <!-- Family Members Section -->
+                        <div class="mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-sm font-semibold text-gray-700 flex items-center">
+                                    <i class="fas fa-users text-blue-500 mr-2"></i>
+                                    Family Members ({{ $family->members->count() }})
+                                </h4>
+                                <button onclick="openMemberModal({{ $family->id }})" class="text-xs bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition-colors">
+                                    <i class="fas fa-plus mr-1"></i>Manage
+                                </button>
+                            </div>
+                            
+                            @if($family->members->count() > 0)
+                                <div class="space-y-2 max-h-32 overflow-y-auto">
+                                    @foreach($family->members->take(3) as $member)
+                                        <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center overflow-hidden">
+                                                    @if($member->photo_path)
+                                                        <img src="{{ asset('storage/' . $member->photo_path) }}" alt="{{ $member->full_name }}" class="w-full h-full object-cover">
+                                                    @else
+                                                        <i class="fas fa-user text-white text-xs"></i>
+                                                    @endif
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs font-medium text-gray-900">{{ $member->full_name }}</p>
+                                                    @if($family->head_of_family_id == $member->id)
+                                                        <span class="text-xs text-yellow-600 flex items-center">
+                                                            <i class="fas fa-crown mr-1"></i>Head
+                                                        </span>
+                                                    @else
+                                                        <p class="text-xs text-gray-500">{{ $member->membership_type ?? 'Member' }}</p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            @if($family->head_of_family_id != $member->id)
+                                                <button onclick="removeMemberFromFamily({{ $family->id }}, {{ $member->id }})" class="text-red-500 hover:text-red-700 text-xs">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                    @if($family->members->count() > 3)
+                                        <p class="text-xs text-gray-500 text-center">+{{ $family->members->count() - 3 }} more members</p>
                                     @endif
                                 </div>
-                                <div class="flex-1">
-                                    <p class="font-semibold text-gray-900">{{ $family->head->full_name }}</p>
-                                    <p class="text-sm text-gray-600">{{ $family->head->email ?: 'No email' }}</p>
-                                    <p class="text-xs text-gray-500">{{ $family->head->phone ?: 'No phone' }}</p>
+                            @else
+                                <div class="text-center py-4 bg-gray-50 rounded-lg">
+                                    <i class="fas fa-users text-gray-400 text-lg mb-2"></i>
+                                    <p class="text-xs text-gray-500">No members assigned</p>
                                 </div>
-                            </div>
+                            @endif
                         </div>
-                        @endif
 
                         <!-- Contact Information -->
                         <div class="space-y-3 mb-6">
@@ -313,7 +343,7 @@
                             </div>
                             <h3 class="text-xl font-bold text-gray-900 mb-3">No families found</h3>
                             <p class="text-gray-600 mb-8 max-w-md mx-auto">Start building your church community by adding your first family. Track relationships, manage contact information, and strengthen connections.</p>
-                            <a href="{{ route('families.create') }}" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white font-bold rounded-2xl hover:from-emerald-700 hover:via-green-700 hover:to-teal-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105">
+                            <a href="{{ route('family.new') }}" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white font-bold rounded-2xl hover:from-emerald-700 hover:via-green-700 hover:to-teal-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105">
                                 <i class="fas fa-home mr-3"></i>
                                 Add First Family
                                 <div class="ml-2 w-2 h-2 bg-white/30 rounded-full animate-pulse"></div>
@@ -429,4 +459,259 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+<!-- Member Management Modal -->
+<div id="memberModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-slate-800">Manage Family Members</h3>
+                    <button onclick="closeMemberModal()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-times text-gray-600"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Current Members -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-users text-blue-500 mr-2"></i>
+                            Current Members
+                        </h4>
+                        <div id="currentMembers" class="space-y-3 max-h-96 overflow-y-auto">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Available Members -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-user-plus text-green-500 mr-2"></i>
+                            Add Members
+                        </h4>
+                        <div class="mb-4">
+                            <input type="text" id="memberSearch" placeholder="Search members..." 
+                                   class="w-full rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 py-3 px-4 text-slate-700">
+                        </div>
+                        <div id="availableMembers" class="space-y-3 max-h-80 overflow-y-auto">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+let currentFamilyId = null;
+let allMembers = [];
+
+// Open member management modal
+function openMemberModal(familyId) {
+    currentFamilyId = familyId;
+    document.getElementById('memberModal').classList.remove('hidden');
+    loadFamilyMembers(familyId);
+    loadAvailableMembers();
+}
+
+// Close member management modal
+function closeMemberModal() {
+    document.getElementById('memberModal').classList.add('hidden');
+    currentFamilyId = null;
+}
+
+// Load current family members
+async function loadFamilyMembers(familyId) {
+    try {
+        const response = await fetch(`/api/families/${familyId}/members`);
+        const members = await response.json();
+        
+        const container = document.getElementById('currentMembers');
+        container.innerHTML = '';
+        
+        if (members.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center py-8">No members in this family</p>';
+            return;
+        }
+        
+        members.forEach(member => {
+            const memberDiv = document.createElement('div');
+            memberDiv.className = 'flex items-center justify-between p-3 bg-blue-50 rounded-xl border border-blue-200';
+            memberDiv.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center overflow-hidden">
+                        ${member.photo_path ? 
+                            `<img src="/storage/${member.photo_path}" alt="${member.full_name}" class="w-full h-full object-cover">` :
+                            '<i class="fas fa-user text-white text-sm"></i>'
+                        }
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-900">${member.full_name}</p>
+                        <p class="text-sm text-gray-600">${member.email || 'No email'}</p>
+                        ${member.is_head ? '<span class="text-xs text-yellow-600 flex items-center"><i class="fas fa-crown mr-1"></i>Family Head</span>' : ''}
+                    </div>
+                </div>
+                ${!member.is_head ? `
+                    <button onclick="removeMemberFromFamily(${familyId}, ${member.id})" 
+                            class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                ` : ''}
+            `;
+            container.appendChild(memberDiv);
+        });
+    } catch (error) {
+        console.error('Error loading family members:', error);
+    }
+}
+
+// Load available members
+async function loadAvailableMembers() {
+    try {
+        const response = await fetch('/api/members/available');
+        allMembers = await response.json();
+        displayAvailableMembers(allMembers);
+    } catch (error) {
+        console.error('Error loading available members:', error);
+    }
+}
+
+// Display available members
+function displayAvailableMembers(members) {
+    const container = document.getElementById('availableMembers');
+    container.innerHTML = '';
+    
+    if (members.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-8">No available members</p>';
+        return;
+    }
+    
+    members.forEach(member => {
+        const memberDiv = document.createElement('div');
+        memberDiv.className = 'flex items-center justify-between p-3 bg-green-50 rounded-xl border border-green-200';
+        memberDiv.innerHTML = `
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center overflow-hidden">
+                    ${member.photo_path ? 
+                        `<img src="/storage/${member.photo_path}" alt="${member.full_name}" class="w-full h-full object-cover">` :
+                        '<i class="fas fa-user text-white text-sm"></i>'
+                    }
+                </div>
+                <div>
+                    <p class="font-medium text-gray-900">${member.full_name}</p>
+                    <p class="text-sm text-gray-600">${member.email || 'No email'}</p>
+                    <p class="text-xs text-gray-500">${member.membership_type || 'Member'}</p>
+                </div>
+            </div>
+            <button onclick="addMemberToFamily(${currentFamilyId}, ${member.id})" 
+                    class="text-green-600 hover:text-green-800 p-2 rounded-lg hover:bg-green-100 transition-colors">
+                <i class="fas fa-plus"></i>
+            </button>
+        `;
+        container.appendChild(memberDiv);
+    });
+}
+
+// Search members
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('memberSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const filteredMembers = allMembers.filter(member => 
+                member.full_name.toLowerCase().includes(searchTerm) ||
+                (member.email && member.email.toLowerCase().includes(searchTerm))
+            );
+            displayAvailableMembers(filteredMembers);
+        });
+    }
+});
+
+// Add member to family
+async function addMemberToFamily(familyId, memberId) {
+    try {
+        const response = await fetch(`/api/families/${familyId}/members`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ member_id: memberId })
+        });
+        
+        if (response.ok) {
+            loadFamilyMembers(familyId);
+            loadAvailableMembers();
+            showNotification('Member added to family successfully!', 'success');
+            // Refresh the page to update the family cards
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            const error = await response.json();
+            showNotification(error.message || 'Failed to add member to family', 'error');
+        }
+    } catch (error) {
+        console.error('Error adding member to family:', error);
+        showNotification('Error adding member to family', 'error');
+    }
+}
+
+// Remove member from family
+async function removeMemberFromFamily(familyId, memberId) {
+    if (!confirm('Are you sure you want to remove this member from the family?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/families/${familyId}/members/${memberId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        if (response.ok) {
+            loadFamilyMembers(familyId);
+            loadAvailableMembers();
+            showNotification('Member removed from family successfully!', 'success');
+            // Refresh the page to update the family cards
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            const error = await response.json();
+            showNotification(error.message || 'Failed to remove member from family', 'error');
+        }
+    } catch (error) {
+        console.error('Error removing member from family:', error);
+        showNotification('Error removing member from family', 'error');
+    }
+}
+
+// Show notification
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+    }`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check' : 'exclamation-triangle'} mr-2"></i>
+        ${message}
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Close modal when clicking outside
+document.getElementById('memberModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeMemberModal();
+    }
+});
+</script>
+@endpush
 @endsection

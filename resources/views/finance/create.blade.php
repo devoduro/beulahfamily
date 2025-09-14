@@ -346,7 +346,9 @@ document.getElementById('quickCategoryForm').addEventListener('submit', async fu
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             }
         });
         
@@ -374,10 +376,21 @@ document.getElementById('quickCategoryForm').addEventListener('submit', async fu
                 notification.remove();
             }, 3000);
         } else {
-            throw new Error('Failed to create category');
+            // Log the response for debugging
+            const responseText = await response.text();
+            console.error('Error response status:', response.status);
+            console.error('Error response text:', responseText);
+            
+            try {
+                const errorData = JSON.parse(responseText);
+                throw new Error(errorData.message || 'Failed to create category');
+            } catch (jsonError) {
+                throw new Error('Server returned invalid response. Check console for details.');
+            }
         }
     } catch (error) {
-        alert('Error creating category. Please try again.');
+        console.error('Category creation error:', error);
+        alert('Error creating category: ' + error.message);
     } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;

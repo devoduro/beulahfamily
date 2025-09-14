@@ -29,7 +29,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600 mb-1">This Month</p>
-                    <p class="text-2xl font-bold text-gray-900">${{ number_format(25450, 2) }}</p>
+                    <p class="text-2xl font-bold text-gray-900">GHS {{ number_format(25450, 2) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
                     <i class="fas fa-calendar text-white"></i>
@@ -40,7 +40,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600 mb-1">This Year</p>
-                    <p class="text-2xl font-bold text-gray-900">${{ number_format(185750, 2) }}</p>
+                    <p class="text-2xl font-bold text-gray-900">GHS {{ number_format(185750, 2) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
                     <i class="fas fa-chart-line text-white"></i>
@@ -62,7 +62,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600 mb-1">Average Gift</p>
-                    <p class="text-2xl font-bold text-gray-900">${{ number_format(125, 2) }}</p>
+                    <p class="text-2xl font-bold text-gray-900">GHS {{ number_format(125, 2) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center">
                     <i class="fas fa-hand-holding-heart text-white"></i>
@@ -157,7 +157,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">${{ number_format($donation->amount ?? 150, 2) }}</div>
+                                <div class="text-sm font-medium text-gray-900">GHS {{ number_format($donation->amount ?? 150, 2) }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">

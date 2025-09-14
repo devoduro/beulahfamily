@@ -73,7 +73,9 @@
                             
                             <div class="flex justify-between items-center py-2 border-b border-gray-100">
                                 <span class="text-gray-600">Date & Time</span>
-                                <span class="text-gray-900 font-medium">{{ $donation->confirmed_at->format('M d, Y \a\t g:i A') }}</span>
+                                <span class="text-gray-900 font-medium">
+                                    {{ $donation->confirmed_at ? $donation->confirmed_at->format('M d, Y \a\t g:i A') : $donation->donation_date->format('M d, Y') }}
+                                </span>
                             </div>
                         </div>
                     </div>

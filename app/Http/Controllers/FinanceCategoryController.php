@@ -35,40 +35,65 @@ class FinanceCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:finance_categories',
-            'type' => 'required|in:income,expense',
-            'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
-            'icon' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'sort_order' => 'nullable|integer|min:0',
-        ]);
-
-        $category = FinanceCategory::create([
-            'name' => $request->name,
-            'type' => $request->type,
-            'color' => $request->color,
-            'icon' => $request->icon,
-            'description' => $request->description,
-            'sort_order' => $request->sort_order ?? 0,
-            'is_active' => true,
-        ]);
-
-        // If this is an AJAX request (from modal), return JSON response
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Category created successfully.',
-                'id' => $category->id,
-                'name' => $category->name,
-                'type' => $category->type,
-                'color' => $category->color,
-                'icon' => $category->icon
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255|unique:finance_categories',
+                'type' => 'required|in:income,expense',
+                'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+                'icon' => 'required|string|max:255',
+                'description' => 'nullable|string|max:1000',
+                'sort_order' => 'nullable|integer|min:0',
             ]);
-        }
 
-        return redirect()->route('finance.categories.index')
-            ->with('success', 'Category created successfully.');
+            $category = FinanceCategory::create([
+                'name' => $request->name,
+                'type' => $request->type,
+                'color' => $request->color,
+                'icon' => $request->icon,
+                'description' => $request->description,
+                'sort_order' => $request->sort_order ?? 0,
+                'is_active' => true,
+            ]);
+
+            // If this is an AJAX request (from modal), return JSON response
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Category created successfully.',
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'type' => $category->type,
+                    'color' => $category->color,
+                    'icon' => $category->icon
+                ]);
+            }
+
+            return redirect()->route('finance.categories.index')
+                ->with('success', 'Category created successfully.');
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            \Log::error('Category creation failed: ' . $e->getMessage());
+            
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to create category: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->back()
+                ->with('error', 'Failed to create category. Please try again.')
+                ->withInput();
+        }
     }
 
     /**

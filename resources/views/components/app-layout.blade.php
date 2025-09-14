@@ -249,7 +249,7 @@
                         <span>Settings</span>
                     </a>
                     
-                    <a href="{{ route('settings.gateways.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-orange-50 hover:text-orange-600 rounded-xl {{ request()->routeIs('settings.gateways.*') ? 'bg-orange-50 text-orange-600 font-medium shadow-sm' : '' }}">
+                    <a href="{{ route('system.config.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-orange-50 hover:text-orange-600 rounded-xl {{ request()->routeIs('system.config.*') ? 'bg-orange-50 text-orange-600 font-medium shadow-sm' : '' }}">
                         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
                             <i class="fas fa-plug text-white text-sm"></i>
                         </div>
@@ -426,7 +426,7 @@
                 @else
                     <div class="py-2 mt-1">
                         <h1 class="text-2xl font-bold text-gray-800">@yield('title', 'Dashboard')</h1>
-                        <p class="text-sm text-gray-500">@yield('subtitle', 'Welcome to the Printer Management System')</p>
+                        <p class="text-sm text-gray-500">@yield('subtitle', 'Welcome to the Church Management System')</p>
                     </div>
                 @endif
                 
@@ -442,7 +442,7 @@
             <footer class="py-4 px-6 border-t border-gray-200">
                 <div class="flex flex-col md:flex-row justify-between items-center">
                     <p class="text-sm text-gray-500">
-                        &copy; {{ date('Y') }} Printer Management System. All rights reserved.
+                        &copy; {{ date('Y') }} Church Management System. All rights reserved.
                     </p>
                     <div class="mt-2 md:mt-0">
                         <a href="#" class="text-sm text-gray-500 hover:text-primary-600 mr-4">Privacy Policy</a>

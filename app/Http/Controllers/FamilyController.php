@@ -230,6 +230,100 @@ class FamilyController extends Controller
     }
 
     /**
+     * Get family members for API
+     */
+    public function getFamilyMembers(Family $family)
+    {
+        $members = $family->members()->with(['family'])->get()->map(function ($member) use ($family) {
+            return [
+                'id' => $member->id,
+                'full_name' => $member->full_name,
+                'email' => $member->email,
+                'phone' => $member->phone,
+                'photo_path' => $member->photo_path,
+                'membership_type' => $member->membership_type,
+                'is_head' => $family->head_of_family_id == $member->id
+            ];
+        });
+
+        return response()->json($members);
+    }
+
+    /**
+     * Add member to family
+     */
+    public function addMemberToFamily(Request $request, Family $family)
+    {
+        $request->validate([
+            'member_id' => 'required|exists:members,id'
+        ]);
+
+        $member = Member::findOrFail($request->member_id);
+
+        // Check if member is already in another family
+        if ($member->family_id && $member->family_id != $family->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Member is already assigned to another family.'
+            ], 400);
+        }
+
+        // Add member to family
+        $member->update(['family_id' => $family->id]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Member added to family successfully.'
+        ]);
+    }
+
+    /**
+     * Remove member from family
+     */
+    public function removeMemberFromFamily(Family $family, Member $member)
+    {
+        // Check if member is the family head
+        if ($family->head_of_family_id == $member->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot remove family head. Please assign a new head first.'
+            ], 400);
+        }
+
+        // Remove member from family
+        $member->update(['family_id' => null]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Member removed from family successfully.'
+        ]);
+    }
+
+    /**
+     * Get available members (not assigned to any family)
+     */
+    public function getAvailableMembers()
+    {
+        $members = Member::whereNull('family_id')
+            ->orWhere('family_id', 0)
+            ->active()
+            ->orderBy('first_name')
+            ->get()
+            ->map(function ($member) {
+                return [
+                    'id' => $member->id,
+                    'full_name' => $member->full_name,
+                    'email' => $member->email,
+                    'phone' => $member->phone,
+                    'photo_path' => $member->photo_path,
+                    'membership_type' => $member->membership_type
+                ];
+            });
+
+        return response()->json($members);
+    }
+
+    /**
      * Export families to CSV
      */
     public function export(Request $request)

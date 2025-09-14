@@ -1,7 +1,7 @@
 @extends('components.app-layout')
 
 @section('title', 'System Settings')
-@section('subtitle', 'Configure and monitor your printer management system')
+@section('subtitle', 'Configure and monitor your Church management system')
 
 @section('content')
 <div class="space-y-8">
@@ -12,7 +12,7 @@
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center">
                 <div class="text-white">
                     <h1 class="text-4xl font-bold mb-3">System Settings</h1>
-                    <p class="text-xl opacity-90 mb-6">Configure and monitor your printer management system</p>
+                    <p class="text-xl opacity-90 mb-6">Configure and monitor your Church management system</p>
                     <div class="flex flex-wrap gap-4">
                         <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-4 py-2">
                             <div class="text-2xl font-bold">{{ $systemStats['total_users'] }}</div>
