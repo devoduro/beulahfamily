@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
-class Member extends Model
+class Member extends Authenticatable
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, Notifiable;
 
     protected $fillable = [
         'member_id',
@@ -51,7 +54,14 @@ class Member extends Model
         'interests',
         'receive_newsletter',
         'receive_sms',
-        'is_active'
+        'is_active',
+        'password',
+        'remember_token'
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
     ];
 
     protected $casts = [
@@ -65,7 +75,8 @@ class Member extends Model
         'is_confirmed' => 'boolean',
         'receive_newsletter' => 'boolean',
         'receive_sms' => 'boolean',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'password' => 'hashed'
     ];
 
     // Relationships

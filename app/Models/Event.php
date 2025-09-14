@@ -68,7 +68,12 @@ class Event extends Model
 
     public function attendances()
     {
-        return $this->hasMany(EventAttendance::class);
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function qrCodes()
+    {
+        return $this->hasMany(EventQrCode::class);
     }
 
     public function attendees()

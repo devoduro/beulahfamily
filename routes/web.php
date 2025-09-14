@@ -171,6 +171,29 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/system-config/{gateway}/test', [App\Http\Controllers\GatewaySettingController::class, 'test'])->name('system.config.test');
 });
 
+// Attendance Routes
+Route::prefix('attendance')->name('attendance.')->middleware(['auth'])->group(function () {
+    Route::get('/', [App\Http\Controllers\AttendanceController::class, 'index'])->name('index');
+    Route::get('/statistics', [App\Http\Controllers\AttendanceController::class, 'statistics'])->name('statistics');
+    Route::get('/export', [App\Http\Controllers\AttendanceController::class, 'export'])->name('export');
+    
+    // Event-specific attendance routes
+    Route::get('/event/{event}', [App\Http\Controllers\AttendanceController::class, 'show'])->name('show');
+    Route::post('/event/{event}/manual', [App\Http\Controllers\AttendanceController::class, 'manualEntry'])->name('manual-entry');
+    
+    // QR Code routes
+    Route::get('/event/{event}/qr', [App\Http\Controllers\AttendanceController::class, 'showQr'])->name('qr.show');
+    Route::post('/event/{event}/qr/generate', [App\Http\Controllers\AttendanceController::class, 'generateQr'])->name('qr.generate');
+    Route::post('/qr/{qrCode}/deactivate', [App\Http\Controllers\AttendanceController::class, 'deactivateQr'])->name('qr.deactivate');
+    
+    // Attendance marking routes
+    Route::post('/checkout/{attendance}', [App\Http\Controllers\AttendanceController::class, 'checkOut'])->name('checkout');
+});
+
+// Public attendance scanning routes (no auth required)
+Route::get('/scan/{token}', [App\Http\Controllers\AttendanceController::class, 'scan'])->name('attendance.scan');
+Route::post('/mark-attendance', [App\Http\Controllers\AttendanceController::class, 'markAttendance'])->name('attendance.mark');
+
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
     // Password Change Routes

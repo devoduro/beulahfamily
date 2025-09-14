@@ -222,6 +222,20 @@
                     </a>
                 </div>
 
+                <!-- Attendance Section -->
+                <div class="mb-6">
+                    <div class="px-2 mb-3">
+                        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Attendance</h3>
+                    </div>
+                    
+                    <a href="{{ route('attendance.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-cyan-50 hover:text-cyan-600 rounded-xl {{ request()->routeIs('attendance.*') ? 'bg-cyan-50 text-cyan-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                            <i class="fas fa-qrcode text-white text-sm"></i>
+                        </div>
+                        <span>QR Attendance</span>
+                    </a>
+                </div>
+
                 <!-- System Management Section -->
                 <div class="mb-6">
                     <div class="px-2 mb-3">
