@@ -36,6 +36,7 @@ return new class extends Migration
             $table->datetime('receipt_sent_at')->nullable();
             $table->enum('status', ['pending', 'confirmed', 'cancelled', 'refunded'])->default('confirmed');
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index(['donation_date', 'donation_type']);
             $table->index('member_id');

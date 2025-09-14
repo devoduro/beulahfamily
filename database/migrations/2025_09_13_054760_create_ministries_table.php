@@ -25,9 +25,10 @@ return new class extends Migration
             $table->enum('target_gender', ['all', 'male', 'female'])->default('all');
             $table->text('requirements')->nullable();
             $table->text('goals')->nullable();
-            $table->decimal('budget', 10, 2)->nullable();
+            $table->decimal('budget', 15, 2)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index('name');
             $table->index('ministry_type');

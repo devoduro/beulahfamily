@@ -1,5 +1,13 @@
 <?php
 
+// MEMBER CREATE, EDIT, UPDATE AND STORE ROUTES
+Route::get('/add-member', [\App\Http\Controllers\MemberController::class, 'create'])->middleware(['auth', 'admin'])->name('members.create');
+Route::post('/add-member', [\App\Http\Controllers\MemberController::class, 'store'])->middleware(['auth', 'admin'])->name('members.store');
+Route::get('/members/{member}/edit', [\App\Http\Controllers\MemberController::class, 'edit'])->middleware(['auth', 'admin'])->name('members.edit');
+Route::put('/members/{member}', [\App\Http\Controllers\MemberController::class, 'update'])->middleware(['auth', 'admin'])->name('members.update');
+Route::get('/members/{member}', [\App\Http\Controllers\MemberController::class, 'show'])->name('members.show');
+
+
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentCategoryController;
 use App\Http\Controllers\DocumentController;
@@ -7,6 +15,8 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ActivityLogController;
 use Illuminate\Support\Facades\Route;
+
+
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
@@ -20,7 +30,7 @@ Route::middleware('guest')->group(function () {
     Route::get('password/reset', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
     Route::post('password/email', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
     Route::get('password/reset/{token}', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-    Route::post('password/reset', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
+    Route::post('password/reset', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.reset.update');
 });
 
 Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
@@ -46,6 +56,26 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 });
 
+// Donation routes
+Route::get('/donations', [DonationController::class, 'index'])->name('donations.index');
+Route::get('/donations/create', [DonationController::class, 'create'])->name('donations.create');
+Route::post('/donations/initialize', [DonationController::class, 'initialize'])->name('donations.initialize');
+Route::get('/donations/verify', [DonationController::class, 'verify'])->name('donations.verify');
+Route::get('/donations/success/{donation}', [DonationController::class, 'success'])->name('donations.success');
+Route::get('/donations/stats', [DonationController::class, 'stats'])->name('donations.stats');
+Route::get('/donations/export', [DonationController::class, 'export'])->name('donations.export');
+Route::get('/donations/top-donors', [DonationController::class, 'topDonors'])->name('donations.top-donors');
+
+// SMS routes
+Route::get('/sms', [App\Http\Controllers\SmsController::class, 'index'])->name('sms.index');
+Route::get('/sms/create', [App\Http\Controllers\SmsController::class, 'create'])->name('sms.create');
+Route::post('/sms', [App\Http\Controllers\SmsController::class, 'store'])->name('sms.store');
+Route::get('/sms/{id}', [App\Http\Controllers\SmsController::class, 'show'])->name('sms.show');
+Route::post('/sms/{id}/cancel', [App\Http\Controllers\SmsController::class, 'cancel'])->name('sms.cancel');
+Route::get('/sms/{id}/delivery-report', [App\Http\Controllers\SmsController::class, 'deliveryReport'])->name('sms.delivery-report');
+Route::get('/sms/stats', [App\Http\Controllers\SmsController::class, 'stats'])->name('sms.stats');
+Route::post('/sms/process-scheduled', [App\Http\Controllers\SmsController::class, 'processScheduled'])->name('sms.process-scheduled');
+
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
     // Password Change Routes
@@ -62,7 +92,6 @@ Route::middleware(['auth'])->group(function () {
     
     // Members - View access for all users
     Route::get('/members', [\App\Http\Controllers\MemberController::class, 'index'])->name('members.index');
-    Route::get('/members/{member}', [\App\Http\Controllers\MemberController::class, 'show'])->name('members.show');
     Route::get('/members/statistics', [\App\Http\Controllers\MemberController::class, 'statistics'])->name('members.statistics');
     
     // Events - View and register access for all users
@@ -101,9 +130,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/members/statistics', [\App\Http\Controllers\MemberController::class, 'statistics'])->name('api.members.statistics');
     });
     
-    
+    // Old problematic route - removed
 
-    
     // Admin Only Routes
     Route::middleware(['auth', 'admin'])->group(function () {
         // User Management
@@ -114,17 +142,15 @@ Route::middleware(['auth'])->group(function () {
 
         // Church Management - Admin Only Routes
         
-        // Members Management (Admin Only)
-        Route::post('/members', [\App\Http\Controllers\MemberController::class, 'store'])->name('members.store');
-        Route::get('/members/create', [\App\Http\Controllers\MemberController::class, 'create'])->name('members.create');
-        Route::get('/members/{member}/edit', [\App\Http\Controllers\MemberController::class, 'edit'])->name('members.edit');
-        Route::put('/members/{member}', [\App\Http\Controllers\MemberController::class, 'update'])->name('members.update');
+        // Members Management (Admin Only) - Edit/Update routes moved to top level
         Route::delete('/members/{member}', [\App\Http\Controllers\MemberController::class, 'destroy'])->name('members.destroy');
         Route::get('/members/export', [\App\Http\Controllers\MemberController::class, 'export'])->name('members.export');
         Route::get('/members/{member}/id-card', [\App\Http\Controllers\MemberController::class, 'generateIdCard'])->name('members.id-card');
         
         // Families Management (Admin Only)
         Route::resource('families', \App\Http\Controllers\FamilyController::class)->except(['index', 'show']);
+        Route::post('families/bulk-action', [\App\Http\Controllers\FamilyController::class, 'bulkAction'])->name('families.bulk-action');
+        Route::get('families/export', [\App\Http\Controllers\FamilyController::class, 'export'])->name('families.export');
         
         // Ministries Management (Admin Only)
         Route::resource('ministries', \App\Http\Controllers\MinistryController::class)->except(['index', 'show']);

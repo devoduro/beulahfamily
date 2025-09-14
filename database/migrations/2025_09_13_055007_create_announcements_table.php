@@ -28,8 +28,10 @@ return new class extends Migration
             $table->string('image_path')->nullable();
             $table->string('attachment_path')->nullable();
             $table->enum('status', ['draft', 'published', 'expired', 'archived'])->default('draft');
+            $table->text('notes')->nullable();
             $table->integer('view_count')->default(0);
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index(['status', 'publish_date']);
             $table->index('type');

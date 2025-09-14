@@ -37,7 +37,8 @@ return new class extends Migration
             $table->foreignId('family_id')->nullable()->constrained()->onDelete('set null');
             $table->string('relationship_to_head')->nullable(); // head, spouse, child, other
             $table->text('emergency_contact_name')->nullable();
-            $table->string('emergency_contact_phone')->nullable();
+            $table->text('emergency_contact_relationship')->nullable();
+            $table->text('emergency_contact_phone')->nullable();
             $table->text('medical_conditions')->nullable();
             $table->text('special_needs')->nullable();
             $table->string('photo_path')->nullable();
@@ -52,6 +53,7 @@ return new class extends Migration
             $table->boolean('receive_sms')->default(true);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index(['first_name', 'last_name']);
             $table->index('membership_status');

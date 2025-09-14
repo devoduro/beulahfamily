@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Printer System') }}</title>
+    <title>{{ config('app.name', 'Beulah Family Church') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,17 +54,32 @@
         [x-cloak] { display: none !important; }
         
         .gradient-bg {
-            background: linear-gradient(135deg, #0c9b13 0%, #0a6107 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .church-gradient {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
         }
         
         .gradient-text {
-            background: linear-gradient(135deg, #0c9c24 0%, #064b07 100%);
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
-        .gradient-border {
-            border-image: linear-gradient(135deg, #41a10d 0%, #1f9330 100%) 1;
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
     </style>
     
@@ -80,89 +95,140 @@
         >
             <!-- Logo -->
             <div class="flex items-center justify-center h-16 px-6 border-b border-gray-200">
-                <h1 class="text-xl font-bold gradient-text">Printer System</h1>
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 church-gradient rounded-lg flex items-center justify-center">
+                        <i class="fas fa-church text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold gradient-text">Beulah Family</h1>
+                        <p class="text-xs text-gray-500">Church Management</p>
+                    </div>
+                </div>
             </div>
             
             <!-- Navigation -->
-            <nav class="p-4 space-y-1">
+            <nav class="p-4 space-y-2">
                 
                 @if(auth()->user()->role === 'admin')
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-primary-50 hover:text-primary-600 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-primary-50 text-primary-600 font-medium' : '' }}">
-                    <i class="fas fa-tachometer-alt w-5"></i>
-                    <span>Dashboard</span>
-                </a>
-                @endif
-                  
-                
-                @if(auth()->user()->role === 'admin')
-                <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-primary-50 hover:text-primary-600 rounded-lg {{ request()->routeIs('users.*') && !request()->routeIs('users.portal*') ? 'bg-primary-50 text-primary-600 font-medium' : '' }}">
-                    <i class="fas fa-users-cog w-5"></i>
-                    <span>User Management</span>
-                </a>
-                @endif
+                <!-- Church Management Section -->
+                <div class="mb-6">
+                    <div class="px-2 mb-3">
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Church Management</h3>
+                    </div>
+                    
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl {{ request()->routeIs('dashboard') ? 'bg-indigo-50 text-indigo-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                            <i class="fas fa-tachometer-alt text-white text-sm"></i>
+                        </div>
+                        <span>Dashboard</span>
+                    </a>
+                    
+                    <a href="{{ route('members.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 rounded-xl {{ request()->routeIs('members.*') ? 'bg-blue-50 text-blue-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+                            <i class="fas fa-users text-white text-sm"></i>
+                        </div>
+                        <span>Members</span>
+                    </a>
+                    
+                    <a href="{{ route('families.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-green-50 hover:text-green-600 rounded-xl {{ request()->routeIs('families.*') ? 'bg-green-50 text-green-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+                            <i class="fas fa-home text-white text-sm"></i>
+                        </div>
+                        <span>Families</span>
+                    </a>
+                    
+                    <a href="{{ route('ministries.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-purple-50 hover:text-purple-600 rounded-xl {{ request()->routeIs('ministries.*') ? 'bg-purple-50 text-purple-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                            <i class="fas fa-hands-praying text-white text-sm"></i>
+                        </div>
+                        <span>Ministries</span>
+                    </a>
+                    
+                    <a href="{{ route('events.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-orange-50 hover:text-orange-600 rounded-xl {{ request()->routeIs('events.*') ? 'bg-orange-50 text-orange-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+                            <i class="fas fa-calendar-alt text-white text-sm"></i>
+                        </div>
+                        <span>Events</span>
+                    </a>
+                    
+                    <a href="{{ route('donations.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-yellow-50 hover:text-yellow-600 rounded-xl {{ request()->routeIs('donations.*') ? 'bg-yellow-50 text-yellow-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center">
+                            <i class="fas fa-hand-holding-heart text-white text-sm"></i>
+                        </div>
+                        <span>Donations</span>
+                    </a>
+                    
+                    <a href="{{ route('donations.create') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl {{ request()->routeIs('donations.create') ? 'bg-emerald-50 text-emerald-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center">
+                            <i class="fas fa-credit-card text-white text-sm"></i>
+                        </div>
+                        <span>Make Donation</span>
+                    </a>
+                    
+                    <a href="{{ route('announcements.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-teal-50 hover:text-teal-600 rounded-xl {{ request()->routeIs('announcements.*') ? 'bg-teal-50 text-teal-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center">
+                            <i class="fas fa-bullhorn text-white text-sm"></i>
+                        </div>
+                        <span>Announcements</span>
+                    </a>
+                    
+                    <a href="{{ route('sms.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-violet-50 hover:text-violet-600 rounded-xl {{ request()->routeIs('sms.*') ? 'bg-violet-50 text-violet-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                            <i class="fas fa-sms text-white text-sm"></i>
+                        </div>
+                        <span>Bulk SMS</span>
+                    </a>
+                </div>
 
-                @if(auth()->user()->role === 'admin')
-                <a href="{{ route('document-categories.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-primary-50 hover:text-primary-600 rounded-lg {{ request()->routeIs('document-categories.*') ? 'bg-primary-50 text-primary-600 font-medium' : '' }}">
-                    <i class="fas fa-folder w-5"></i>
-                    <span>Document Categories</span>
-                </a>
-                @endif
-
-                @if(auth()->user()->role === 'admin')
-                <a href="{{ route('documents.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-primary-50 hover:text-primary-600 rounded-lg {{ request()->routeIs('documents.*') ? 'bg-primary-50 text-primary-600 font-medium' : '' }}">
-                    <i class="fas fa-file-alt w-5"></i>
-                    <span>Documents</span>
-                </a>
+                <!-- System Management Section -->
+                <div class="mb-6">
+                    <div class="px-2 mb-3">
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">System Management</h3>
+                    </div>
+                    
+                    <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-gray-50 hover:text-gray-700 rounded-xl {{ request()->routeIs('users.*') && !request()->routeIs('users.portal*') ? 'bg-gray-50 text-gray-700 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-500 to-gray-600 flex items-center justify-center">
+                            <i class="fas fa-users-cog text-white text-sm"></i>
+                        </div>
+                        <span>User Management</span>
+                    </a>
+                    
+                    <a href="{{ route('documents.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-slate-50 hover:text-slate-600 rounded-xl {{ request()->routeIs('documents.*') ? 'bg-slate-50 text-slate-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center">
+                            <i class="fas fa-file-alt text-white text-sm"></i>
+                        </div>
+                        <span>Documents</span>
+                    </a>
+                    
+                    <a href="{{ route('settings.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-zinc-50 hover:text-zinc-600 rounded-xl {{ request()->routeIs('settings.*') ? 'bg-zinc-50 text-zinc-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-zinc-500 to-zinc-600 flex items-center justify-center">
+                            <i class="fas fa-cog text-white text-sm"></i>
+                        </div>
+                        <span>Settings</span>
+                    </a>
+                    
+                    <a href="{{ route('activity-logs.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-stone-50 hover:text-stone-600 rounded-xl {{ request()->routeIs('activity-logs.*') ? 'bg-stone-50 text-stone-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center">
+                            <i class="fas fa-history text-white text-sm"></i>
+                        </div>
+                        <span>Activity Logs</span>
+                    </a>
+                </div>
                 @else
-                <a href="{{ route('users.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-primary-50 hover:text-primary-600 rounded-lg {{ request()->routeIs('users.dashboard') ? 'bg-primary-50 text-primary-600 font-medium' : '' }}">
-                    <i class="fas fa-chart-bar w-5"></i>
+                <!-- Staff Navigation -->
+                <a href="{{ route('users.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl {{ request()->routeIs('users.dashboard') ? 'bg-indigo-50 text-indigo-600 font-medium shadow-sm' : '' }}">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-chart-bar text-white text-sm"></i>
+                    </div>
                     <span>My Dashboard</span>
                 </a>
 
-                <a href="{{ route('users.portal') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-primary-50 hover:text-primary-600 rounded-lg {{ request()->routeIs('users.portal*') && !request()->has('category') ? 'bg-primary-50 text-primary-600 font-medium' : '' }}">
-                    <i class="fas fa-file-alt w-5"></i>
+                <a href="{{ route('users.portal') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 rounded-xl {{ request()->routeIs('users.portal*') && !request()->has('category') ? 'bg-blue-50 text-blue-600 font-medium shadow-sm' : '' }}">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+                        <i class="fas fa-file-alt text-white text-sm"></i>
+                    </div>
                     <span>All Documents</span>
                 </a>
-
-                <!-- Categories for Staff Users (Read-only) -->
-                @php
-                    $rootCategories = \App\Models\DocumentCategory::with(['children.children', 'activeDocuments'])
-                        ->withCount(['activeDocuments'])
-                        ->whereNull('parent_id')
-                        ->where('is_active', true)
-                        ->ordered()
-                        ->get();
-                @endphp
-
-                @if($rootCategories->count() > 0)
-                <div class="mt-4 mb-2">
-                    <div class="px-4 py-2">
-                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Categories</h3>
-                    </div>
-                </div>
-
-                <div x-data="{ openFolders: {} }">
-                    @foreach($rootCategories as $category)
-                        @include('components.category-menu-item', ['category' => $category, 'level' => 0])
-                    @endforeach
-                </div>
-                @endif
-                @endif
-                
-                @if(auth()->user()->role === 'admin')
-                <a href="{{ route('settings.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-primary-50 hover:text-primary-600 rounded-lg {{ request()->routeIs('settings.*') ? 'bg-primary-50 text-primary-600 font-medium' : '' }}">
-                    <i class="fas fa-cog w-5"></i>
-                    <span>Settings</span>
-                </a>
-                @endif
-                
-                @if (auth()->user()->role === 'admin')
-                <a href="{{ route('activity-logs.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-primary-50 hover:text-primary-600 rounded-lg {{ request()->routeIs('activity-logs.*') ? 'bg-primary-50 text-primary-600 font-medium' : '' }}">
-                    <i class="fas fa-history w-5"></i>
-                    <span>Activity Logs</span>
-                </a>
-
-                
                 @endif
             </nav>
         </aside>

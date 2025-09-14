@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+    'paystack' => [
+        'public_key' => env('PAYSTACK_PUBLIC_KEY'),
+        'secret_key' => env('PAYSTACK_SECRET_KEY'),
+        'merchant_email' => env('PAYSTACK_MERCHANT_EMAIL'),
+    ],
+
+    'mnotify' => [
+        'api_key' => env('MNOTIFY_API_KEY'),
+        'sender_id' => env('MNOTIFY_SENDER_ID'),
+        'base_url' => 'https://api.mnotify.com/api/sms/quick',
+    ],
+
 ];

@@ -32,18 +32,28 @@ class Donation extends Model
         'receipt_number',
         'receipt_sent',
         'receipt_sent_at',
-        'status'
+        'status',
+        'paystack_reference',
+        'paystack_transaction_id',
+        'paystack_access_code',
+        'payment_channel',
+        'payment_gateway_response',
+        'transaction_fee',
+        'net_amount'
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'transaction_fee' => 'decimal:2',
+        'net_amount' => 'decimal:2',
         'donation_date' => 'date',
         'recurring_end_date' => 'date',
         'receipt_sent_at' => 'datetime',
         'is_anonymous' => 'boolean',
         'is_recurring' => 'boolean',
         'tax_deductible' => 'boolean',
-        'receipt_sent' => 'boolean'
+        'receipt_sent' => 'boolean',
+        'payment_gateway_response' => 'array'
     ];
 
     // Relationships

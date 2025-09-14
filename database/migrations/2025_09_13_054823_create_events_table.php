@@ -20,7 +20,7 @@ return new class extends Migration
             $table->datetime('end_datetime');
             $table->boolean('is_all_day')->default(false);
             $table->string('location')->nullable();
-            $table->text('address')->nullable();
+            $table->text('notes')->nullable();
             $table->foreignId('ministry_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('organizer_id')->nullable()->constrained('members')->onDelete('set null');
             $table->integer('max_attendees')->nullable();
@@ -39,6 +39,7 @@ return new class extends Migration
             $table->boolean('send_reminders')->default(true);
             $table->integer('reminder_days_before')->default(1);
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index(['start_datetime', 'end_datetime']);
             $table->index('event_type');
