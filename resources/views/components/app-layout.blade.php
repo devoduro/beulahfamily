@@ -222,6 +222,20 @@
                     </a>
                 </div>
 
+                <!-- Programs & Events Section -->
+                <div class="mb-6">
+                    <div class="px-2 mb-3">
+                        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Programs</h3>
+                    </div>
+                    
+                    <a href="{{ route('admin.programs.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl {{ request()->routeIs('admin.programs.*') ? 'bg-indigo-50 text-indigo-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                            <i class="fas fa-calendar-check text-white text-sm"></i>
+                        </div>
+                        <span>Manage Programs</span>
+                    </a>
+                </div>
+
                 <!-- Attendance Section -->
                 <div class="mb-6">
                     <div class="px-2 mb-3">

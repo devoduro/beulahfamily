@@ -183,6 +183,7 @@ Route::prefix('attendance')->name('attendance.')->middleware(['auth'])->group(fu
     
     // QR Code routes
     Route::get('/event/{event}/qr', [App\Http\Controllers\AttendanceController::class, 'showQr'])->name('qr.show');
+    Route::get('/qr-display/{qrCode}', [App\Http\Controllers\AttendanceController::class, 'displayQr'])->name('qr-display');
     Route::post('/event/{event}/qr/generate', [App\Http\Controllers\AttendanceController::class, 'generateQr'])->name('qr.generate');
     Route::post('/qr/{qrCode}/deactivate', [App\Http\Controllers\AttendanceController::class, 'deactivateQr'])->name('qr.deactivate');
     
@@ -193,6 +194,22 @@ Route::prefix('attendance')->name('attendance.')->middleware(['auth'])->group(fu
 // Public attendance scanning routes (no auth required)
 Route::get('/scan/{token}', [App\Http\Controllers\AttendanceController::class, 'scan'])->name('attendance.scan');
 Route::post('/mark-attendance', [App\Http\Controllers\AttendanceController::class, 'markAttendance'])->name('attendance.mark');
+
+// Program Registration Routes (Public Access)
+Route::get('/programs', [App\Http\Controllers\ProgramRegistrationController::class, 'programs'])->name('programs.index');
+Route::get('/programs/{program}', [App\Http\Controllers\ProgramRegistrationController::class, 'show'])->name('programs.show');
+Route::get('/programs/{program}/register', [App\Http\Controllers\ProgramRegistrationController::class, 'create'])->name('programs.register');
+Route::post('/programs/{program}/register', [App\Http\Controllers\ProgramRegistrationController::class, 'store'])->name('programs.register.store');
+Route::get('/programs/registration/{registration}/success', [App\Http\Controllers\ProgramRegistrationController::class, 'success'])->name('programs.registration.success');
+
+// File download routes for program registrations
+Route::get('/programs/files/{registration}/{filename}', [App\Http\Controllers\ProgramRegistrationController::class, 'downloadFile'])
+    ->name('programs.files.download')
+    ->where('filename', '.*');
+Route::get('/programs/{program}/registration/{registration}/edit', [App\Http\Controllers\ProgramRegistrationController::class, 'edit'])->name('programs.registration.edit');
+Route::put('/programs/{program}/registration/{registration}', [App\Http\Controllers\ProgramRegistrationController::class, 'update'])->name('programs.registration.update');
+Route::post('/programs/{program}/registration/{registration}/cancel', [App\Http\Controllers\ProgramRegistrationController::class, 'cancel'])->name('programs.registration.cancel');
+Route::get('/programs/{program}/registration/{registration}/file/{fileIndex}', [App\Http\Controllers\ProgramRegistrationController::class, 'downloadFile'])->name('programs.registration.file.download');
 
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
@@ -295,6 +312,26 @@ Route::middleware(['auth'])->group(function () {
         
         // Announcements Management (Admin Only)
         Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->except(['index', 'show']);
+
+        // Admin Program Management Routes
+        Route::prefix('admin/programs')->name('admin.programs.')->middleware(['auth', 'admin'])->group(function () {
+            Route::get('/', [App\Http\Controllers\ProgramController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\ProgramController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\ProgramController::class, 'store'])->name('store');
+            Route::get('/{program}', [App\Http\Controllers\ProgramController::class, 'show'])->name('show');
+            Route::get('/{program}/edit', [App\Http\Controllers\ProgramController::class, 'edit'])->name('edit');
+            Route::put('/{program}', [App\Http\Controllers\ProgramController::class, 'update'])->name('update');
+            Route::delete('/{program}', [App\Http\Controllers\ProgramController::class, 'destroy'])->name('destroy');
+            
+            // Program registrations management
+            Route::get('/{program}/registrations', [App\Http\Controllers\ProgramController::class, 'registrations'])->name('registrations');
+            Route::get('/{program}/registrations/export', [App\Http\Controllers\ProgramController::class, 'exportRegistrations'])->name('registrations.export');
+            Route::post('/{program}/registrations/bulk-update', [App\Http\Controllers\ProgramController::class, 'bulkUpdateRegistrations'])->name('registrations.bulk-update');
+            Route::get('/{program}/registrations/{registration}', [App\Http\Controllers\ProgramController::class, 'showRegistration'])->name('registrations.show');
+            
+            // Registration status updates
+            Route::patch('/{program}/registrations/{registration}/status', [App\Http\Controllers\ProgramRegistrationController::class, 'updateStatus'])->name('registrations.update-status');
+        });
 
         // Document Categories Management (Admin Only)
         Route::resource('document-categories', DocumentCategoryController::class);
