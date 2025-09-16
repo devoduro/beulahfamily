@@ -211,6 +211,34 @@ Route::put('/programs/{program}/registration/{registration}', [App\Http\Controll
 Route::post('/programs/{program}/registration/{registration}/cancel', [App\Http\Controllers\ProgramRegistrationController::class, 'cancel'])->name('programs.registration.cancel');
 Route::get('/programs/{program}/registration/{registration}/file/{fileIndex}', [App\Http\Controllers\ProgramRegistrationController::class, 'downloadFile'])->name('programs.registration.file.download');
 
+// Member Authentication Routes
+Route::prefix('member')->name('member.')->group(function () {
+    // Guest routes
+    Route::middleware('guest:member')->group(function () {
+        Route::get('/login', [App\Http\Controllers\MemberAuthController::class, 'showLoginForm'])->name('login');
+        Route::post('/login', [App\Http\Controllers\MemberAuthController::class, 'login']);
+    });
+
+    // Authenticated member routes
+    Route::middleware('auth:member')->group(function () {
+        Route::post('/logout', [App\Http\Controllers\MemberAuthController::class, 'logout'])->name('logout');
+        Route::get('/dashboard', [App\Http\Controllers\MemberAuthController::class, 'dashboard'])->name('dashboard');
+        Route::get('/profile', [App\Http\Controllers\MemberAuthController::class, 'profile'])->name('profile');
+        Route::put('/profile', [App\Http\Controllers\MemberAuthController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/password/change', [App\Http\Controllers\MemberAuthController::class, 'changePassword'])->name('password.change');
+        
+        // Member portal routes
+        Route::get('/donations', function () { return view('member.donations.index'); })->name('donations.index');
+        Route::get('/donations/create', function () { return view('member.donations.create'); })->name('donations.create');
+        Route::get('/events', function () { return view('member.events.index'); })->name('events.index');
+        Route::get('/events/{event}', function () { return view('member.events.show'); })->name('events.show');
+        Route::get('/ministries', function () { return view('member.ministries.index'); })->name('ministries.index');
+        Route::get('/family', function () { return view('member.family.index'); })->name('family.index');
+        Route::get('/settings', function () { return view('member.settings.index'); })->name('settings.index');
+        Route::get('/help', function () { return view('member.help.index'); })->name('help.index');
+    });
+});
+
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
     // Password Change Routes
