@@ -3,346 +3,442 @@
 @section('title', 'Family & Connections')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-8">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900">Family & Connections</h1>
-            <p class="text-gray-600">Manage your family members and church connections</p>
-        </div>
-        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
-            <i class="fas fa-plus mr-2"></i>Add Family Member
-        </button>
+<!-- Enhanced Background with Animated Elements -->
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+    <!-- Animated Background Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-purple-400/10 to-blue-400/10 rounded-full blur-2xl animate-pulse" style="animation-delay: 4s"></div>
     </div>
 
-    <!-- Family Overview -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <div class="flex items-center">
-                <div class="p-3 bg-blue-100 rounded-lg">
-                    <i class="fas fa-users text-blue-600 text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm text-gray-600">Family Members</p>
-                    <p class="text-2xl font-bold text-gray-900">4</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <div class="flex items-center">
-                <div class="p-3 bg-green-100 rounded-lg">
-                    <i class="fas fa-church text-green-600 text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm text-gray-600">Church Members</p>
-                    <p class="text-2xl font-bold text-gray-900">3</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <div class="flex items-center">
-                <div class="p-3 bg-purple-100 rounded-lg">
-                    <i class="fas fa-heart text-purple-600 text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm text-gray-600">Connections</p>
-                    <p class="text-2xl font-bold text-gray-900">12</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Family Members -->
-        <div class="lg:col-span-2">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                <div class="p-6 border-b border-gray-100">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-lg font-semibold text-gray-900">My Family</h2>
-                        <div class="flex space-x-2">
-                            <select class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option>All Members</option>
-                                <option>Church Members</option>
-                                <option>Non-Members</option>
-                            </select>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Enhanced Header with Gradient Background -->
+        <div class="relative mb-16">
+            <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl shadow-2xl overflow-hidden">
+                <!-- Animated Header Background -->
+                <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full animate-pulse"></div>
+                <div class="absolute -bottom-10 -left-10 w-24 h-24 bg-white/10 rounded-full animate-pulse" style="animation-delay: 1s"></div>
+                
+                <div class="relative p-10">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between">
+                        <div class="mb-8 lg:mb-0">
+                            <div class="flex items-center mb-4">
+                                <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center mr-6 shadow-xl">
+                                    <i class="fas fa-users text-white text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h1 class="text-4xl lg:text-5xl font-bold text-white mb-2">Family & Connections</h1>
+                                    <p class="text-xl text-blue-100">Manage your family members and church connections</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-6 text-white/80">
+                                <div class="flex items-center">
+                                    <i class="fas fa-home mr-2"></i>
+                                    <span>{{ $family ? $family->family_name : auth('member')->user()->last_name . ' Family' }}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar mr-2"></i>
+                                    <span>Member since {{ auth('member')->user()->membership_date ? auth('member')->user()->membership_date->format('Y') : 'N/A' }}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-heart mr-2"></i>
+                                    <span>{{ $familyStats['total_members'] }} Member{{ $familyStats['total_members'] !== 1 ? 's' : '' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col space-y-4">
+                            <a href="{{ route('member.family.add-member') }}" class="group bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 flex items-center border border-white/30">
+                                <i class="fas fa-plus mr-3 group-hover:scale-110 transition-transform"></i>
+                                Add Family Member
+                                <i class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                            <a href="{{ route('member.family.export') }}" class="group bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-8 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center">
+                                <i class="fas fa-download mr-2 group-hover:scale-110 transition-transform"></i>
+                                Export Family Data
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div class="p-6 space-y-4">
-                    <!-- Family Member Card -->
-                    <div class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-start justify-between">
-                            <div class="flex items-start">
-                                <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-user text-gray-500 text-xl"></i>
+            </div>
+        </div>
+
+        <!-- Enhanced Family Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <!-- Family Members Card -->
+            <div class="group bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border-2 border-blue-100 p-8 hover:shadow-2xl hover:border-blue-200 transition-all duration-500 transform hover:-translate-y-2">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-users text-white text-2xl"></i>
+                    </div>
+                    <div class="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                </div>
+                <div class="mb-4">
+                    <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">Family Members</p>
+                    <h3 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">{{ $familyStats['total_members'] }}</h3>
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            Active
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-gray-500">Total registered</p>
+                    <div class="flex items-center text-green-600 text-sm font-medium">
+                        <i class="fas fa-arrow-up mr-1"></i>
+                        <span>Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Church Members Card -->
+            <div class="group bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border-2 border-green-100 p-8 hover:shadow-2xl hover:border-green-200 transition-all duration-500 transform hover:-translate-y-2">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-church text-white text-2xl"></i>
+                    </div>
+                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                </div>
+                <div class="mb-4">
+                    <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">Church Members</p>
+                    <h3 class="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">{{ $familyStats['church_members'] }}</h3>
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <i class="fas fa-star mr-1"></i>
+                            Verified
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-gray-500">Baptized members</p>
+                    <div class="flex items-center text-blue-600 text-sm font-medium">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        <span>Verified</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connections Card -->
+            <div class="group bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border-2 border-purple-100 p-8 hover:shadow-2xl hover:border-purple-200 transition-all duration-500 transform hover:-translate-y-2">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-violet-600 rounded-3xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-heart text-white text-2xl"></i>
+                    </div>
+                    <div class="w-3 h-3 bg-purple-400 rounded-full animate-pulse"></div>
+                </div>
+                <div class="mb-4">
+                    <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">Connections</p>
+                    <p class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">12</p>
+                </div>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-gray-500">Church relationships</p>
+                    <div class="flex items-center text-orange-600 text-sm font-medium">
+                        <i class="fas fa-users mr-1"></i>
+                        <span>Growing</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Enhanced Family Members Section -->
+            <div class="lg:col-span-2">
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-gray-100 overflow-hidden">
+                    <!-- Enhanced Header -->
+                    <div class="relative bg-gradient-to-r from-indigo-600 to-purple-600 p-8">
+                        <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+                        <div class="absolute -top-5 -right-5 w-20 h-20 bg-white/10 rounded-full animate-pulse"></div>
+                        <div class="absolute -bottom-5 -left-5 w-16 h-16 bg-white/10 rounded-full animate-pulse" style="animation-delay: 1s"></div>
+                        
+                        <div class="relative flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4">
+                                    <i class="fas fa-users text-white text-xl"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold text-gray-900">Jane Doe</h3>
-                                    <p class="text-sm text-gray-600">Spouse</p>
-                                    <div class="flex items-center space-x-4 text-xs text-gray-500 mt-2">
-                                        <span><i class="fas fa-phone mr-1"></i>+233 24 123 4568</span>
-                                        <span><i class="fas fa-envelope mr-1"></i>jane.doe@example.com</span>
-                                        <span><i class="fas fa-birthday-cake mr-1"></i>June 20</span>
+                                    <h2 class="text-3xl font-bold text-white mb-1">My Family</h2>
+                                    <p class="text-indigo-100">Manage your family members</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-3">
+                                <select class="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-4 py-3 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-white/50 focus:border-white/50">
+                                    <option class="text-gray-900">All Members</option>
+                                    <option class="text-gray-900">Church Members</option>
+                                    <option class="text-gray-900">Non-Members</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-8 space-y-8">
+                        @forelse($familyMembers as $index => $member)
+                            @php
+                                $gradientColors = [
+                                    0 => ['from' => 'from-green-50', 'to' => 'to-emerald-50', 'border' => 'border-green-100', 'hover-border' => 'hover:border-green-200', 'icon-bg' => 'from-green-500 to-emerald-600', 'badge-bg' => 'bg-green-500', 'hover-text' => 'group-hover:text-green-600'],
+                                    1 => ['from' => 'from-blue-50', 'to' => 'to-indigo-50', 'border' => 'border-blue-100', 'hover-border' => 'hover:border-blue-200', 'icon-bg' => 'from-blue-500 to-indigo-600', 'badge-bg' => 'bg-blue-500', 'hover-text' => 'group-hover:text-blue-600'],
+                                    2 => ['from' => 'from-yellow-50', 'to' => 'to-orange-50', 'border' => 'border-yellow-100', 'hover-border' => 'hover:border-yellow-200', 'icon-bg' => 'from-yellow-500 to-orange-600', 'badge-bg' => 'bg-yellow-500', 'hover-text' => 'group-hover:text-yellow-600'],
+                                    3 => ['from' => 'from-purple-50', 'to' => 'to-pink-50', 'border' => 'border-purple-100', 'hover-border' => 'hover:border-purple-200', 'icon-bg' => 'from-purple-500 to-pink-600', 'badge-bg' => 'bg-purple-500', 'hover-text' => 'group-hover:text-purple-600'],
+                                ];
+                                $colorIndex = $index % 4;
+                                $colors = $gradientColors[$colorIndex];
+                                
+                                $statusIcon = match($member->membership_status) {
+                                    'active' => 'fas fa-check',
+                                    'inactive' => 'fas fa-clock',
+                                    'pending' => 'fas fa-hourglass-half',
+                                    default => 'fas fa-user'
+                                };
+                            @endphp
+                            
+                            <!-- Enhanced Family Member Card -->
+                            <div class="group bg-gradient-to-r {{ $colors['from'] }} {{ $colors['to'] }} rounded-3xl p-8 border-2 {{ $colors['border'] }} {{ $colors['hover-border'] }} hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1">
+                                <div class="flex items-start justify-between mb-6">
+                                    <div class="flex items-start">
+                                        <div class="relative">
+                                            <div class="w-20 h-20 bg-gradient-to-br {{ $colors['icon-bg'] }} rounded-3xl flex items-center justify-center mr-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                                @if($member->photo_path)
+                                                    <img src="{{ asset('storage/' . $member->photo_path) }}" alt="{{ $member->full_name }}" class="w-full h-full rounded-3xl object-cover">
+                                                @else
+                                                    <i class="fas fa-user text-white text-2xl"></i>
+                                                @endif
+                                            </div>
+                                            <div class="absolute -bottom-1 -right-1 w-6 h-6 {{ $colors['badge-bg'] }} rounded-full flex items-center justify-center border-2 border-white">
+                                                <i class="{{ $statusIcon }} text-white text-xs"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-2xl font-bold text-gray-900 mb-1 {{ $colors['hover-text'] }} transition-colors">{{ $member->full_name }}</h3>
+                                            <p class="text-lg text-gray-600 mb-4">{{ ucfirst($member->relationship_to_head ?? 'Member') }}</p>
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            @if($member->phone)
+                                            <div class="flex items-center bg-white/60 backdrop-blur-sm rounded-2xl p-3">
+                                                <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
+                                                    <i class="fas fa-phone text-blue-600 text-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500 uppercase tracking-wide">Phone</p>
+                                                    <p class="font-semibold text-gray-900 text-sm">{{ $member->phone }}</p>
+                                                </div>
+                                            </div>
+                                            @endif
+                                            
+                                            @if($member->email)
+                                            <div class="flex items-center bg-white/60 backdrop-blur-sm rounded-2xl p-3">
+                                                <div class="w-8 h-8 bg-green-100 rounded-xl flex items-center justify-center mr-3">
+                                                    <i class="fas fa-envelope text-green-600 text-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500 uppercase tracking-wide">Email</p>
+                                                    <p class="font-semibold text-gray-900 text-sm">{{ $member->email }}</p>
+                                                </div>
+                                            </div>
+                                            @endif
+                                            
+                                            @if($member->date_of_birth)
+                                            <div class="flex items-center bg-white/60 backdrop-blur-sm rounded-2xl p-3">
+                                                <div class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center mr-3">
+                                                    <i class="fas fa-birthday-cake text-purple-600 text-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500 uppercase tracking-wide">Age</p>
+                                                    <p class="font-semibold text-gray-900 text-sm">{{ $member->age ?? 'N/A' }} years</p>
+                                                </div>
+                                            </div>
+                                            @endif
+                                            
+                                            <div class="flex items-center bg-white/60 backdrop-blur-sm rounded-2xl p-3">
+                                                <div class="w-8 h-8 bg-orange-100 rounded-xl flex items-center justify-center mr-3">
+                                                    <i class="fas fa-id-card text-orange-600 text-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500 uppercase tracking-wide">Status</p>
+                                                    <p class="font-semibold text-gray-900 text-sm">{{ ucfirst($member->membership_status ?? 'Unknown') }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium 
+                                            @if($member->membership_status === 'active') bg-green-100 text-green-800
+                                            @elseif($member->membership_status === 'inactive') bg-red-100 text-red-800
+                                            @elseif($member->membership_status === 'pending') bg-yellow-100 text-yellow-800
+                                            @else bg-gray-100 text-gray-800 @endif">
+                                            <i class="{{ $statusIcon }} mr-1"></i>
+                                            {{ ucfirst($member->membership_status ?? 'Unknown') }}
+                                        </span>
+                                        @if($member->membership_type)
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <i class="fas fa-certificate mr-1"></i>
+                                            {{ ucfirst($member->membership_type) }}
+                                        </span>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-center space-x-2">
-                                <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">
-                                    Church Member
-                                </span>
-                                <button class="text-gray-400 hover:text-gray-600">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="mt-4 flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <span class="text-sm text-gray-600">Member ID: <span class="font-medium">20240002</span></span>
-                                <span class="text-sm text-gray-600">Active since: <span class="font-medium">Jan 2020</span></span>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            
+                            <div class="flex flex-wrap gap-3">
+                                <a href="{{ route('member.family.show-member', $member) }}" class="group flex items-center bg-white/80 backdrop-blur-sm hover:bg-white text-gray-700 hover:text-blue-600 px-6 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                                    <i class="fas fa-eye mr-2 group-hover:scale-110 transition-transform"></i>
                                     View Profile
+                                </a>
+                                <button class="group flex items-center bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                                    <i class="fas fa-edit mr-2 group-hover:scale-110 transition-transform"></i>
+                                    Edit Member
                                 </button>
-                                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                    Edit
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Family Member Card -->
-                    <div class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-start justify-between">
-                            <div class="flex items-start">
-                                <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-child text-gray-500 text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-900">Michael Doe</h3>
-                                    <p class="text-sm text-gray-600">Son</p>
-                                    <div class="flex items-center space-x-4 text-xs text-gray-500 mt-2">
-                                        <span><i class="fas fa-birthday-cake mr-1"></i>Age 12</span>
-                                        <span><i class="fas fa-graduation-cap mr-1"></i>Grade 7</span>
-                                        <span><i class="fas fa-calendar mr-1"></i>March 10</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
-                                    Youth Member
-                                </span>
-                                <button class="text-gray-400 hover:text-gray-600">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="mt-4 flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <span class="text-sm text-gray-600">Attends: <span class="font-medium">Children's Church</span></span>
-                                <span class="text-sm text-gray-600">Active since: <span class="font-medium">Jan 2022</span></span>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                    View Activities
-                                </button>
-                                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                    Edit
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Family Member Card -->
-                    <div class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-start justify-between">
-                            <div class="flex items-start">
-                                <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-                                    <i class="fas fa-female text-gray-500 text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-900">Sarah Doe</h3>
-                                    <p class="text-sm text-gray-600">Daughter</p>
-                                    <div class="flex items-center space-x-4 text-xs text-gray-500 mt-2">
-                                        <span><i class="fas fa-birthday-cake mr-1"></i>Age 8</span>
-                                        <span><i class="fas fa-graduation-cap mr-1"></i>Grade 3</span>
-                                        <span><i class="fas fa-calendar mr-1"></i>September 5</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <span class="inline-block bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded">
-                                    Not Member
-                                </span>
-                                <button class="text-gray-400 hover:text-gray-600">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="mt-4 flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <span class="text-sm text-gray-600">Attends: <span class="font-medium">Sunday School</span></span>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button class="text-green-600 hover:text-green-800 text-sm font-medium">
+                                @if($member->membership_status !== 'active')
+                                <button class="group flex items-center bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                                    <i class="fas fa-user-plus mr-2 group-hover:scale-110 transition-transform"></i>
                                     Register as Member
                                 </button>
-                                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                    Edit
-                                </button>
+                                @endif
+                            </div>
+                        </div>
+                        @empty
+                        <!-- Add Family Member Card -->
+                        <div class="bg-gradient-to-r from-gray-50 to-blue-50 border-2 border-dashed border-blue-300 rounded-3xl p-12 text-center hover:border-blue-400 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                                <i class="fas fa-user-plus text-white text-3xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-4">No Family Members Yet</h3>
+                            <p class="text-gray-600 mb-8 max-w-md mx-auto">Start building your family tree by adding your first family member. Connect with your loved ones and manage your family information all in one place.</p>
+                            <a href="{{ route('member.family.add-member') }}" class="inline-flex items-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
+                                <i class="fas fa-plus mr-3"></i>
+                                Add Your First Family Member
+                                <i class="fas fa-arrow-right ml-3"></i>
+                            </a>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1 space-y-8">
+                <!-- Enhanced Family Activities -->
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-green-100 overflow-hidden">
+                    <div class="relative bg-gradient-to-r from-green-600 to-emerald-600 p-6">
+                        <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+                        <div class="absolute -top-3 -right-3 w-16 h-16 bg-white/10 rounded-full animate-pulse"></div>
+                        <div class="absolute -bottom-3 -left-3 w-12 h-12 bg-white/10 rounded-full animate-pulse" style="animation-delay: 1s"></div>
+                        
+                        <div class="relative flex items-center">
+                            <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4">
+                                <i class="fas fa-calendar-alt text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-white mb-1">Family Activities</h3>
+                                <p class="text-green-100">Recent events and programs</p>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Add Family Member Card -->
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
-                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-plus text-blue-600 text-xl"></i>
+                    
+                    <div class="p-8 space-y-6">
+                        @forelse($familyActivities as $activity)
+                        <div class="group flex items-center bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="w-4 h-4 bg-blue-500 rounded-full mr-4 animate-pulse"></div>
+                            <div class="flex-1">
+                                <div class="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ $activity['title'] }}</div>
+                                <div class="text-sm text-gray-600 flex items-center mt-1">
+                                    <i class="fas fa-clock mr-2"></i>
+                                    {{ $activity['date'] }}
+                                </div>
+                            </div>
+                            <i class="fas fa-arrow-right text-blue-500 group-hover:translate-x-1 transition-transform"></i>
                         </div>
-                        <h3 class="font-medium text-gray-900 mb-2">Add Family Member</h3>
-                        <p class="text-sm text-gray-600 mb-4">Add spouse, children, or other family members to your profile</p>
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                            Add Member
+                        @empty
+                        <div class="text-center py-8">
+                            <i class="fas fa-calendar-times text-gray-400 text-3xl mb-4"></i>
+                            <p class="text-gray-500">No recent family activities</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Enhanced Church Connections -->
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-blue-100 overflow-hidden">
+                    <div class="relative bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
+                        <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+                        <div class="absolute -top-3 -right-3 w-16 h-16 bg-white/10 rounded-full animate-pulse"></div>
+                        <div class="absolute -bottom-3 -left-3 w-12 h-12 bg-white/10 rounded-full animate-pulse" style="animation-delay: 1.5s"></div>
+                        
+                        <div class="relative flex items-center">
+                            <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4">
+                                <i class="fas fa-users text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-white mb-1">Church Connections</h3>
+                                <p class="text-blue-100">Your spiritual network</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-8 space-y-6">
+                        @forelse($churchConnections as $connection)
+                        <div class="group flex items-center bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-lg font-bold text-gray-900 group-hover:text-purple-600 transition-colors">{{ $connection['name'] }}</div>
+                                <div class="text-sm text-gray-600 flex items-center mt-1">
+                                    <i class="fas fa-church mr-2"></i>
+                                    {{ $connection['role'] }}
+                                </div>
+                            </div>
+                            <i class="fas fa-arrow-right text-purple-500 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                        @empty
+                        <div class="text-center py-8">
+                            <i class="fas fa-users text-gray-400 text-3xl mb-4"></i>
+                            <p class="text-gray-500">No church connections found</p>
+                        </div>
+                        @endforelse
+                        
+                        <button class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
+                            <i class="fas fa-users mr-3"></i>
+                            View All Connections
+                            <i class="fas fa-arrow-right ml-3"></i>
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Sidebar -->
-        <div class="space-y-6">
-            <!-- Family Activities -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                <div class="p-6 border-b border-gray-100">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-calendar-alt text-green-600 mr-2"></i>Family Activities
-                    </h3>
-                </div>
-                <div class="p-6 space-y-4">
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
-                        <div class="flex-1">
-                            <div class="text-sm font-medium text-gray-900">Family Service Day</div>
-                            <div class="text-xs text-gray-500">Sunday after service</div>
+                <!-- Enhanced Quick Actions -->
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-yellow-100 overflow-hidden">
+                    <div class="relative bg-gradient-to-r from-yellow-600 to-orange-600 p-6">
+                        <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+                        <div class="absolute -top-3 -right-3 w-16 h-16 bg-white/10 rounded-full animate-pulse"></div>
+                        <div class="absolute -bottom-3 -left-3 w-12 h-12 bg-white/10 rounded-full animate-pulse" style="animation-delay: 2.5s"></div>
+                        
+                        <div class="relative flex items-center">
+                            <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4">
+                                <i class="fas fa-bolt text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-white mb-1">Quick Actions</h3>
+                                <p class="text-yellow-100">Manage your family</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-                        <div class="flex-1">
-                            <div class="text-sm font-medium text-gray-900">Children's Program</div>
-                            <div class="text-xs text-gray-500">Every Sunday 9:00 AM</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
-                        <div class="flex-1">
-                            <div class="text-sm font-medium text-gray-900">Family Fellowship</div>
-                            <div class="text-xs text-gray-500">First Saturday monthly</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Church Connections -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                <div class="p-6 border-b border-gray-100">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-users text-blue-600 mr-2"></i>Church Connections
-                    </h3>
-                </div>
-                <div class="p-6 space-y-3">
-                    <div class="flex items-center">
-                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                            <i class="fas fa-user text-gray-500 text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-medium text-gray-900">Pastor Emmanuel</div>
-                            <div class="text-xs text-gray-500">Senior Pastor</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                            <i class="fas fa-user text-gray-500 text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-medium text-gray-900">Sister Grace</div>
-                            <div class="text-xs text-gray-500">Children's Ministry Leader</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                            <i class="fas fa-user text-gray-500 text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-medium text-gray-900">Brother David</div>
-                            <div class="text-xs text-gray-500">Worship Leader</div>
-                        </div>
-                    </div>
-                    <button class="w-full text-blue-600 hover:text-blue-800 text-sm font-medium mt-3">
-                        View All Connections
-                    </button>
-                </div>
-            </div>
-
-            <!-- Family Statistics -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                <div class="p-6 border-b border-gray-100">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-chart-pie text-purple-600 mr-2"></i>Family Stats
-                    </h3>
-                </div>
-                <div class="p-6 space-y-4">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Total Family Donations</span>
-                        <span class="font-medium">₵2,450.00</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Events Attended</span>
-                        <span class="font-medium">28</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Ministry Involvement</span>
-                        <span class="font-medium">5 Ministries</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600">Years as Members</span>
-                        <span class="font-medium">4 Years</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                <div class="p-6 border-b border-gray-100">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        <i class="fas fa-bolt text-yellow-600 mr-2"></i>Quick Actions
-                    </h3>
-                </div>
-                <div class="p-6 space-y-3">
-                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
-                        <i class="fas fa-plus mr-2"></i>Add Family Member
-                    </button>
-                    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
-                        <i class="fas fa-calendar-plus mr-2"></i>Schedule Family Event
-                    </button>
-                    <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
-                        <i class="fas fa-heart mr-2"></i>Family Donation
-                    </button>
-                </div>
-            </div>
-
-            <!-- Family Directory -->
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                <div class="flex items-start">
-                    <i class="fas fa-address-book text-blue-600 mt-1 mr-3"></i>
-                    <div>
-                        <h4 class="font-medium text-blue-900 mb-2">Church Directory</h4>
-                        <p class="text-sm text-blue-700 mb-3">Connect with other church families and build meaningful relationships.</p>
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                            Browse Directory
-                        </button>
+                    
+                    <div class="p-8 space-y-4">
+                        <a href="{{ route('member.family.add-member') }}" class="group w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
+                            <i class="fas fa-plus mr-3 group-hover:scale-110 transition-transform"></i>
+                            Add Family Member
+                            <i class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                        <a href="{{ route('member.family.export') }}" class="group w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
+                            <i class="fas fa-download mr-3 group-hover:scale-110 transition-transform"></i>
+                            Export Family Data
+                            <i class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                        <a href="{{ route('member.profile') }}" class="group w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
+                            <i class="fas fa-user mr-3 group-hover:scale-110 transition-transform"></i>
+                            Update Profile
+                            <i class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
                     </div>
                 </div>
             </div>

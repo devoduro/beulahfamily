@@ -172,6 +172,20 @@
                         <span>Announcements</span>
                     </a>
                     
+                    <a href="{{ route('admin.testimonies.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-amber-50 hover:text-amber-600 rounded-xl {{ request()->routeIs('admin.testimonies.*') ? 'bg-amber-50 text-amber-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                            <i class="fas fa-heart text-white text-sm"></i>
+                        </div>
+                        <span>Testimonies</span>
+                    </a>
+                    
+                    <a href="{{ route('admin.prayer-requests.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-purple-50 hover:text-purple-600 rounded-xl {{ request()->routeIs('admin.prayer-requests.*') ? 'bg-purple-50 text-purple-600 font-medium shadow-sm' : '' }}">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                            <i class="fas fa-praying-hands text-white text-sm"></i>
+                        </div>
+                        <span>Prayer Line</span>
+                    </a>
+                    
                     <a href="{{ route('sms.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-violet-50 hover:text-violet-600 rounded-xl {{ request()->routeIs('sms.*') && !request()->routeIs('sms.templates.*') && !request()->routeIs('sms.credits.*') ? 'bg-violet-50 text-violet-600 font-medium shadow-sm' : '' }}">
                         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
                             <i class="fas fa-sms text-white text-sm"></i>

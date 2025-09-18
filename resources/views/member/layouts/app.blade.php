@@ -97,6 +97,18 @@
                     My Family
                 </a>
 
+                <!-- Testimonies -->
+                <a href="{{ route('member.testimonies.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('member.testimonies*') ? 'bg-amber-100 text-amber-700' : 'text-gray-700 hover:bg-gray-100' }} transition-colors">
+                    <i class="fas fa-heart mr-3"></i>
+                    Testimonies
+                </a>
+
+                <!-- Prayer Requests -->
+                <a href="{{ route('member.prayer-requests.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('member.prayer-requests*') ? 'bg-purple-100 text-purple-700' : 'text-gray-700 hover:bg-gray-100' }} transition-colors">
+                    <i class="fas fa-praying-hands mr-3"></i>
+                    Prayer Line
+                </a>
+
                 <!-- Divider -->
                 <div class="border-t border-gray-200 my-4"></div>
 

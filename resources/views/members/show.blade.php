@@ -203,11 +203,11 @@
                                     </div>
                                     <div>
                                         <h3 class="font-medium text-gray-900">{{ $ministry->name }}</h3>
-                                        <p class="text-sm text-gray-600">{{ ucfirst($ministry->pivot->role ?? 'Member') }}</p>
+                                        <p class="text-sm text-gray-600">{{ ucfirst($ministry->pivot ? $ministry->pivot->role ?? 'Member' : 'Member') }}</p>
                                     </div>
                                 </div>
                                 <span class="text-sm text-gray-500">
-                                    Since {{ $ministry->pivot->joined_date ? \Carbon\Carbon::parse($ministry->pivot->joined_date)->format('M Y') : 'Unknown' }}
+                                    Since {{ ($ministry->pivot && $ministry->pivot->joined_date) ? \Carbon\Carbon::parse($ministry->pivot->joined_date)->format('M Y') : 'Unknown' }}
                                 </span>
                             </div>
                         @endforeach

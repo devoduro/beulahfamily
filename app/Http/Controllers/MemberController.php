@@ -110,6 +110,7 @@ class MemberController extends Controller
                 'ACCRA' => Member::where('chapter', 'ACCRA')->count(),
                 'KUMASI' => Member::where('chapter', 'KUMASI')->count(),
                 'NEW JESSY' => Member::where('chapter', 'NEW JESSY')->count(),
+                'STUDENTS' => Member::where('chapter', 'STUDENTS')->count(),
             ],
         ];
         
@@ -167,7 +168,7 @@ class MemberController extends Controller
             'membership_date' => 'nullable|date',
             'membership_status' => 'required|in:active,inactive,transferred,deceased',
             'membership_type' => 'nullable|in:member,visitor,friend,associate',
-            'chapter' => 'required|in:ACCRA,KUMASI,NEW JESSY',
+            'chapter' => 'required|in:ACCRA,KUMASI,NEW JESSY,STUDENTS',
             'family_id' => 'nullable|exists:families,id',
             'relationship_to_head' => 'nullable|string|max:50',
             'emergency_contact_name' => 'nullable|string',
@@ -272,7 +273,7 @@ class MemberController extends Controller
             'membership_date' => 'nullable|date',
             'membership_status' => 'required|in:active,inactive,transferred,deceased',
             'membership_type' => 'nullable|in:member,visitor,friend,associate',
-            'chapter' => 'required|in:ACCRA,KUMASI,NEW JESSY',
+            'chapter' => 'required|in:ACCRA,KUMASI,NEW JESSY,STUDENTS',
             'family_id' => 'nullable|exists:families,id',
             'relationship_to_head' => 'nullable|string|max:50',
             'emergency_contact_name' => 'nullable|string',

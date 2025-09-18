@@ -9,118 +9,170 @@
         
         <!-- Analytics Dashboard -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-            <div class="group bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
-                        <i class="fas fa-users text-2xl"></i>
+            <div class="group bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:rotate-1 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="p-4 bg-white/20 rounded-2xl backdrop-blur-sm group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                            <i class="fas fa-users text-3xl group-hover:rotate-12 transition-transform duration-300"></i>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-blue-100 text-sm font-medium uppercase tracking-wider">Total Members</p>
+                            <p class="text-4xl font-bold group-hover:scale-110 transition-transform duration-300">{{ $stats['total_members'] ?? 0 }}</p>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <p class="text-blue-100 text-sm font-medium">Total Members</p>
-                        <p class="text-3xl font-bold">{{ $stats['total_members'] ?? 0 }}</p>
+                    <div class="flex items-center justify-between text-blue-100">
+                        <div class="flex items-center">
+                            <i class="fas fa-chart-line mr-2 group-hover:animate-pulse"></i>
+                            <span class="text-sm font-medium">Active community</span>
+                        </div>
+                        <div class="w-3 h-3 bg-blue-300 rounded-full animate-pulse"></div>
                     </div>
-                </div>
-                <div class="flex items-center text-blue-100">
-                    <i class="fas fa-chart-line mr-2"></i>
-                    <span class="text-sm">Active community</span>
                 </div>
             </div>
 
-            <div class="group bg-gradient-to-br from-green-500 via-green-600 to-emerald-700 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
-                        <i class="fas fa-user-plus text-2xl"></i>
+            <div class="group bg-gradient-to-br from-green-500 via-green-600 to-emerald-700 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:rotate-1 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="p-4 bg-white/20 rounded-2xl backdrop-blur-sm group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                            <i class="fas fa-user-plus text-3xl group-hover:rotate-12 transition-transform duration-300"></i>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-green-100 text-sm font-medium uppercase tracking-wider">New This Month</p>
+                            <p class="text-4xl font-bold group-hover:scale-110 transition-transform duration-300">{{ $stats['new_members'] ?? 0 }}</p>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <p class="text-green-100 text-sm font-medium">New This Month</p>
-                        <p class="text-3xl font-bold">{{ $stats['new_members'] ?? 0 }}</p>
+                    <div class="flex items-center justify-between text-green-100">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-plus mr-2 group-hover:animate-pulse"></i>
+                            <span class="text-sm font-medium">Recent additions</span>
+                        </div>
+                        <div class="w-3 h-3 bg-green-300 rounded-full animate-pulse"></div>
                     </div>
-                </div>
-                <div class="flex items-center text-green-100">
-                    <i class="fas fa-calendar-plus mr-2"></i>
-                    <span class="text-sm">Recent additions</span>
                 </div>
             </div>
 
-            <div class="group bg-gradient-to-br from-purple-500 via-purple-600 to-violet-700 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
-                        <i class="fas fa-home text-2xl"></i>
+            <div class="group bg-gradient-to-br from-purple-500 via-purple-600 to-violet-700 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:rotate-1 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="p-4 bg-white/20 rounded-2xl backdrop-blur-sm group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                            <i class="fas fa-home text-3xl group-hover:rotate-12 transition-transform duration-300"></i>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-purple-100 text-sm font-medium uppercase tracking-wider">Total Families</p>
+                            <p class="text-4xl font-bold group-hover:scale-110 transition-transform duration-300">{{ $stats['total_families'] ?? 0 }}</p>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <p class="text-purple-100 text-sm font-medium">Total Families</p>
-                        <p class="text-3xl font-bold">{{ $stats['total_families'] ?? 0 }}</p>
+                    <div class="flex items-center justify-between text-purple-100">
+                        <div class="flex items-center">
+                            <i class="fas fa-heart mr-2 group-hover:animate-pulse"></i>
+                            <span class="text-sm font-medium">Family units</span>
+                        </div>
+                        <div class="w-3 h-3 bg-purple-300 rounded-full animate-pulse"></div>
                     </div>
-                </div>
-                <div class="flex items-center text-purple-100">
-                    <i class="fas fa-heart mr-2"></i>
-                    <span class="text-sm">Family units</span>
                 </div>
             </div>
 
-            <div class="group bg-gradient-to-br from-orange-500 via-orange-600 to-red-600 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
-                        <i class="fas fa-hands-helping text-2xl"></i>
+            <div class="group bg-gradient-to-br from-orange-500 via-orange-600 to-red-600 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:rotate-1 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="p-4 bg-white/20 rounded-2xl backdrop-blur-sm group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                            <i class="fas fa-hands-helping text-3xl group-hover:rotate-12 transition-transform duration-300"></i>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-orange-100 text-sm font-medium uppercase tracking-wider">Active Ministries</p>
+                            <p class="text-4xl font-bold group-hover:scale-110 transition-transform duration-300">{{ $stats['active_ministries'] ?? 0 }}</p>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <p class="text-orange-100 text-sm font-medium">Active Ministries</p>
-                        <p class="text-3xl font-bold">{{ $stats['active_ministries'] ?? 0 }}</p>
+                    <div class="flex items-center justify-between text-orange-100">
+                        <div class="flex items-center">
+                            <i class="fas fa-pray mr-2 group-hover:animate-pulse"></i>
+                            <span class="text-sm font-medium">Service areas</span>
+                        </div>
+                        <div class="w-3 h-3 bg-orange-300 rounded-full animate-pulse"></div>
                     </div>
-                </div>
-                <div class="flex items-center text-orange-100">
-                    <i class="fas fa-pray mr-2"></i>
-                    <span class="text-sm">Service areas</span>
                 </div>
             </div>
         </div>
 
         <!-- Chapter Statistics -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div class="group bg-gradient-to-br from-cyan-500 via-cyan-600 to-blue-700 rounded-3xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                        <i class="fas fa-map-marker-alt text-xl"></i>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="group bg-gradient-to-br from-cyan-500 via-cyan-600 to-blue-700 rounded-3xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:rotate-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm group-hover:bg-white/30 transition-all duration-300">
+                        <i class="fas fa-city text-2xl group-hover:scale-110 transition-transform duration-300"></i>
                     </div>
                     <div class="text-right">
-                        <p class="text-cyan-100 text-sm font-medium">ACCRA Chapter</p>
-                        <p class="text-2xl font-bold">{{ $stats['chapter_stats']['ACCRA'] ?? 0 }}</p>
+                        <p class="text-cyan-100 text-sm font-medium uppercase tracking-wide">ACCRA Chapter</p>
+                        <p class="text-3xl font-bold group-hover:scale-110 transition-transform duration-300">{{ $stats['chapter_stats']['ACCRA'] ?? 0 }}</p>
                     </div>
                 </div>
-                <div class="flex items-center text-cyan-100">
-                    <i class="fas fa-users mr-2"></i>
-                    <span class="text-sm">Members</span>
+                <div class="flex items-center justify-between text-cyan-100">
+                    <div class="flex items-center">
+                        <i class="fas fa-users mr-2"></i>
+                        <span class="text-sm font-medium">Members</span>
+                    </div>
+                    <div class="w-2 h-2 bg-cyan-300 rounded-full animate-pulse"></div>
                 </div>
             </div>
 
-            <div class="group bg-gradient-to-br from-teal-500 via-teal-600 to-green-700 rounded-3xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                        <i class="fas fa-map-marker-alt text-xl"></i>
+            <div class="group bg-gradient-to-br from-teal-500 via-teal-600 to-green-700 rounded-3xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:rotate-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm group-hover:bg-white/30 transition-all duration-300">
+                        <i class="fas fa-mountain text-2xl group-hover:scale-110 transition-transform duration-300"></i>
                     </div>
                     <div class="text-right">
-                        <p class="text-teal-100 text-sm font-medium">KUMASI Chapter</p>
-                        <p class="text-2xl font-bold">{{ $stats['chapter_stats']['KUMASI'] ?? 0 }}</p>
+                        <p class="text-teal-100 text-sm font-medium uppercase tracking-wide">KUMASI Chapter</p>
+                        <p class="text-3xl font-bold group-hover:scale-110 transition-transform duration-300">{{ $stats['chapter_stats']['KUMASI'] ?? 0 }}</p>
                     </div>
                 </div>
-                <div class="flex items-center text-teal-100">
-                    <i class="fas fa-users mr-2"></i>
-                    <span class="text-sm">Members</span>
+                <div class="flex items-center justify-between text-teal-100">
+                    <div class="flex items-center">
+                        <i class="fas fa-users mr-2"></i>
+                        <span class="text-sm font-medium">Members</span>
+                    </div>
+                    <div class="w-2 h-2 bg-teal-300 rounded-full animate-pulse"></div>
                 </div>
             </div>
 
-            <div class="group bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-700 rounded-3xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                        <i class="fas fa-map-marker-alt text-xl"></i>
+            <div class="group bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-700 rounded-3xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:rotate-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm group-hover:bg-white/30 transition-all duration-300">
+                        <i class="fas fa-map-marker-alt text-2xl group-hover:scale-110 transition-transform duration-300"></i>
                     </div>
                     <div class="text-right">
-                        <p class="text-indigo-100 text-sm font-medium">NEW JESSY Chapter</p>
-                        <p class="text-2xl font-bold">{{ $stats['chapter_stats']['NEW JESSY'] ?? 0 }}</p>
+                        <p class="text-indigo-100 text-sm font-medium uppercase tracking-wide">NEW JESSY Chapter</p>
+                        <p class="text-3xl font-bold group-hover:scale-110 transition-transform duration-300">{{ $stats['chapter_stats']['NEW JESSY'] ?? 0 }}</p>
                     </div>
                 </div>
-                <div class="flex items-center text-indigo-100">
-                    <i class="fas fa-users mr-2"></i>
-                    <span class="text-sm">Members</span>
+                <div class="flex items-center justify-between text-indigo-100">
+                    <div class="flex items-center">
+                        <i class="fas fa-users mr-2"></i>
+                        <span class="text-sm font-medium">Members</span>
+                    </div>
+                    <div class="w-2 h-2 bg-indigo-300 rounded-full animate-pulse"></div>
+                </div>
+            </div>
+
+            <div class="group bg-gradient-to-br from-rose-500 via-pink-600 to-red-700 rounded-3xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:rotate-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm group-hover:bg-white/30 transition-all duration-300">
+                        <i class="fas fa-graduation-cap text-2xl group-hover:scale-110 transition-transform duration-300"></i>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-rose-100 text-sm font-medium uppercase tracking-wide">STUDENTS Chapter</p>
+                        <p class="text-3xl font-bold group-hover:scale-110 transition-transform duration-300">{{ $stats['chapter_stats']['STUDENTS'] ?? 0 }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-rose-100">
+                    <div class="flex items-center">
+                        <i class="fas fa-user-graduate mr-2"></i>
+                        <span class="text-sm font-medium">Students</span>
+                    </div>
+                    <div class="w-2 h-2 bg-rose-300 rounded-full animate-pulse"></div>
                 </div>
             </div>
         </div>
@@ -282,6 +334,7 @@
                                 <option value="ACCRA" {{ request('chapter') == 'ACCRA' ? 'selected' : '' }}>ACCRA</option>
                                 <option value="KUMASI" {{ request('chapter') == 'KUMASI' ? 'selected' : '' }}>KUMASI</option>
                                 <option value="NEW JESSY" {{ request('chapter') == 'NEW JESSY' ? 'selected' : '' }}>NEW JESSY</option>
+                                <option value="STUDENTS" {{ request('chapter') == 'STUDENTS' ? 'selected' : '' }}>STUDENTS</option>
                             </select>
                         </div>
                         

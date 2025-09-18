@@ -233,7 +233,24 @@ Route::prefix('member')->name('member.')->group(function () {
         Route::get('/events', function () { return view('member.events.index'); })->name('events.index');
         Route::get('/events/{event}', function () { return view('member.events.show'); })->name('events.show');
         Route::get('/ministries', function () { return view('member.ministries.index'); })->name('ministries.index');
-        Route::get('/family', function () { return view('member.family.index'); })->name('family.index');
+        
+        // Family management routes
+        Route::get('/family', [App\Http\Controllers\Member\MemberFamilyController::class, 'index'])->name('family.index');
+        Route::get('/family/create', [App\Http\Controllers\Member\MemberFamilyController::class, 'create'])->name('family.create');
+        Route::post('/family', [App\Http\Controllers\Member\MemberFamilyController::class, 'store'])->name('family.store');
+        Route::get('/family/member/{familyMember}', [App\Http\Controllers\Member\MemberFamilyController::class, 'showMember'])->name('family.show-member');
+        Route::get('/family/export', [App\Http\Controllers\Member\MemberFamilyController::class, 'exportFamily'])->name('family.export');
+        
+        // Testimonies routes
+        Route::resource('testimonies', App\Http\Controllers\Member\TestimonyController::class);
+        Route::get('/my-testimonies', [App\Http\Controllers\Member\TestimonyController::class, 'myTestimonies'])->name('testimonies.my-testimonies');
+        
+        // Prayer Requests routes
+        Route::resource('prayer-requests', App\Http\Controllers\Member\PrayerRequestController::class);
+        Route::get('/my-prayer-requests', [App\Http\Controllers\Member\PrayerRequestController::class, 'myRequests'])->name('prayer-requests.my-requests');
+        Route::post('/prayer-requests/{prayerRequest}/pray', [App\Http\Controllers\Member\PrayerRequestController::class, 'pray'])->name('prayer-requests.pray');
+        Route::post('/prayer-requests/{prayerRequest}/mark-answered', [App\Http\Controllers\Member\PrayerRequestController::class, 'markAnswered'])->name('prayer-requests.mark-answered');
+        
         Route::get('/settings', function () { return view('member.settings.index'); })->name('settings.index');
         Route::get('/help', function () { return view('member.help.index'); })->name('help.index');
     });
@@ -340,6 +357,30 @@ Route::middleware(['auth'])->group(function () {
         
         // Announcements Management (Admin Only)
         Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->except(['index', 'show']);
+        
+        // Testimonies Management (Admin Only)
+        Route::prefix('admin/testimonies')->name('admin.testimonies.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\TestimonyController::class, 'index'])->name('index');
+            Route::get('/{testimony}', [\App\Http\Controllers\Admin\TestimonyController::class, 'show'])->name('show');
+            Route::post('/{testimony}/approve', [\App\Http\Controllers\Admin\TestimonyController::class, 'approve'])->name('approve');
+            Route::post('/{testimony}/reject', [\App\Http\Controllers\Admin\TestimonyController::class, 'reject'])->name('reject');
+            Route::delete('/{testimony}', [\App\Http\Controllers\Admin\TestimonyController::class, 'destroy'])->name('destroy');
+            Route::post('/bulk-action', [\App\Http\Controllers\Admin\TestimonyController::class, 'bulkAction'])->name('bulk-action');
+            Route::get('/export/csv', [\App\Http\Controllers\Admin\TestimonyController::class, 'export'])->name('export');
+        });
+        
+        // Prayer Requests Management (Admin Only)
+        Route::prefix('admin/prayer-requests')->name('admin.prayer-requests.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\PrayerRequestController::class, 'index'])->name('index');
+            Route::get('/{prayerRequest}', [\App\Http\Controllers\Admin\PrayerRequestController::class, 'show'])->name('show');
+            Route::post('/{prayerRequest}/mark-answered', [\App\Http\Controllers\Admin\PrayerRequestController::class, 'markAnswered'])->name('mark-answered');
+            Route::post('/{prayerRequest}/reopen', [\App\Http\Controllers\Admin\PrayerRequestController::class, 'reopen'])->name('reopen');
+            Route::post('/{prayerRequest}/close', [\App\Http\Controllers\Admin\PrayerRequestController::class, 'close'])->name('close');
+            Route::delete('/{prayerRequest}', [\App\Http\Controllers\Admin\PrayerRequestController::class, 'destroy'])->name('destroy');
+            Route::post('/bulk-action', [\App\Http\Controllers\Admin\PrayerRequestController::class, 'bulkAction'])->name('bulk-action');
+            Route::get('/export/csv', [\App\Http\Controllers\Admin\PrayerRequestController::class, 'export'])->name('export');
+            Route::get('/statistics/overview', [\App\Http\Controllers\Admin\PrayerRequestController::class, 'statistics'])->name('statistics');
+        });
 
         // Admin Program Management Routes
         Route::prefix('admin/programs')->name('admin.programs.')->middleware(['auth', 'admin'])->group(function () {

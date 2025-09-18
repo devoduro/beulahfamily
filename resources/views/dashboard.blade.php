@@ -27,21 +27,21 @@
                     </div>
                     <p class="text-xl opacity-90 mb-8 max-w-2xl">Empowering our congregation through digital ministry management and community connection</p>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="glass-effect rounded-xl px-4 py-3 text-center">
+                        <div class="glass-effect bg-gradient-to-br from-blue-500/50 to-cyan-600/50 border border-blue-300/50 rounded-xl px-4 py-3 text-center hover:from-blue-500/70 hover:to-cyan-600/70 transition-all duration-300">
                             <div class="text-2xl font-bold text-white">{{ $churchStats['total_members'] ?? 0 }}</div>
                             <div class="text-sm opacity-90">Members</div>
                         </div>
-                        <div class="glass-effect rounded-xl px-4 py-3 text-center">
+                        <div class="glass-effect bg-gradient-to-br from-green-500/50 to-emerald-600/50 border border-green-300/50 rounded-xl px-4 py-3 text-center hover:from-green-500/70 hover:to-emerald-600/70 transition-all duration-300">
                             <div class="text-2xl font-bold text-white">{{ $churchStats['total_families'] ?? 0 }}</div>
                             <div class="text-sm opacity-90">Families</div>
                         </div>
-                        <div class="glass-effect rounded-xl px-4 py-3 text-center">
-                            <div class="text-2xl font-bold text-white">{{ $churchStats['upcoming_events'] ?? 0 }}</div>
-                            <div class="text-sm opacity-90">Events</div>
+                        <div class="glass-effect bg-gradient-to-br from-purple-500/50 to-pink-600/50 border border-purple-300/50 rounded-xl px-4 py-3 text-center hover:from-purple-500/70 hover:to-pink-600/70 transition-all duration-300">
+                            <div class="text-2xl font-bold text-white">{{ $churchStats['total_events'] ?? 0 }}</div>
+                            <div class="text-sm opacity-90">Total Events</div>
                         </div>
-                        <div class="glass-effect rounded-xl px-4 py-3 text-center">
-                            <div class="text-2xl font-bold text-white">GHS {{ number_format($churchStats['total_donations_this_year'] ?? 0) }}</div>
-                            <div class="text-sm opacity-90">Donations</div>
+                        <div class="glass-effect bg-gradient-to-br from-yellow-500/50 to-orange-600/50 border border-yellow-300/50 rounded-xl px-4 py-3 text-center hover:from-yellow-500/70 hover:to-orange-600/70 transition-all duration-300">
+                            <div class="text-2xl font-bold text-white">{{ number_format($churchStats['sms_credits'] ?? 0, 2) }}</div>
+                            <div class="text-sm opacity-90">SMS Credits</div>
                         </div>
                     </div>
                 </div>

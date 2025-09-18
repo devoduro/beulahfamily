@@ -414,6 +414,7 @@
                             <option value="ACCRA" {{ old('chapter', 'ACCRA') == 'ACCRA' ? 'selected' : '' }}>ACCRA</option>
                             <option value="KUMASI" {{ old('chapter') == 'KUMASI' ? 'selected' : '' }}>KUMASI</option>
                             <option value="NEW JESSY" {{ old('chapter') == 'NEW JESSY' ? 'selected' : '' }}>NEW JESSY</option>
+                            <option value="STUDENTS" {{ old('chapter') == 'STUDENTS' ? 'selected' : '' }}>STUDENTS</option>
                         </select>
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <i class="fas fa-map-marker-alt text-gray-400"></i>

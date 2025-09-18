@@ -538,8 +538,100 @@
                         @endif
                     </div>
                 </div>
+
+                <!-- Latest Testimonies Section -->
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-lg font-semibold text-gray-900">
+                                <i class="fas fa-heart text-amber-600 mr-2"></i>Latest Testimonies
+                            </h2>
+                            <a href="{{ route('member.testimonies.index') }}" class="text-amber-600 hover:text-amber-800 text-sm font-medium">
+                                View All <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        @php
+                            $latestTestimonies = \App\Models\Testimony::with('member')->published()->latest()->limit(3)->get();
+                        @endphp
+                        
+                        @if($latestTestimonies->count() > 0)
+                            <div class="space-y-4">
+                                @foreach($latestTestimonies as $testimony)
+                                <div class="group p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl hover:from-amber-100 hover:to-orange-100 transition-all duration-300 border border-amber-100">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                            @if($testimony->member->photo_path)
+                                                <img src="{{ asset('storage/' . $testimony->member->photo_path) }}" alt="{{ $testimony->member->full_name }}" class="w-full h-full object-cover rounded-full">
+                                            @else
+                                                <i class="fas fa-user text-white text-sm"></i>
+                                            @endif
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <h4 class="text-sm font-semibold text-gray-900 group-hover:text-amber-700 transition-colors duration-200 truncate">
+                                                    {{ $testimony->title }}
+                                                </h4>
+                                                <span class="text-xs text-gray-500 flex-shrink-0 ml-2">
+                                                    {{ $testimony->created_at->diffForHumans() }}
+                                                </span>
+                                            </div>
+                                            <p class="text-xs text-gray-600 mb-2 line-clamp-2">
+                                                {{ Str::limit($testimony->content, 100) }}
+                                            </p>
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="text-xs font-medium text-amber-700">{{ $testimony->member->full_name }}</span>
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                                        {{ $testimony->category_display }}
+                                                    </span>
+                                                </div>
+                                                <a href="{{ route('member.testimonies.show', $testimony) }}" class="text-xs text-amber-600 hover:text-amber-800 font-medium">
+                                                    Read More →
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            
+                            <!-- Share Testimony CTA -->
+                            <div class="mt-6 p-4 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl text-center">
+                                <h4 class="text-white font-semibold mb-2">Have a testimony to share?</h4>
+                                <p class="text-amber-100 text-sm mb-3">Encourage others with your story of God's goodness!</p>
+                                <a href="{{ route('member.testimonies.create') }}" class="inline-flex items-center px-4 py-2 bg-white text-amber-600 font-semibold rounded-lg hover:bg-amber-50 transition-colors duration-200">
+                                    <i class="fas fa-heart mr-2"></i>
+                                    Share Your Testimony
+                                </a>
+                            </div>
+                        @else
+                            <div class="text-center py-8">
+                                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-heart text-amber-500 text-2xl"></i>
+                                </div>
+                                <h4 class="text-gray-900 font-semibold mb-2">No testimonies yet</h4>
+                                <p class="text-gray-500 text-sm mb-4">Be the first to share how God has worked in your life!</p>
+                                <a href="{{ route('member.testimonies.create') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                    <i class="fas fa-plus mr-2"></i>
+                                    Share Your First Testimony
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
 @endsection

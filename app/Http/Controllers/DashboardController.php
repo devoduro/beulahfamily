@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Document;
 use App\Models\DocumentCategory;
+use App\Services\MNotifyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,13 +36,19 @@ class DashboardController extends Controller
             return redirect()->route('users.portal');
         }
         
+        // Get SMS credits from MNotify
+        $mnotifyService = new MNotifyService();
+        $smsBalance = $mnotifyService->getBalance();
+        $smsCredits = $smsBalance['success'] ? $smsBalance['balance'] : 0;
+
         // Get church management statistics
         $churchStats = [
             'total_members' => \App\Models\Member::count(),
             'active_members' => \App\Models\Member::active()->count(),
             'total_families' => \App\Models\Family::count(),
             'total_ministries' => \App\Models\Ministry::active()->count(),
-            'upcoming_events' => \App\Models\Event::upcoming()->published()->count(),
+            'total_events' => \App\Models\Event::count(), // Changed from upcoming_events to total_events
+            'sms_credits' => $smsCredits, // Added SMS credits from MNotify
             'total_donations_this_year' => \App\Models\Donation::confirmed()
                 ->whereYear('donation_date', now()->year)
                 ->sum('amount'),
@@ -49,6 +56,9 @@ class DashboardController extends Controller
             'total_birthdays' => \App\Models\Member::whereNotNull('date_of_birth')->count(),
             'birthdays_this_month' => \App\Models\Member::whereNotNull('date_of_birth')
                 ->whereRaw('MONTH(date_of_birth) = ?', [now()->month])
+                ->count(),
+            'birthdays_this_week' => \App\Models\Member::whereNotNull('date_of_birth')
+                ->whereRaw('WEEK(date_of_birth) = ?', [now()->week])
                 ->count(),
             // Payment statistics  
             'total_payments' => \App\Models\Donation::confirmed()->count(),
