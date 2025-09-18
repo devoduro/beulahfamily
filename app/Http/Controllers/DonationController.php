@@ -74,6 +74,26 @@ class DonationController extends Controller
 
         $donations = $query->paginate(15);
 
+        // Calculate statistics
+        $stats = [
+            'this_month' => Donation::confirmed()
+                ->whereYear('donation_date', now()->year)
+                ->whereMonth('donation_date', now()->month)
+                ->sum('amount'),
+            'this_year' => Donation::confirmed()
+                ->whereYear('donation_date', now()->year)
+                ->sum('amount'),
+            'total_donors' => Donation::confirmed()
+                ->distinct('member_id')
+                ->whereNotNull('member_id')
+                ->count() + 
+                Donation::confirmed()
+                ->whereNull('member_id')
+                ->distinct('donor_email')
+                ->count(),
+            'average_gift' => Donation::confirmed()->avg('amount') ?? 0
+        ];
+
         if ($request->ajax()) {
             return response()->json([
                 'donations' => $donations->items(),
@@ -85,7 +105,7 @@ class DonationController extends Controller
             ]);
         }
 
-        return view('donations.index', compact('donations'));
+        return view('donations.index', compact('donations', 'stats'));
     }
 
 

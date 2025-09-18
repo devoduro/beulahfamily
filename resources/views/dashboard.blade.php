@@ -39,9 +39,17 @@
                             <div class="text-2xl font-bold text-white">{{ $churchStats['total_events'] ?? 0 }}</div>
                             <div class="text-sm opacity-90">Total Events</div>
                         </div>
-                        <div class="glass-effect bg-gradient-to-br from-yellow-500/50 to-orange-600/50 border border-yellow-300/50 rounded-xl px-4 py-3 text-center hover:from-yellow-500/70 hover:to-orange-600/70 transition-all duration-300">
-                            <div class="text-2xl font-bold text-white">{{ number_format($churchStats['sms_credits'] ?? 0, 2) }}</div>
+                        <div class="glass-effect bg-gradient-to-br from-yellow-500/50 to-orange-600/50 border border-yellow-300/50 rounded-xl px-4 py-3 text-center hover:from-yellow-500/70 hover:to-orange-600/70 transition-all duration-300 relative group">
+                            <div class="text-2xl font-bold text-white" id="sms-balance">{{ number_format($churchStats['sms_credits'] ?? 0, 2) }}</div>
                             <div class="text-sm opacity-90">SMS Credits</div>
+                            @if(($churchStats['sms_credits'] ?? 0) == 0)
+                                <div class="text-xs opacity-75 mt-1">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>Check API Config
+                                </div>
+                            @endif
+                            <button onclick="refreshSmsBalance()" class="absolute top-2 right-2 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white/30" title="Refresh SMS Balance">
+                                <i class="fas fa-sync-alt text-white text-xs" id="refresh-icon"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -430,6 +438,74 @@
         </div>
     </div>
 </div>
+
+<script>
+async function refreshSmsBalance() {
+    const button = event.target.closest('button');
+    const icon = document.getElementById('refresh-icon');
+    const balanceElement = document.getElementById('sms-balance');
+    
+    // Show loading state
+    icon.classList.add('fa-spin');
+    button.disabled = true;
+    
+    try {
+        const response = await fetch('/api/sms-balance', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            balanceElement.textContent = parseFloat(data.balance).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            // Show success feedback
+            button.classList.add('bg-green-500/30');
+            setTimeout(() => {
+                button.classList.remove('bg-green-500/30');
+            }, 1000);
+            
+            // Hide error message if balance is now > 0
+            const errorMsg = button.closest('.glass-effect').querySelector('.text-xs');
+            if (data.balance > 0 && errorMsg) {
+                errorMsg.style.display = 'none';
+            }
+        } else {
+            // Show error feedback
+            button.classList.add('bg-red-500/30');
+            setTimeout(() => {
+                button.classList.remove('bg-red-500/30');
+            }, 1000);
+            
+            console.error('Failed to refresh SMS balance:', data.error);
+            
+            // Show error message in console for debugging
+            if (data.error) {
+                console.log('MNotify API Error Details:', data.error);
+            }
+        }
+    } catch (error) {
+        console.error('Error refreshing SMS balance:', error);
+        
+        // Show error feedback
+        button.classList.add('bg-red-500/30');
+        setTimeout(() => {
+            button.classList.remove('bg-red-500/30');
+        }, 1000);
+    } finally {
+        // Remove loading state
+        icon.classList.remove('fa-spin');
+        button.disabled = false;
+    }
+}
+</script>
 @endsection
 
 

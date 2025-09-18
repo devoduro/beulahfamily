@@ -14,7 +14,7 @@ class MinistryController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Ministry::with(['leader', 'members']);
+        $query = Ministry::with(['leader', 'members'])->withCount('members');
 
         // Search functionality
         if ($request->has('search') && $request->search) {
@@ -122,7 +122,7 @@ class MinistryController extends Controller
     public function show(Ministry $ministry)
     {
         $ministry->load(['leader', 'members' => function ($query) {
-            $query->orderBy('pivot.role', 'desc')
+            $query->orderByPivot('role', 'desc')
                   ->orderBy('first_name');
         }]);
 
@@ -219,7 +219,7 @@ class MinistryController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'member_id' => 'required|exists:members,id',
-            'role' => 'required|string|in:leader,member,volunteer'
+            'role' => 'required|string|in:leader,member,coordinator,assistant_leader'
         ]);
 
         if ($validator->fails()) {
@@ -232,7 +232,7 @@ class MinistryController extends Controller
         $member = Member::findOrFail($request->member_id);
         
         // Check if member is already in this ministry
-        if ($ministry->members()->where('member_id', $member->id)->exists()) {
+        if ($ministry->members()->where('member_ministry.member_id', $member->id)->exists()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Member is already part of this ministry.'
@@ -257,7 +257,7 @@ class MinistryController extends Controller
      */
     public function removeMember(Request $request, Ministry $ministry, Member $member)
     {
-        if (!$ministry->members()->where('member_id', $member->id)->exists()) {
+        if (!$ministry->members()->where('member_ministry.member_id', $member->id)->exists()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Member is not part of this ministry.'
@@ -278,7 +278,7 @@ class MinistryController extends Controller
     public function updateMemberRole(Request $request, Ministry $ministry, Member $member)
     {
         $validator = Validator::make($request->all(), [
-            'role' => 'required|string|in:leader,member,volunteer',
+            'role' => 'required|string|in:leader,member,coordinator,assistant_leader',
             'is_active' => 'boolean'
         ]);
 
@@ -289,7 +289,7 @@ class MinistryController extends Controller
             ], 422);
         }
 
-        if (!$ministry->members()->where('member_id', $member->id)->exists()) {
+        if (!$ministry->members()->where('member_ministry.member_id', $member->id)->exists()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Member is not part of this ministry.'
@@ -305,6 +305,35 @@ class MinistryController extends Controller
             'success' => true,
             'message' => 'Member role updated successfully!'
         ]);
+    }
+
+    /**
+     * Show the member management page for a ministry.
+     */
+    public function manageMembers(Ministry $ministry)
+    {
+        $ministry->load(['members' => function ($query) {
+            $query->orderByPivot('role', 'desc')
+                  ->orderBy('first_name');
+        }]);
+
+        // Get all members not in this ministry with additional info
+        $availableMembers = Member::active()
+            ->whereNotIn('id', $ministry->members->pluck('id'))
+            ->select('id', 'first_name', 'last_name', 'email', 'phone', 'gender', 'marital_status', 'date_of_birth', 'photo')
+            ->orderBy('first_name')
+            ->get();
+
+        // Get filter options
+        $genders = ['male' => 'Male', 'female' => 'Female'];
+        $maritalStatuses = [
+            'single' => 'Single',
+            'married' => 'Married', 
+            'divorced' => 'Divorced',
+            'widowed' => 'Widowed'
+        ];
+
+        return view('ministries.manage-members', compact('ministry', 'availableMembers', 'genders', 'maritalStatuses'));
     }
 
     /**

@@ -39,7 +39,17 @@ class DashboardController extends Controller
         // Get SMS credits from MNotify
         $mnotifyService = new MNotifyService();
         $smsBalance = $mnotifyService->getBalance();
-        $smsCredits = $smsBalance['success'] ? $smsBalance['balance'] : 0;
+        $smsCredits = 0;
+        
+        if ($smsBalance['success']) {
+            $smsCredits = $smsBalance['balance'];
+        } else {
+            // Log the error for debugging
+            \Log::warning('Failed to fetch MNotify balance for dashboard', [
+                'error' => $smsBalance['error'] ?? 'Unknown error',
+                'response' => $smsBalance['response'] ?? null
+            ]);
+        }
 
         // Get church management statistics
         $churchStats = [

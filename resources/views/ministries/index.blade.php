@@ -12,7 +12,7 @@
             <p class="text-gray-600 mt-1">Organize and manage ministry groups and their activities</p>
         </div>
         <div class="flex gap-3">
-            <a href="{{ route('ministries.create') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg hover:shadow-xl">
+            <a href="{{ route('ministries.create.public') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg hover:shadow-xl">
                 <i class="fas fa-hands-praying mr-2"></i>
                 Add Ministry
             </a>
@@ -73,23 +73,27 @@
                             <i class="fas fa-hands-praying text-white text-lg"></i>
                         </div>
                         <div>
-                            <h3 class="font-semibold text-gray-900">{{ $ministry->name ?? 'Worship Ministry' }}</h3>
-                            <p class="text-sm text-gray-600">{{ $ministry->category ?? 'Worship' }}</p>
+                            <h3 class="font-semibold text-gray-900">{{ $ministry->name }}</h3>
+                            <p class="text-sm text-gray-600">{{ ucfirst($ministry->ministry_type) }} Ministry</p>
                         </div>
                     </div>
                     <div class="flex space-x-2">
-                        <a href="{{ route('ministries.show', $ministry->id ?? 1) }}" class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
+                        <a href="{{ route('ministries.show', $ministry->id) }}" class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <a href="{{ route('ministries.edit', $ministry->id ?? 1) }}" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors">
-                            <i class="fas fa-edit"></i>
-                        </a>
+                        @auth
+                            @if(auth()->user()->role === 'admin')
+                                <a href="{{ route('ministries.edit', $ministry->id) }}" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            @endif
+                        @endauth
                     </div>
                 </div>
 
                 <!-- Ministry Description -->
                 <p class="text-sm text-gray-600 mb-4 line-clamp-3">
-                    {{ $ministry->description ?? 'Leading worship services and music ministry for the congregation. Coordinating musicians, singers, and technical support for all church services.' }}
+                    {{ $ministry->description ?: 'No description available for this ministry.' }}
                 </p>
 
                 <!-- Ministry Leader -->
@@ -99,7 +103,7 @@
                             <i class="fas fa-user text-white text-sm"></i>
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-900">{{ $ministry->leader->full_name ?? 'Sarah Johnson' }}</p>
+                            <p class="text-sm font-medium text-gray-900">{{ $ministry->leader->full_name ?? 'No Leader Assigned' }}</p>
                             <p class="text-xs text-gray-600">Ministry Leader</p>
                         </div>
                     </div>
@@ -108,34 +112,55 @@
                 <!-- Ministry Stats -->
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="text-center p-3 bg-gray-50 rounded-lg">
-                        <div class="text-lg font-bold text-gray-900">{{ $ministry->members_count ?? 12 }}</div>
+                        <div class="text-lg font-bold text-gray-900">{{ $ministry->members_count ?? 0 }}</div>
                         <div class="text-xs text-gray-600">Members</div>
                     </div>
                     <div class="text-center p-3 bg-gray-50 rounded-lg">
-                        <div class="text-lg font-bold text-gray-900">${{ number_format($ministry->budget ?? 2500) }}</div>
+                        <div class="text-lg font-bold text-gray-900">
+                            @if($ministry->budget)
+                                GHS {{ number_format($ministry->budget, 0) }}
+                            @else
+                                No Budget
+                            @endif
+                        </div>
                         <div class="text-xs text-gray-600">Budget</div>
                     </div>
                 </div>
 
                 <!-- Meeting Schedule -->
                 <div class="mb-4">
-                    <div class="flex items-center text-sm text-gray-600 mb-2">
-                        <i class="fas fa-calendar w-4 mr-3 text-gray-400"></i>
-                        <span>{{ $ministry->meeting_schedule ?? 'Sundays 9:00 AM' }}</span>
-                    </div>
+                    @if($ministry->meeting_day || $ministry->meeting_time)
+                        <div class="flex items-center text-sm text-gray-600 mb-2">
+                            <i class="fas fa-calendar w-4 mr-3 text-gray-400"></i>
+                            <span>
+                                @if($ministry->meeting_day)
+                                    {{ ucfirst($ministry->meeting_day) }}s
+                                @endif
+                                @if($ministry->meeting_time)
+                                    at {{ \Carbon\Carbon::parse($ministry->meeting_time)->format('g:i A') }}
+                                @endif
+                            </span>
+                        </div>
+                    @else
+                        <div class="flex items-center text-sm text-gray-600 mb-2">
+                            <i class="fas fa-calendar w-4 mr-3 text-gray-400"></i>
+                            <span>No schedule set</span>
+                        </div>
+                    @endif
+                    
                     <div class="flex items-center text-sm text-gray-600">
                         <i class="fas fa-map-marker-alt w-4 mr-3 text-gray-400"></i>
-                        <span>{{ $ministry->meeting_location ?? 'Sanctuary' }}</span>
+                        <span>{{ $ministry->meeting_location ?: 'No location set' }}</span>
                     </div>
                 </div>
 
                 <!-- Status and Actions -->
                 <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ ($ministry->is_active ?? true) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                        {{ ($ministry->is_active ?? true) ? 'Active' : 'Inactive' }}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $ministry->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                        {{ $ministry->is_active ? 'Active' : 'Inactive' }}
                     </span>
                     <div class="flex space-x-2">
-                        <button class="text-xs text-purple-600 hover:text-purple-800 font-medium">Manage Members</button>
+                        <a href="{{ route('ministries.members.manage', $ministry->id) }}" class="text-xs text-purple-600 hover:text-purple-800 font-medium">Manage Members</a>
                     </div>
                 </div>
             </div>
@@ -147,7 +172,7 @@
                     </div>
                     <h3 class="text-lg font-medium text-gray-900 mb-2">No ministries found</h3>
                     <p class="text-gray-500 mb-6">Get started by creating your first ministry group.</p>
-                    <a href="{{ route('ministries.create') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-200">
+                    <a href="{{ route('ministries.create.public') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-200">
                         <i class="fas fa-hands-praying mr-2"></i>
                         Create First Ministry
                     </a>

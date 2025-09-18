@@ -283,6 +283,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/ministries', [\App\Http\Controllers\MinistryController::class, 'index'])->name('ministries.index');
     Route::get('/ministries/{ministry}', [\App\Http\Controllers\MinistryController::class, 'show'])->name('ministries.show');
     
+    // Ministry creation - accessible to all authenticated users
+    Route::get('/new-ministry', [\App\Http\Controllers\MinistryController::class, 'create'])->name('ministries.create.public');
+    Route::post('/new-ministry', [\App\Http\Controllers\MinistryController::class, 'store'])->name('ministries.store.public');
+    
+    // Ministry member management - accessible to all authenticated users
+    Route::get('/ministries/{ministry}/members', [\App\Http\Controllers\MinistryController::class, 'manageMembers'])->name('ministries.members.manage');
+    Route::post('/ministries/{ministry}/members', [\App\Http\Controllers\MinistryController::class, 'addMember'])->name('ministries.members.add');
+    Route::delete('/ministries/{ministry}/members/{member}', [\App\Http\Controllers\MinistryController::class, 'removeMember'])->name('ministries.members.remove');
+    Route::patch('/ministries/{ministry}/members/{member}', [\App\Http\Controllers\MinistryController::class, 'updateMemberRole'])->name('ministries.members.update');
+    
     // Families - View access for all users
     Route::get('/families', [\App\Http\Controllers\FamilyController::class, 'index'])->name('families.index');
     Route::get('/families/{family}', [\App\Http\Controllers\FamilyController::class, 'show'])->name('families.show');
@@ -438,5 +448,9 @@ Route::middleware(['auth'])->group(function () {
         // Institution Settings
         Route::get('/settings/institution', [SettingController::class, 'institution'])->name('settings.institution');
         Route::put('/settings/institution', [SettingController::class, 'updateInstitution'])->name('settings.institution.update');
+        
+        // SMS Configuration
+        Route::get('/sms-config', [\App\Http\Controllers\Admin\SmsConfigController::class, 'index'])->name('admin.sms-config');
+        Route::get('/sms-config/test', [\App\Http\Controllers\Admin\SmsConfigController::class, 'test'])->name('admin.sms-config.test');
     });
 });

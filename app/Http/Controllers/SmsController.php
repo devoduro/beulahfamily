@@ -66,15 +66,25 @@ class SmsController extends Controller
     public function create()
     {
         $templates = SmsTemplate::active()->orderBy('name')->get();
-        $members = Member::select('id', 'first_name', 'last_name', 'phone', 'chapter')
+        $members = Member::select('id', 'first_name', 'last_name', 'phone', 'chapter', 'gender', 'marital_status', 'date_of_birth', 'photo')
                         ->whereNotNull('phone')
                         ->orderBy('first_name')
                         ->get();
 
+        // Get filter options
+        $chapters = Member::distinct()->pluck('chapter')->filter()->sort()->values();
+        $genders = ['male' => 'Male', 'female' => 'Female'];
+        $maritalStatuses = [
+            'single' => 'Single',
+            'married' => 'Married', 
+            'divorced' => 'Divorced',
+            'widowed' => 'Widowed'
+        ];
+
         // Get balance from MNotify
         $balance = $this->mnotifyService->getBalance();
 
-        return view('sms.create', compact('templates', 'members', 'balance'));
+        return view('sms.create', compact('templates', 'members', 'balance', 'chapters', 'genders', 'maritalStatuses'));
     }
 
     /**

@@ -15,7 +15,7 @@
             <p class="text-gray-600 text-lg mt-2">Establish a new ministry to serve your church community</p>
         </div>
 
-        <form action="{{ route('ministries.store') }}" method="POST" class="space-y-8">
+        <form action="{{ route('ministries.store.public') }}" method="POST" class="space-y-8">
             @csrf
             
             <!-- Basic Information -->

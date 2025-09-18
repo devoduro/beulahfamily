@@ -29,7 +29,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600 mb-1">This Month</p>
-                    <p class="text-2xl font-bold text-gray-900">GHS {{ number_format(25450, 2) }}</p>
+                    <p class="text-2xl font-bold text-gray-900">GHS {{ number_format($stats['this_month'], 2) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
                     <i class="fas fa-calendar text-white"></i>
@@ -40,7 +40,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600 mb-1">This Year</p>
-                    <p class="text-2xl font-bold text-gray-900">GHS {{ number_format(185750, 2) }}</p>
+                    <p class="text-2xl font-bold text-gray-900">GHS {{ number_format($stats['this_year'], 2) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
                     <i class="fas fa-chart-line text-white"></i>
@@ -51,7 +51,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600 mb-1">Total Donors</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ number_format(127) }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total_donors']) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
                     <i class="fas fa-users text-white"></i>
@@ -62,7 +62,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600 mb-1">Average Gift</p>
-                    <p class="text-2xl font-bold text-gray-900">GHS {{ number_format(125, 2) }}</p>
+                    <p class="text-2xl font-bold text-gray-900">GHS {{ number_format($stats['average_gift'], 2) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center">
                     <i class="fas fa-hand-holding-heart text-white"></i>
@@ -143,43 +143,64 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($donations ?? [] as $donation)
+                    @forelse($donations as $donation)
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-user text-white text-sm"></i>
+                                        @if($donation->member && $donation->member->photo_path)
+                                            <img src="{{ asset('storage/' . $donation->member->photo_path) }}" alt="{{ $donation->member->full_name }}" class="w-full h-full object-cover rounded-full">
+                                        @else
+                                            <i class="fas fa-user text-white text-sm"></i>
+                                        @endif
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">{{ $donation->member->full_name ?? 'John Doe' }}</div>
-                                        <div class="text-sm text-gray-500">{{ $donation->member->email ?? 'john@example.com' }}</div>
+                                        <div class="text-sm font-medium text-gray-900">
+                                            {{ $donation->member ? $donation->member->full_name : $donation->donor_name }}
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            {{ $donation->member ? $donation->member->email : $donation->donor_email }}
+                                        </div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">GHS {{ number_format($donation->amount ?? 150, 2) }}</div>
+                                <div class="text-sm font-medium text-gray-900">GHS {{ number_format($donation->amount, 2) }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {{ ucfirst($donation->type ?? 'Tithe') }}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    @if($donation->donation_type === 'tithe') bg-blue-100 text-blue-800
+                                    @elseif($donation->donation_type === 'offering') bg-green-100 text-green-800
+                                    @elseif($donation->donation_type === 'building_fund') bg-purple-100 text-purple-800
+                                    @elseif($donation->donation_type === 'missions') bg-orange-100 text-orange-800
+                                    @else bg-gray-100 text-gray-800 @endif">
+                                    {{ ucfirst(str_replace('_', ' ', $donation->donation_type)) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ ucfirst($donation->payment_method ?? 'Cash') }}
+                                {{ ucfirst(str_replace('_', ' ', $donation->payment_method)) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $donation->donation_date ? $donation->donation_date->format('M j, Y') : 'Jan 15, 2025' }}
+                                {{ $donation->donation_date->format('M j, Y') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ ($donation->status ?? 'confirmed') === 'confirmed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                    {{ ucfirst($donation->status ?? 'Confirmed') }}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    @if($donation->status === 'confirmed') bg-green-100 text-green-800
+                                    @elseif($donation->status === 'pending') bg-yellow-100 text-yellow-800
+                                    @elseif($donation->status === 'failed') bg-red-100 text-red-800
+                                    @else bg-gray-100 text-gray-800 @endif">
+                                    {{ ucfirst($donation->status) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <a href="{{ route('donations.show', $donation->id ?? 1) }}" class="text-blue-600 hover:text-blue-900">View</a>
-                                    <a href="{{ route('donations.edit', $donation->id ?? 1) }}" class="text-green-600 hover:text-green-900">Edit</a>
-                                    <button class="text-purple-600 hover:text-purple-900">Receipt</button>
+                                    <a href="{{ route('donations.show', $donation) }}" class="text-blue-600 hover:text-blue-900">View</a>
+                                    <a href="{{ route('donations.edit', $donation) }}" class="text-green-600 hover:text-green-900">Edit</a>
+                                    @if($donation->receipt_number)
+                                        <a href="{{ route('donations.receipt.download', $donation) }}" class="text-purple-600 hover:text-purple-900">Receipt</a>
+                                    @else
+                                        <button onclick="generateReceipt({{ $donation->id }})" class="text-purple-600 hover:text-purple-900">Generate Receipt</button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -210,4 +231,29 @@
         </div>
     @endif
 </div>
+
+<script>
+function generateReceipt(donationId) {
+    fetch(`/donations/${donationId}/generate-receipt`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Receipt generated successfully!');
+            location.reload();
+        } else {
+            alert('Failed to generate receipt.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while generating the receipt.');
+    });
+}
+</script>
 @endsection

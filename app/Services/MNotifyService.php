@@ -16,7 +16,7 @@ class MNotifyService
     {
         $this->apiKey = config('services.mnotify.api_key');
         $this->senderId = config('services.mnotify.sender_id');
-        $this->baseUrl = 'https://api.mnotify.com/api';
+        $this->baseUrl = 'https://sms.pastechsolutions.com';
     }
 
     /**
@@ -25,20 +25,17 @@ class MNotifyService
     public function sendSMS($recipient, $message, $senderId = null)
     {
         try {
-            $response = Http::timeout(30)->post($this->baseUrl . '/sms/quick', [
-                'recipient' => [$this->formatPhoneNumber($recipient)],
-                'sender' => $senderId ?? $this->senderId,
-                'message' => $message,
-                'is_schedule' => false,
-                'schedule_date' => ''
-            ], [
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Content-Type' => 'application/json',
+            $url = $this->baseUrl . '/smsapi?' . http_build_query([
+                'key' => $this->apiKey,
+                'to' => $this->formatPhoneNumber($recipient),
+                'msg' => $message,
+                'sender_id' => $senderId ?? $this->senderId
             ]);
 
+            $response = Http::timeout(30)->get($url);
             $responseData = $response->json();
 
-            if ($response->successful() && isset($responseData['code']) && $responseData['code'] === '2000') {
+            if ($response->successful() && isset($responseData['code']) && $responseData['code'] === '1000') {
                 Log::info('SMS sent successfully', [
                     'recipient' => $recipient,
                     'message_id' => $responseData['message_id'] ?? null,
@@ -52,15 +49,20 @@ class MNotifyService
                     'response' => $responseData
                 ];
             } else {
+                $errorMessage = isset($responseData['code']) ? 
+                    $this->getPastechErrorMessage($responseData['code']) : 
+                    'SMS sending failed';
+
                 Log::error('SMS sending failed', [
                     'recipient' => $recipient,
                     'response' => $responseData,
-                    'status_code' => $response->status()
+                    'status_code' => $response->status(),
+                    'error' => $errorMessage
                 ]);
 
                 return [
                     'success' => false,
-                    'error' => $responseData['message'] ?? 'SMS sending failed',
+                    'error' => $errorMessage,
                     'response' => $responseData
                 ];
             }
@@ -234,33 +236,122 @@ class MNotifyService
     public function getBalance()
     {
         try {
-            $response = Http::timeout(30)->get($this->baseUrl . '/balance', [], [
-                'Authorization' => 'Bearer ' . $this->apiKey,
-            ]);
+            // Try both Pastech balance endpoints
+            $endpoints = [
+                $this->baseUrl . '/api/smsapibalance?key=' . $this->apiKey,
+                $this->baseUrl . '/api/balance/sms?key=' . $this->apiKey
+            ];
 
-            $responseData = $response->json();
+            foreach ($endpoints as $url) {
+                $response = Http::timeout(30)->get($url);
+                $responseBody = $response->body();
+                
+                // Try to parse as JSON first
+                $responseData = json_decode($responseBody, true);
+                
+                Log::info('Pastech SMS API Test', [
+                    'url' => $url,
+                    'status_code' => $response->status(),
+                    'raw_response' => $responseBody,
+                    'parsed_response' => $responseData
+                ]);
 
-            if ($response->successful() && isset($responseData['code']) && $responseData['code'] === '2000') {
-                return [
-                    'success' => true,
-                    'balance' => $responseData['balance'] ?? 0,
-                    'currency' => $responseData['currency'] ?? 'GHS'
-                ];
-            } else {
-                return [
-                    'success' => false,
-                    'error' => 'Failed to get balance',
-                    'response' => $responseData
-                ];
+                if ($response->successful()) {
+                    // Check if response is just a number (balance)
+                    if (is_numeric($responseBody)) {
+                        return [
+                            'success' => true,
+                            'balance' => (float) $responseBody,
+                            'currency' => 'GHS',
+                            'response' => $responseBody,
+                            'endpoint_used' => $url
+                        ];
+                    }
+                    
+                    // Check if response contains balance information in JSON
+                    if (is_array($responseData)) {
+                        if (isset($responseData['balance']) || isset($responseData['credit_balance']) || isset($responseData['credits'])) {
+                            $balance = $responseData['balance'] ?? $responseData['credit_balance'] ?? $responseData['credits'] ?? 0;
+                            
+                            return [
+                                'success' => true,
+                                'balance' => (float) $balance,
+                                'currency' => $responseData['currency'] ?? 'GHS',
+                                'response' => $responseData,
+                                'endpoint_used' => $url
+                            ];
+                        }
+                        
+                        // Check for success response codes (1000 = success)
+                        if (isset($responseData['code']) && $responseData['code'] == '1000') {
+                            $balance = $responseData['balance'] ?? $responseData['credit_balance'] ?? $responseData['credits'] ?? 0;
+                            
+                            return [
+                                'success' => true,
+                                'balance' => (float) $balance,
+                                'currency' => 'GHS',
+                                'response' => $responseData,
+                                'endpoint_used' => $url
+                            ];
+                        }
+                        
+                        // Check for specific error codes
+                        if (isset($responseData['code'])) {
+                            $errorMessage = $this->getPastechErrorMessage($responseData['code']);
+                            if ($errorMessage) {
+                                return [
+                                    'success' => false,
+                                    'error' => $errorMessage,
+                                    'response' => $responseData,
+                                    'balance' => 0
+                                ];
+                            }
+                        }
+                    }
+                    
+                    // If response is successful but no balance found, try next endpoint
+                    continue;
+                }
             }
 
-        } catch (\Exception $e) {
-            Log::error('Balance check error: ' . $e->getMessage());
+            // If all endpoints failed
             return [
                 'success' => false,
-                'error' => 'Balance check error: ' . $e->getMessage()
+                'error' => 'Failed to get balance from all endpoints',
+                'response' => $responseData ?? null,
+                'balance' => 0
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Balance check error: ' . $e->getMessage(), [
+                'exception' => $e->getTraceAsString(),
+                'api_key_prefix' => substr($this->apiKey ?? '', 0, 10) . '...'
+            ]);
+            return [
+                'success' => false,
+                'error' => 'Balance check error: ' . $e->getMessage(),
+                'balance' => 0
             ];
         }
+    }
+
+    /**
+     * Get error message for Pastech response codes
+     */
+    private function getPastechErrorMessage($code)
+    {
+        $errorCodes = [
+            '1000' => null, // Success
+            '1002' => 'SMS sending failed',
+            '1003' => 'Insufficient balance',
+            '1004' => 'Invalid API key',
+            '1005' => 'Invalid phone number',
+            '1006' => 'Invalid sender ID (must not be more than 11 characters)',
+            '1007' => 'Message scheduled for later delivery',
+            '1008' => 'Empty message'
+        ];
+
+        return $errorCodes[$code] ?? 'Unknown error code: ' . $code;
     }
 
     /**

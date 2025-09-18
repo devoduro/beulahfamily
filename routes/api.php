@@ -17,3 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// SMS API routes (using web middleware for session-based auth)
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/sms-balance', [App\Http\Controllers\Api\SmsController::class, 'getBalance']);
+    Route::get('/sms-stats', [App\Http\Controllers\Api\SmsController::class, 'getStats']);
+});
