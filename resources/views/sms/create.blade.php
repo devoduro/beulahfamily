@@ -156,7 +156,7 @@
                         <div class="text-sm text-slate-500">Total Members</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-black text-purple-600" id="campaign-cost">$0.00</div>
+                        <div class="text-2xl font-black text-purple-600" id="campaign-cost">GHS0.00</div>
                         <div class="text-sm text-slate-500">Estimated Cost</div>
                     </div>
                 </div>
