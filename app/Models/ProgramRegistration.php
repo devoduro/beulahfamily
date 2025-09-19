@@ -102,6 +102,14 @@ class ProgramRegistration extends Model
     }
 
     /**
+     * Get business type label (alias for formatted_business_type)
+     */
+    public function getBusinessTypeLabel(): string
+    {
+        return $this->getFormattedBusinessTypeAttribute();
+    }
+
+    /**
      * Get status badge color
      */
     public function getStatusColorAttribute(): string

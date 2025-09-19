@@ -164,7 +164,11 @@ class Program extends Model
      */
     public function getDateRangeAttribute(): string
     {
-        if ($this->start_date->isSameDay($this->end_date)) {
+        if (!$this->start_date) {
+            return 'Date TBD';
+        }
+
+        if (!$this->end_date || $this->start_date->isSameDay($this->end_date)) {
             return $this->start_date->format('M j, Y');
         }
 

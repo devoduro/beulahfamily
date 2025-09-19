@@ -1,4 +1,4 @@
-@extends('components.app-layout')
+@extends('components.public-layout')
 
 @section('title', 'Registration Successful')
 

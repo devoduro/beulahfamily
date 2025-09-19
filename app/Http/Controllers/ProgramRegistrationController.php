@@ -21,7 +21,7 @@ class ProgramRegistrationController extends Controller
                            ->with('error', 'Registration is closed for this program.');
         }
 
-        $members = Member::where('status', 'active')->orderBy('first_name')->get();
+        $members = Member::where('membership_status', 'active')->orderBy('first_name')->get();
         $businessTypes = ProgramRegistration::getBusinessTypeOptions();
 
         return view('programs.register', compact('program', 'members', 'businessTypes'));
@@ -113,7 +113,7 @@ class ProgramRegistrationController extends Controller
      */
     public function edit(Program $program, ProgramRegistration $registration)
     {
-        $members = Member::where('status', 'active')->orderBy('first_name')->get();
+        $members = Member::where('membership_status', 'active')->orderBy('first_name')->get();
         $businessTypes = ProgramRegistration::getBusinessTypeOptions();
 
         return view('programs.edit-registration', compact('program', 'registration', 'members', 'businessTypes'));

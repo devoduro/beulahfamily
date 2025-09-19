@@ -38,11 +38,9 @@ Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logou
 
 
 
-// Guest Routes
-Route::middleware(['guest'])->group(function () {
-    Route::get('/', function () {
-        return redirect()->route('login');
-    });
+// Public Routes (accessible to everyone)
+Route::get('/', function () {
+    return redirect()->route('programs.index');
 });
 
 // Dashboard Routes (Role-based access)
@@ -200,7 +198,8 @@ Route::get('/programs', [App\Http\Controllers\ProgramRegistrationController::cla
 Route::get('/programs/{program}', [App\Http\Controllers\ProgramRegistrationController::class, 'show'])->name('programs.show');
 Route::get('/programs/{program}/register', [App\Http\Controllers\ProgramRegistrationController::class, 'create'])->name('programs.register');
 Route::post('/programs/{program}/register', [App\Http\Controllers\ProgramRegistrationController::class, 'store'])->name('programs.register.store');
-Route::get('/programs/registration/{registration}/success', [App\Http\Controllers\ProgramRegistrationController::class, 'success'])->name('programs.registration.success');
+Route::get('/programs/{program}/registration/{registration}/success', [App\Http\Controllers\ProgramRegistrationController::class, 'success'])->name('programs.registration.success');
+Route::get('/programs/{program}/registration/{registration}', [App\Http\Controllers\ProgramRegistrationController::class, 'showRegistration'])->name('programs.registration.show');
 
 // File download routes for program registrations
 Route::get('/programs/files/{registration}/{filename}', [App\Http\Controllers\ProgramRegistrationController::class, 'downloadFile'])

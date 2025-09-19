@@ -168,10 +168,10 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($registration->uploaded_files)
+                                        @if($registration->uploaded_files && count($registration->uploaded_files) > 0)
                                             <span class="text-sm text-blue-600">
                                                 <i class="fas fa-paperclip mr-1"></i>
-                                                {{ count(json_decode($registration->uploaded_files, true)) }} files
+                                                {{ count($registration->uploaded_files) }} files
                                             </span>
                                         @else
                                             <span class="text-sm text-gray-400">No files</span>

@@ -1,4 +1,4 @@
-@extends('components.app-layout')
+@extends('components.public-layout')
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
