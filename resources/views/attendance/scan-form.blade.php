@@ -117,13 +117,7 @@
 let searchTimeout;
 let members = []; // This would typically be loaded from an API
 
-// Mock member data - in real implementation, this would come from an API
-const mockMembers = [
-    { id: 1, first_name: 'John', last_name: 'Doe', email: 'john@example.com', full_name: 'John Doe' },
-    { id: 2, first_name: 'Jane', last_name: 'Smith', email: 'jane@example.com', full_name: 'Jane Smith' },
-    { id: 3, first_name: 'Michael', last_name: 'Johnson', email: 'michael@example.com', full_name: 'Michael Johnson' },
-    // Add more mock members as needed
-];
+// Member search will use real API data
 
 // Member search functionality
 document.getElementById('member_search').addEventListener('input', function() {
@@ -141,13 +135,16 @@ document.getElementById('member_search').addEventListener('input', function() {
 });
 
 function searchMembers(query) {
-    // In real implementation, this would be an AJAX call
-    const filteredMembers = mockMembers.filter(member => 
-        member.full_name.toLowerCase().includes(query) ||
-        member.email.toLowerCase().includes(query)
-    );
-    
-    displaySearchResults(filteredMembers);
+    // Make AJAX call to search members
+    fetch(`/api/members/search?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(members => {
+            displaySearchResults(members);
+        })
+        .catch(error => {
+            console.error('Error searching members:', error);
+            displaySearchResults([]);
+        });
 }
 
 function displaySearchResults(members) {

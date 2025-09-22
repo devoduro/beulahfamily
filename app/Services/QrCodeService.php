@@ -6,10 +6,6 @@ use App\Models\Event;
 use App\Models\EventQrCode;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
 
 class QrCodeService
 {
@@ -31,13 +27,12 @@ class QrCodeService
         $token = EventQrCode::generateToken();
         $qrUrl = route('attendance.scan', ['token' => $token]);
 
-        // Generate QR code using native SVG backend (no Imagick required)
-        $renderer = new ImageRenderer(
-            new RendererStyle(300, 2),
-            new SvgImageBackEnd()
-        );
-        $writer = new Writer($renderer);
-        $qrCodeImage = $writer->writeString($qrUrl);
+        // Generate QR code using SimpleSoftwareIO QrCode facade (SVG format - no Imagick required)
+        $qrCodeImage = QrCode::format('svg')
+                            ->size(300)
+                            ->margin(2)
+                            ->errorCorrection('M')
+                            ->generate($qrUrl);
 
         // Save QR code image
         $fileName = "qr-codes/event-{$event->id}-" . time() . ".svg";
@@ -63,12 +58,11 @@ class QrCodeService
     {
         $qrUrl = route('attendance.member-scan', ['member' => $memberId]);
         
-        $renderer = new ImageRenderer(
-            new RendererStyle(200, 1),
-            new SvgImageBackEnd()
-        );
-        $writer = new Writer($renderer);
-        return $writer->writeString($qrUrl);
+        return QrCode::format('svg')
+                    ->size(200)
+                    ->margin(1)
+                    ->errorCorrection('M')
+                    ->generate($qrUrl);
     }
 
     /**

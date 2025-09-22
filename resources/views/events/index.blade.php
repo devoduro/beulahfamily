@@ -22,36 +22,36 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-200">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-blue-100 text-sm font-medium">Total Events</p>
-                                    <p class="text-3xl font-bold text-white">{{ $events->total() ?? 0 }}</p>
+                                    <p class="text-3xl font-bold text-white">{{ $eventStats['total'] ?? 0 }}</p>
                                 </div>
-                                <div class="w-10 h-10 bg-blue-500/30 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-calendar text-blue-200"></i>
+                                <div class="w-12 h-12 bg-blue-500/30 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-calendar text-blue-200 text-lg"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-200">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-green-100 text-sm font-medium">This Month</p>
-                                    <p class="text-3xl font-bold text-white">{{ $events->where('start_datetime', '>=', now()->startOfMonth())->count() ?? 0 }}</p>
+                                    <p class="text-3xl font-bold text-white">{{ $eventStats['this_month'] ?? 0 }}</p>
                                 </div>
-                                <div class="w-10 h-10 bg-green-500/30 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-chart-line text-green-200"></i>
+                                <div class="w-12 h-12 bg-green-500/30 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-chart-line text-green-200 text-lg"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 hover:bg-white/15 transition-all duration-200">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-purple-100 text-sm font-medium">Upcoming</p>
-                                    <p class="text-3xl font-bold text-white">{{ $events->where('start_datetime', '>=', now())->count() ?? 0 }}</p>
+                                    <p class="text-3xl font-bold text-white">{{ $eventStats['upcoming'] ?? 0 }}</p>
                                 </div>
-                                <div class="w-10 h-10 bg-purple-500/30 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-clock text-purple-200"></i>
+                                <div class="w-12 h-12 bg-purple-500/30 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-clock text-purple-200 text-lg"></i>
                                 </div>
                             </div>
                         </div>
@@ -139,79 +139,151 @@
                         <div class="flex items-start space-x-6 flex-1">
                             <!-- Date Badge -->
                             <div class="relative">
-                                <div class="w-20 h-20 bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 rounded-2xl flex flex-col items-center justify-center text-white shadow-lg">
-                                    <div class="text-xs font-bold uppercase tracking-wide">{{ $event->start_datetime ? $event->start_datetime->format('M') : 'JAN' }}</div>
-                                    <div class="text-2xl font-black">{{ $event->start_datetime ? $event->start_datetime->format('d') : '15' }}</div>
+                                @php
+                                    $eventTypeColors = [
+                                        'service' => 'from-blue-600 via-blue-700 to-blue-800',
+                                        'meeting' => 'from-green-600 via-green-700 to-green-800',
+                                        'conference' => 'from-red-600 via-red-700 to-red-800',
+                                        'workshop' => 'from-yellow-600 via-yellow-700 to-yellow-800',
+                                        'social' => 'from-pink-600 via-pink-700 to-pink-800',
+                                        'outreach' => 'from-purple-600 via-purple-700 to-purple-800',
+                                        'fundraising' => 'from-orange-600 via-orange-700 to-orange-800',
+                                        'other' => 'from-gray-600 via-gray-700 to-gray-800'
+                                    ];
+                                    $colorClass = $eventTypeColors[$event->event_type ?? 'other'] ?? $eventTypeColors['other'];
+                                @endphp
+                                <div class="w-20 h-20 bg-gradient-to-br {{ $colorClass }} rounded-2xl flex flex-col items-center justify-center text-white shadow-lg transform hover:scale-105 transition-transform duration-200">
+                                    <div class="text-xs font-bold uppercase tracking-wide">{{ $event->start_datetime ? $event->start_datetime->format('M') : now()->format('M') }}</div>
+                                    <div class="text-2xl font-black">{{ $event->start_datetime ? $event->start_datetime->format('d') : now()->format('d') }}</div>
                                 </div>
-                                <div class="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check text-white text-xs"></i>
-                                </div>
+                                @if($event->status === 'published')
+                                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                @elseif($event->status === 'draft')
+                                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center shadow-lg">
+                                        <i class="fas fa-edit text-white text-xs"></i>
+                                    </div>
+                                @elseif($event->status === 'cancelled')
+                                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+                                        <i class="fas fa-times text-white text-xs"></i>
+                                    </div>
+                                @endif
                             </div>
                             
                             <div class="flex-1 min-w-0">
                                 <!-- Title and Status -->
-                                <div class="flex items-center gap-4 mb-3">
-                                    <h3 class="text-2xl font-bold text-gray-900 group-hover:text-purple-700 transition-colors">{{ $event->title ?? 'Sunday Service' }}</h3>
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold {{ ($event->status ?? 'upcoming') === 'upcoming' ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' : (($event->status ?? 'upcoming') === 'completed' ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' : 'bg-gradient-to-r from-gray-500 to-slate-500 text-white') }}">
-                                        @if(($event->status ?? 'upcoming') === 'upcoming')
-                                            <i class="fas fa-clock mr-1"></i>
-                                        @elseif(($event->status ?? 'upcoming') === 'completed')
-                                            <i class="fas fa-check mr-1"></i>
-                                        @else
-                                            <i class="fas fa-pause mr-1"></i>
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                                    <h3 class="text-2xl font-bold text-gray-900 group-hover:text-purple-700 transition-colors">{{ $event->title }}</h3>
+                                    <div class="flex items-center gap-2">
+                                        @php
+                                            $statusConfig = [
+                                                'published' => ['color' => 'from-green-500 to-emerald-500', 'icon' => 'fas fa-check', 'text' => 'Published'],
+                                                'draft' => ['color' => 'from-yellow-500 to-orange-500', 'icon' => 'fas fa-edit', 'text' => 'Draft'],
+                                                'cancelled' => ['color' => 'from-red-500 to-red-600', 'icon' => 'fas fa-times', 'text' => 'Cancelled'],
+                                                'completed' => ['color' => 'from-blue-500 to-blue-600', 'icon' => 'fas fa-flag-checkered', 'text' => 'Completed']
+                                            ];
+                                            $status = $event->status ?? 'draft';
+                                            $config = $statusConfig[$status] ?? $statusConfig['draft'];
+                                            
+                                            // Check if event is upcoming
+                                            $isUpcoming = $event->start_datetime && $event->start_datetime->isFuture();
+                                        @endphp
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gradient-to-r {{ $config['color'] }} text-white shadow-sm">
+                                            <i class="{{ $config['icon'] }} mr-1"></i>
+                                            {{ $config['text'] }}
+                                        </span>
+                                        @if($isUpcoming && $status === 'published')
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <i class="fas fa-clock mr-1"></i>
+                                                Upcoming
+                                            </span>
                                         @endif
-                                        {{ ucfirst($event->status ?? 'Upcoming') }}
-                                    </span>
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                            {{ ucfirst(str_replace('_', ' ', $event->event_type ?? 'other')) }}
+                                        </span>
+                                    </div>
                                 </div>
                                 
                                 <!-- Description -->
-                                <p class="text-gray-600 mb-4 text-lg leading-relaxed">{{ $event->description ?? 'Join us for our weekly Sunday worship service with inspiring messages and uplifting music.' }}</p>
+                                <p class="text-gray-600 mb-4 text-lg leading-relaxed line-clamp-2">
+                                    {{ $event->description ?: 'No description available for this event.' }}
+                                </p>
                                 
                                 <!-- Event Details Grid -->
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                    <div class="flex items-center bg-gray-50 rounded-xl p-3">
-                                        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mr-3">
-                                            <i class="fas fa-clock text-purple-600"></i>
+                                    <div class="flex items-center bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-3 hover:shadow-sm transition-shadow">
+                                        <div class="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center mr-3 shadow-sm">
+                                            <i class="fas fa-clock text-white"></i>
                                         </div>
-                                        <div>
-                                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Time</p>
-                                            <p class="text-sm font-semibold text-gray-900">{{ $event->start_datetime ? $event->start_datetime->format('g:i A') : '10:00 AM' }} - {{ $event->end_datetime ? $event->end_datetime->format('g:i A') : '12:00 PM' }}</p>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs font-medium text-purple-700 uppercase tracking-wide">Time</p>
+                                            @if($event->is_all_day)
+                                                <p class="text-sm font-semibold text-gray-900">All Day</p>
+                                            @else
+                                                <p class="text-sm font-semibold text-gray-900">
+                                                    {{ $event->start_datetime ? $event->start_datetime->format('g:i A') : 'TBD' }}
+                                                    @if($event->end_datetime)
+                                                        - {{ $event->end_datetime->format('g:i A') }}
+                                                    @endif
+                                                </p>
+                                            @endif
                                         </div>
                                     </div>
-                                    <div class="flex items-center bg-gray-50 rounded-xl p-3">
-                                        <div class="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center mr-3">
-                                            <i class="fas fa-map-marker-alt text-pink-600"></i>
+                                    <div class="flex items-center bg-gradient-to-r from-pink-50 to-pink-100 rounded-xl p-3 hover:shadow-sm transition-shadow">
+                                        <div class="w-10 h-10 bg-pink-500 rounded-xl flex items-center justify-center mr-3 shadow-sm">
+                                            <i class="fas fa-map-marker-alt text-white"></i>
                                         </div>
-                                        <div>
-                                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Location</p>
-                                            <p class="text-sm font-semibold text-gray-900">{{ $event->location ?? 'Main Sanctuary' }}</p>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs font-medium text-pink-700 uppercase tracking-wide">Location</p>
+                                            <p class="text-sm font-semibold text-gray-900 truncate">{{ $event->location ?: 'Location TBD' }}</p>
                                         </div>
                                     </div>
-                                    <div class="flex items-center bg-gray-50 rounded-xl p-3">
-                                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
-                                            <i class="fas fa-users text-blue-600"></i>
+                                    <div class="flex items-center bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-3 hover:shadow-sm transition-shadow">
+                                        <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center mr-3 shadow-sm">
+                                            <i class="fas fa-users text-white"></i>
                                         </div>
-                                        <div>
-                                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Attendance</p>
-                                            <p class="text-sm font-semibold text-gray-900">{{ $event->registered_count ?? 45 }} registered</p>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs font-medium text-blue-700 uppercase tracking-wide">Attendance</p>
+                                            <p class="text-sm font-semibold text-gray-900">
+                                                {{ $event->registered_count ?? 0 }} registered
+                                                @if($event->checked_in_count ?? 0 > 0)
+                                                    <span class="text-green-600">({{ $event->checked_in_count }} present)</span>
+                                                @endif
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <!-- Ministry and Organizer -->
                                 <div class="flex flex-wrap items-center gap-4 text-sm">
-                                    <div class="flex items-center text-gray-600">
-                                        <i class="fas fa-hands-praying w-4 mr-2 text-purple-500"></i>
-                                        <span class="font-medium">{{ $event->ministry->name ?? 'General Ministry' }}</span>
-                                    </div>
-                                    <div class="flex items-center text-gray-600">
-                                        <i class="fas fa-user w-4 mr-2 text-pink-500"></i>
-                                        <span>Organized by <span class="font-medium">{{ $event->organizer->full_name ?? 'Pastor John' }}</span></span>
-                                    </div>
-                                    @if($event->registration_fee ?? 0 > 0)
-                                        <div class="flex items-center text-green-600 font-semibold">
+                                    @if($event->ministry)
+                                        <div class="flex items-center text-gray-600 bg-purple-50 px-3 py-1 rounded-full">
+                                            <i class="fas fa-hands-praying w-4 mr-2 text-purple-500"></i>
+                                            <span class="font-medium">{{ $event->ministry->name }}</span>
+                                        </div>
+                                    @endif
+                                    @if($event->organizer)
+                                        <div class="flex items-center text-gray-600 bg-pink-50 px-3 py-1 rounded-full">
+                                            <i class="fas fa-user w-4 mr-2 text-pink-500"></i>
+                                            <span>Organized by <span class="font-medium">{{ $event->organizer->first_name }} {{ $event->organizer->last_name }}</span></span>
+                                        </div>
+                                    @endif
+                                    @if($event->registration_fee && $event->registration_fee > 0)
+                                        <div class="flex items-center text-green-600 font-semibold bg-green-50 px-3 py-1 rounded-full">
                                             <i class="fas fa-dollar-sign w-4 mr-1"></i>
-                                            <span>${{ number_format($event->registration_fee ?? 0, 2) }}</span>
+                                            <span>${{ number_format($event->registration_fee, 2) }}</span>
+                                        </div>
+                                    @else
+                                        <div class="flex items-center text-blue-600 font-medium bg-blue-50 px-3 py-1 rounded-full">
+                                            <i class="fas fa-gift w-4 mr-1"></i>
+                                            <span>Free Event</span>
+                                        </div>
+                                    @endif
+                                    @if($event->max_attendees)
+                                        <div class="flex items-center text-orange-600 font-medium bg-orange-50 px-3 py-1 rounded-full">
+                                            <i class="fas fa-users w-4 mr-1"></i>
+                                            <span>Max {{ $event->max_attendees }} attendees</span>
                                         </div>
                                     @endif
                                 </div>
@@ -219,21 +291,30 @@
                         </div>
 
                         <!-- Event Actions -->
-                        <div class="flex flex-col gap-3 xl:w-48">
-                            <a href="{{ route('events.show', $event->id ?? 1) }}" class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-2xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        <div class="flex flex-col gap-3 xl:w-52">
+                            <a href="{{ route('events.show', $event->id) }}" class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-2xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                                 <i class="fas fa-eye mr-2"></i>
                                 View Details
                             </a>
-                            <div class="grid grid-cols-2 gap-2">
-                                <a href="{{ route('events.edit', $event->id ?? 1) }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors">
-                                    <i class="fas fa-edit mr-1"></i>
-                                    Edit
+                            <div class="grid grid-cols-3 gap-2">
+                                <a href="{{ route('events.edit', $event->id) }}" class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors" title="Edit Event">
+                                    <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{{ route('attendance.qr-display', $event->id ?? 1) }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-xl hover:bg-green-100 transition-colors">
-                                    <i class="fas fa-qrcode mr-1"></i>
-                                    QR
+                                <a href="{{ route('attendance.show', $event->id) }}" class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-xl hover:bg-green-100 transition-colors" title="Attendance">
+                                    <i class="fas fa-users"></i>
+                                </a>
+                                <a href="{{ route('attendance.qr.show', $event->id) }}" class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-orange-600 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors" title="QR Code">
+                                    <i class="fas fa-qrcode"></i>
                                 </a>
                             </div>
+                            @if($event->start_datetime && $event->start_datetime->isFuture() && $event->status === 'published')
+                                <div class="text-center">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-calendar-check mr-1"></i>
+                                        {{ $event->start_datetime->diffForHumans() }}
+                                    </span>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

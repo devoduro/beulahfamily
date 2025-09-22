@@ -15,13 +15,32 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($programs as $program)
                     <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                        <!-- Program Flyer -->
+                        @if($program->hasFlyer())
+                            <div class="h-48 overflow-hidden">
+                                <img src="{{ $program->flyer_url }}" alt="{{ $program->name }} Flyer" class="w-full h-full object-cover">
+                            </div>
+                        @endif
+                        
                         <!-- Program Header -->
-                        <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-6 py-4">
+                        @php
+                            $headerColors = [
+                                'ergates_conference' => 'from-orange-600 via-red-600 to-pink-600',
+                                'annual_retreat' => 'from-green-600 via-teal-600 to-blue-600',
+                                'conference' => 'from-blue-600 via-purple-600 to-indigo-600',
+                                'workshop' => 'from-yellow-600 via-orange-600 to-red-600',
+                                'seminar' => 'from-purple-600 via-pink-600 to-red-600',
+                                'retreat' => 'from-green-600 via-emerald-600 to-teal-600',
+                                'other' => 'from-gray-600 via-slate-600 to-zinc-600'
+                            ];
+                            $headerColor = $headerColors[$program->type] ?? $headerColors['other'];
+                        @endphp
+                        <div class="bg-gradient-to-r {{ $headerColor }} px-6 py-4">
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h3 class="text-xl font-bold text-white mb-2">{{ $program->name }}</h3>
                                     <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
-                                        {{ ucfirst($program->type) }}
+                                        {{ $program->formatted_type }}
                                     </span>
                                 </div>
                                 @if($program->registration_fee > 0)

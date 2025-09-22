@@ -31,12 +31,22 @@ class ProgramRegistration extends Model
         'amount_paid',
         'payment_status',
         'payment_reference',
+        // Annual Retreat specific fields
+        'participant_name',
+        'contact_phone',
+        'residential_address',
+        'how_heard_about',
+        'dietary_requirements',
+        'emergency_contact',
+        'emergency_phone',
+        'registration_data',
     ];
 
     protected $casts = [
         'uploaded_files' => 'array',
         'registered_at' => 'datetime',
         'amount_paid' => 'decimal:2',
+        'registration_data' => 'array',
     ];
 
     /**
@@ -218,6 +228,71 @@ class ProgramRegistration extends Model
      */
     public function getRegistrationSummaryAttribute(): string
     {
+        if ($this->program && $this->program->type === 'annual_retreat') {
+            return $this->participant_name ?: $this->contact_name ?: 'Unknown Participant';
+        }
+        
         return $this->business_name . ' (' . $this->formatted_business_type . ')';
+    }
+
+    /**
+     * Get how heard about options for annual retreat
+     */
+    public static function getHowHeardAboutOptions(): array
+    {
+        return [
+            'radio_advert' => 'Radio Advert',
+            'friend' => 'Friend',
+            'family' => 'Family',
+            'social_media' => 'Social Media',
+            'church_announcement' => 'Church Announcement',
+            'website' => 'Website',
+            'other' => 'Other'
+        ];
+    }
+
+    /**
+     * Get formatted how heard about
+     */
+    public function getFormattedHowHeardAboutAttribute(): string
+    {
+        $options = self::getHowHeardAboutOptions();
+        return $options[$this->how_heard_about] ?? ucfirst(str_replace('_', ' ', $this->how_heard_about));
+    }
+
+    /**
+     * Get primary contact name based on program type
+     */
+    public function getPrimaryContactNameAttribute(): string
+    {
+        if ($this->program && $this->program->type === 'annual_retreat') {
+            return $this->participant_name ?: 'Unknown Participant';
+        }
+        
+        return $this->contact_name ?: 'Unknown Contact';
+    }
+
+    /**
+     * Get primary contact phone based on program type
+     */
+    public function getPrimaryContactPhoneAttribute(): string
+    {
+        if ($this->program && $this->program->type === 'annual_retreat') {
+            return $this->contact_phone ?: '';
+        }
+        
+        return $this->business_phone ?: '';
+    }
+
+    /**
+     * Get primary address based on program type
+     */
+    public function getPrimaryAddressAttribute(): string
+    {
+        if ($this->program && $this->program->type === 'annual_retreat') {
+            return $this->residential_address ?: '';
+        }
+        
+        return $this->business_address ?: '';
     }
 }

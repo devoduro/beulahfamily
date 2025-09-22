@@ -23,3 +23,6 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/sms-balance', [App\Http\Controllers\Api\SmsController::class, 'getBalance']);
     Route::get('/sms-stats', [App\Http\Controllers\Api\SmsController::class, 'getStats']);
 });
+
+// Public API routes for attendance
+Route::get('/members/search', [App\Http\Controllers\Api\MemberController::class, 'search'])->name('api.members.search');

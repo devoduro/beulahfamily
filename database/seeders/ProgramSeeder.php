@@ -16,29 +16,59 @@ class ProgramSeeder extends Seeder
         // Create ERGATES Conference 2025
         Program::create([
             'name' => 'ERGATES Conference 2025',
-            'description' => 'Join us for the annual ERGATES Conference 2025, a premier business and entrepreneurship conference designed to empower Christian entrepreneurs and business leaders. This conference will feature keynote speakers, workshops, networking opportunities, and business exhibitions.',
-            'type' => 'conference',
-            'start_date' => Carbon::create(2025, 3, 15), // March 15, 2025
-            'end_date' => Carbon::create(2025, 3, 17),   // March 17, 2025
+            'description' => 'Join us for the annual ERGATES Conference 2025 - a premier business networking and development event for entrepreneurs, business owners, and professionals. This conference brings together industry leaders, innovative thinkers, and aspiring entrepreneurs to share insights, build connections, and explore new opportunities.',
+            'type' => 'ergates_conference',
+            'start_date' => '2025-03-15',
+            'end_date' => '2025-03-16',
             'start_time' => '08:00',
-            'end_time' => '18:00',
-            'venue' => 'Beulah Family Church Main Auditorium',
+            'end_time' => '17:00',
+            'venue' => 'Beulah Family Conference Center',
             'registration_fee' => 150.00,
             'max_participants' => 500,
-            'registration_deadline' => Carbon::create(2025, 3, 1), // March 1, 2025
+            'registration_deadline' => '2025-03-01',
             'status' => 'published',
             'requirements' => [
-                'business_registration' => true,
-                'contact_information' => true,
-                'business_flyer_upload' => true,
+                'Valid business registration or proof of business ownership',
+                'Professional photo for conference badge',
+                'Business flyer or promotional material (optional)',
             ],
-            'terms_and_conditions' => 'By registering for ERGATES Conference 2025, you agree to: 1) Provide accurate business information, 2) Participate professionally and respectfully, 3) Allow photography and videography for promotional purposes, 4) Comply with all conference guidelines and schedules, 5) Pay registration fees as required. Refunds are available up to 7 days before the event. The organizers reserve the right to modify the program schedule if necessary.',
-            'contact_email' => 'ergates2025@beulahfamily.org',
+            'terms_and_conditions' => 'By registering for ERGATES Conference 2025, you agree to our terms and conditions. Registration fees are non-refundable after the deadline. Participants must adhere to the conference code of conduct.',
+            'contact_email' => 'ergates@beulahfamily.org',
             'contact_phone' => '+233 24 123 4567',
             'allow_file_uploads' => true,
-            'allowed_file_types' => ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'mp4', 'mov', 'avi', 'mp3', 'wav'],
-            'max_file_size' => 100, // 100 MB
+            'allowed_file_types' => ['pdf', 'jpg', 'jpeg', 'png', 'mp4', 'mp3'],
+            'max_file_size' => 100, // MB
             'max_files' => 5,
+            'program_category' => 'business_conference',
+        ]);
+
+        // Create Annual Retreat 2025
+        Program::create([
+            'name' => 'Beulah Family Annual Retreat 2025',
+            'description' => 'Join us for our annual spiritual retreat - a time of renewal, fellowship, and spiritual growth. Experience powerful worship sessions, inspiring teachings, and meaningful connections with fellow believers in a serene and peaceful environment.',
+            'type' => 'annual_retreat',
+            'start_date' => '2025-07-10',
+            'end_date' => '2025-07-13',
+            'start_time' => '09:00',
+            'end_time' => '18:00',
+            'venue' => 'Peduase Valley Resort, Eastern Region',
+            'registration_fee' => 250.00,
+            'max_participants' => 200,
+            'registration_deadline' => '2025-06-30',
+            'status' => 'published',
+            'requirements' => [
+                'Valid identification document',
+                'Medical clearance (if applicable)',
+                'Emergency contact information',
+            ],
+            'terms_and_conditions' => 'By registering for the Annual Retreat 2025, you agree to our terms and conditions. Registration includes accommodation, meals, and all retreat activities. Cancellations must be made at least 14 days before the retreat date for partial refund.',
+            'contact_email' => 'retreat@beulahfamily.org',
+            'contact_phone' => '+233 24 987 6543',
+            'allow_file_uploads' => false,
+            'allowed_file_types' => [],
+            'max_file_size' => 0,
+            'max_files' => 0,
+            'program_category' => 'spiritual_retreat',
         ]);
 
         // Create additional sample programs

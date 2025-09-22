@@ -178,6 +178,7 @@ Route::prefix('attendance')->name('attendance.')->middleware(['auth'])->group(fu
     // Event-specific attendance routes
     Route::get('/event/{event}', [App\Http\Controllers\AttendanceController::class, 'show'])->name('show');
     Route::post('/event/{event}/manual', [App\Http\Controllers\AttendanceController::class, 'manualEntry'])->name('manual-entry');
+    Route::post('/event/{event}/bulk', [App\Http\Controllers\AttendanceController::class, 'bulkEntry'])->name('bulk-entry');
     
     // QR Code routes
     Route::get('/event/{event}/qr', [App\Http\Controllers\AttendanceController::class, 'showQr'])->name('qr.show');
@@ -192,6 +193,7 @@ Route::prefix('attendance')->name('attendance.')->middleware(['auth'])->group(fu
 // Public attendance scanning routes (no auth required)
 Route::get('/scan/{token}', [App\Http\Controllers\AttendanceController::class, 'scan'])->name('attendance.scan');
 Route::post('/mark-attendance', [App\Http\Controllers\AttendanceController::class, 'markAttendance'])->name('attendance.mark');
+
 
 // Program Registration Routes (Public Access)
 Route::get('/programs', [App\Http\Controllers\ProgramRegistrationController::class, 'programs'])->name('programs.index');

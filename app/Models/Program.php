@@ -31,6 +31,9 @@ class Program extends Model
         'allowed_file_types',
         'max_file_size',
         'max_files',
+        'flyer_path',
+        'program_category',
+        'registration_fields',
     ];
 
     protected $casts = [
@@ -45,6 +48,7 @@ class Program extends Model
         'registration_fee' => 'decimal:2',
         'max_file_size' => 'integer',
         'max_files' => 'integer',
+        'registration_fields' => 'array',
     ];
 
     /**
@@ -200,5 +204,91 @@ class Program extends Model
             'cancelled' => 'red',
             default => 'gray',
         };
+    }
+
+    /**
+     * Get program type options
+     */
+    public static function getProgramTypeOptions(): array
+    {
+        return [
+            'ergates_conference' => 'ERGATES Conference',
+            'annual_retreat' => 'Annual Retreat',
+            'workshop' => 'Workshop',
+            'seminar' => 'Seminar',
+            'conference' => 'Conference',
+            'other' => 'Other',
+        ];
+    }
+
+    /**
+     * Get flyer URL
+     */
+    public function getFlyerUrlAttribute(): ?string
+    {
+        if (!$this->flyer_path) {
+            return null;
+        }
+        
+        return asset('storage/' . $this->flyer_path);
+    }
+
+    /**
+     * Check if program has flyer
+     */
+    public function hasFlyer(): bool
+    {
+        return !empty($this->flyer_path);
+    }
+
+    /**
+     * Get registration fields for program type
+     */
+    public function getRegistrationFieldsForType(): array
+    {
+        return match($this->type) {
+            'ergates_conference' => [
+                'business_name' => ['required' => true, 'type' => 'text', 'label' => 'Business Name'],
+                'business_type' => ['required' => true, 'type' => 'select', 'label' => 'Business Type'],
+                'business_type_other' => ['required' => false, 'type' => 'text', 'label' => 'Other Business Type'],
+                'services_offered' => ['required' => true, 'type' => 'textarea', 'label' => 'Services Offered'],
+                'business_address' => ['required' => true, 'type' => 'textarea', 'label' => 'Business Address'],
+                'contact_name' => ['required' => true, 'type' => 'text', 'label' => 'Contact Name'],
+                'business_phone' => ['required' => true, 'type' => 'tel', 'label' => 'Business Phone'],
+                'whatsapp_number' => ['required' => false, 'type' => 'tel', 'label' => 'WhatsApp Number'],
+                'email' => ['required' => true, 'type' => 'email', 'label' => 'Email Address'],
+                'special_offers' => ['required' => false, 'type' => 'textarea', 'label' => 'Special Offers'],
+                'additional_info' => ['required' => false, 'type' => 'textarea', 'label' => 'Additional Information'],
+            ],
+            'annual_retreat' => [
+                'participant_name' => ['required' => true, 'type' => 'text', 'label' => 'Name'],
+                'contact_phone' => ['required' => true, 'type' => 'tel', 'label' => 'Contact'],
+                'residential_address' => ['required' => true, 'type' => 'textarea', 'label' => 'Residential Address'],
+                'email' => ['required' => true, 'type' => 'email', 'label' => 'Email Address'],
+                'how_heard_about' => ['required' => true, 'type' => 'select', 'label' => 'How did you hear of the Retreat?', 'options' => [
+                    'radio_advert' => 'Radio Advert',
+                    'friend' => 'Friend',
+                    'family' => 'Family',
+                    'social_media' => 'Social Media',
+                    'church_announcement' => 'Church Announcement',
+                    'website' => 'Website',
+                    'other' => 'Other'
+                ]],
+                'dietary_requirements' => ['required' => false, 'type' => 'textarea', 'label' => 'Dietary Requirements'],
+                'emergency_contact' => ['required' => false, 'type' => 'text', 'label' => 'Emergency Contact'],
+                'emergency_phone' => ['required' => false, 'type' => 'tel', 'label' => 'Emergency Contact Phone'],
+                'additional_info' => ['required' => false, 'type' => 'textarea', 'label' => 'Additional Information'],
+            ],
+            default => $this->registration_fields ?? []
+        };
+    }
+
+    /**
+     * Get formatted program type
+     */
+    public function getFormattedTypeAttribute(): string
+    {
+        $types = self::getProgramTypeOptions();
+        return $types[$this->type] ?? ucfirst(str_replace('_', ' ', $this->type));
     }
 }

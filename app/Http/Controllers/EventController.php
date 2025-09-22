@@ -17,7 +17,7 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Event::with(['ministry', 'organizer']);
+        $query = Event::with(['ministry', 'organizer', 'attendances']);
 
         // Search functionality
         if ($request->has('search') && $request->search) {
@@ -37,15 +37,17 @@ class EventController extends Controller
 
         // Filter by status
         if ($request->has('status') && $request->status !== '') {
-            $query->where('status', $request->status);
+            if ($request->status === 'upcoming') {
+                $query->where('start_datetime', '>=', now());
+            } else {
+                $query->where('status', $request->status);
+            }
         }
 
-        // Filter by date range
-        if ($request->has('start_date') && $request->start_date) {
-            $query->where('start_datetime', '>=', $request->start_date);
-        }
-        if ($request->has('end_date') && $request->end_date) {
-            $query->where('end_datetime', '<=', $request->end_date);
+        // Filter by date
+        if ($request->has('date') && $request->date) {
+            $date = Carbon::parse($request->date);
+            $query->whereDate('start_datetime', '>=', $date);
         }
 
         // Sort
@@ -53,11 +55,37 @@ class EventController extends Controller
         $sortOrder = $request->get('sort_order', 'asc');
         $query->orderBy($sortBy, $sortOrder);
 
-        $events = $query->paginate(15);
+        $events = $query->paginate(12);
+
+        // Calculate statistics
+        $totalEvents = Event::count();
+        $upcomingEvents = Event::where('start_datetime', '>=', now())->count();
+        $thisMonthEvents = Event::whereBetween('start_datetime', [
+            now()->startOfMonth(),
+            now()->endOfMonth()
+        ])->count();
+        $publishedEvents = Event::where('status', 'published')->count();
+        $completedEvents = Event::where('status', 'completed')->count();
+
+        // Add attendance counts to events
+        $events->getCollection()->transform(function ($event) {
+            $event->registered_count = $event->attendances->count();
+            $event->checked_in_count = $event->attendances->where('checked_in_at', '!=', null)->count();
+            return $event;
+        });
+
+        $eventStats = [
+            'total' => $totalEvents,
+            'upcoming' => $upcomingEvents,
+            'this_month' => $thisMonthEvents,
+            'published' => $publishedEvents,
+            'completed' => $completedEvents
+        ];
 
         if ($request->ajax()) {
             return response()->json([
                 'events' => $events->items(),
+                'stats' => $eventStats,
                 'pagination' => [
                     'current_page' => $events->currentPage(),
                     'last_page' => $events->lastPage(),
@@ -66,7 +94,7 @@ class EventController extends Controller
             ]);
         }
 
-        return view('events.index', compact('events'));
+        return view('events.index', compact('events', 'eventStats'));
     }
 
     /**

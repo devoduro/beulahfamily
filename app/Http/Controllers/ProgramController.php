@@ -73,7 +73,7 @@ class ProgramController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'type' => 'required|in:conference,workshop,seminar,retreat,other',
+            'type' => 'required|in:ergates_conference,annual_retreat,conference,workshop,seminar,retreat,other',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'start_time' => 'nullable|date_format:H:i',
@@ -90,7 +90,16 @@ class ProgramController extends Controller
             'allowed_file_types' => 'nullable|array',
             'max_file_size' => 'nullable|integer|min:1|max:500',
             'max_files' => 'nullable|integer|min:1|max:20',
+            'flyer' => 'nullable|file|mimes:jpg,jpeg,png,pdf,gif|max:10240',
+            'program_category' => 'nullable|string|max:255',
+            'registration_fields' => 'nullable|array',
         ]);
+
+        // Handle flyer upload
+        if ($request->hasFile('flyer')) {
+            $flyerPath = $request->file('flyer')->store('program_flyers', 'public');
+            $validated['flyer_path'] = $flyerPath;
+        }
 
         $program = Program::create($validated);
 
@@ -133,7 +142,7 @@ class ProgramController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'type' => 'required|in:conference,workshop,seminar,retreat,other',
+            'type' => 'required|in:ergates_conference,annual_retreat,conference,workshop,seminar,retreat,other',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'start_time' => 'nullable|date_format:H:i',
@@ -150,7 +159,21 @@ class ProgramController extends Controller
             'allowed_file_types' => 'nullable|array',
             'max_file_size' => 'nullable|integer|min:1|max:500',
             'max_files' => 'nullable|integer|min:1|max:20',
+            'flyer' => 'nullable|file|mimes:jpg,jpeg,png,pdf,gif|max:10240',
+            'program_category' => 'nullable|string|max:255',
+            'registration_fields' => 'nullable|array',
         ]);
+
+        // Handle flyer upload
+        if ($request->hasFile('flyer')) {
+            // Delete old flyer if exists
+            if ($program->flyer_path && Storage::exists('public/' . $program->flyer_path)) {
+                Storage::delete('public/' . $program->flyer_path);
+            }
+            
+            $flyerPath = $request->file('flyer')->store('program_flyers', 'public');
+            $validated['flyer_path'] = $flyerPath;
+        }
 
         $program->update($validated);
 
@@ -163,6 +186,11 @@ class ProgramController extends Controller
      */
     public function destroy(Program $program)
     {
+        // Delete program flyer
+        if ($program->flyer_path && Storage::exists('public/' . $program->flyer_path)) {
+            Storage::delete('public/' . $program->flyer_path);
+        }
+
         // Delete associated files
         if ($program->registrations()->exists()) {
             foreach ($program->registrations as $registration) {

@@ -251,6 +251,82 @@ class AttendanceController extends Controller
     }
 
     /**
+     * Bulk attendance entry
+     */
+    public function bulkEntry(Event $event, Request $request)
+    {
+        $request->validate([
+            'member_ids' => 'required|array|min:1',
+            'member_ids.*' => 'exists:members,id',
+            'checked_in_at' => 'nullable|date',
+            'notes' => 'nullable|string|max:500'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $memberIds = $request->member_ids;
+            $checkedInAt = $request->checked_in_at ?? now();
+            $notes = $request->notes;
+            $successCount = 0;
+            $skippedCount = 0;
+            $errors = [];
+
+            foreach ($memberIds as $memberId) {
+                // Check for existing attendance
+                $existingAttendance = Attendance::where('event_id', $event->id)
+                                              ->where('member_id', $memberId)
+                                              ->first();
+
+                if ($existingAttendance) {
+                    $member = Member::find($memberId);
+                    $skippedCount++;
+                    $errors[] = "Skipped {$member->full_name} - already has attendance";
+                    continue;
+                }
+
+                Attendance::create([
+                    'event_id' => $event->id,
+                    'member_id' => $memberId,
+                    'checked_in_at' => $checkedInAt,
+                    'attendance_method' => 'manual_bulk',
+                    'notes' => $notes,
+                    'ip_address' => $request->ip(),
+                    'is_verified' => true
+                ]);
+
+                $successCount++;
+            }
+
+            DB::commit();
+
+            $message = "Successfully added {$successCount} attendance records";
+            if ($skippedCount > 0) {
+                $message .= ", skipped {$skippedCount} duplicates";
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'details' => [
+                    'success_count' => $successCount,
+                    'skipped_count' => $skippedCount,
+                    'errors' => $errors
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk attendance entry failed: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to record bulk attendance'
+            ], 500);
+        }
+    }
+
+    /**
      * Check out member
      */
     public function checkOut(Attendance $attendance, Request $request)

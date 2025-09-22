@@ -36,21 +36,9 @@ class ProgramRegistrationController extends Controller
             return back()->with('error', 'Registration is closed for this program.');
         }
 
-        $validated = $request->validate([
-            'member_id' => 'nullable|exists:members,id',
-            'business_name' => 'required|string|max:255',
-            'business_type' => 'required|in:' . implode(',', array_keys(ProgramRegistration::getBusinessTypeOptions())),
-            'business_type_other' => 'required_if:business_type,other|nullable|string|max:255',
-            'services_offered' => 'required|string',
-            'business_address' => 'required|string',
-            'contact_name' => 'required|string|max:255',
-            'business_phone' => 'required|string|max:20',
-            'whatsapp_number' => 'nullable|string|max:20',
-            'email' => 'required|email|max:255',
-            'special_offers' => 'nullable|string',
-            'additional_info' => 'nullable|string',
-            'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,gif,mp4,mov,avi,mp3,wav|max:' . ($program->max_file_size * 1024),
-        ]);
+        // Get validation rules based on program type
+        $validationRules = $this->getValidationRules($program);
+        $validated = $request->validate($validationRules);
 
         // Handle file uploads
         $uploadedFiles = [];
@@ -279,5 +267,58 @@ class ProgramRegistrationController extends Controller
         $program->load(['registrations']);
 
         return view('programs.show', compact('program'));
+    }
+
+    /**
+     * Get validation rules based on program type
+     */
+    private function getValidationRules(Program $program): array
+    {
+        $baseRules = [
+            'member_id' => 'nullable|exists:members,id',
+            'additional_info' => 'nullable|string',
+        ];
+
+        // Add file upload rules if enabled
+        if ($program->allow_file_uploads) {
+            $baseRules['files.*'] = 'nullable|file|mimes:pdf,jpg,jpeg,png,gif,mp4,mov,avi,mp3,wav|max:' . ($program->max_file_size * 1024);
+        }
+
+        // Program type specific rules
+        switch ($program->type) {
+            case 'ergates_conference':
+                return array_merge($baseRules, [
+                    'business_name' => 'required|string|max:255',
+                    'business_type' => 'required|in:' . implode(',', array_keys(ProgramRegistration::getBusinessTypeOptions())),
+                    'business_type_other' => 'required_if:business_type,other|nullable|string|max:255',
+                    'services_offered' => 'required|string',
+                    'business_address' => 'required|string',
+                    'contact_name' => 'required|string|max:255',
+                    'business_phone' => 'required|string|max:20',
+                    'whatsapp_number' => 'nullable|string|max:20',
+                    'email' => 'required|email|max:255',
+                    'special_offers' => 'nullable|string',
+                ]);
+
+            case 'annual_retreat':
+                return array_merge($baseRules, [
+                    'participant_name' => 'required|string|max:255',
+                    'contact_phone' => 'required|string|max:20',
+                    'residential_address' => 'required|string',
+                    'email' => 'required|email|max:255',
+                    'how_heard_about' => 'required|in:' . implode(',', array_keys(ProgramRegistration::getHowHeardAboutOptions())),
+                    'dietary_requirements' => 'nullable|string',
+                    'emergency_contact' => 'nullable|string|max:255',
+                    'emergency_phone' => 'nullable|string|max:20',
+                ]);
+
+            default:
+                // Default rules for other program types
+                return array_merge($baseRules, [
+                    'participant_name' => 'required|string|max:255',
+                    'contact_phone' => 'required|string|max:20',
+                    'email' => 'required|email|max:255',
+                ]);
+        }
     }
 }
