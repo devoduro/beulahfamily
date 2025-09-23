@@ -280,6 +280,49 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/events/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
     Route::post('/events/{event}/register', [\App\Http\Controllers\EventController::class, 'register'])->name('events.register');
     
+    // Simple event creation routes
+    Route::get('/create-event', function() {
+        $ministries = \App\Models\Ministry::orderBy('name')->get();
+        return view('events.create', compact('ministries'));
+    })->name('create.event');
+    
+    Route::post('/create-event', function(\Illuminate\Http\Request $request) {
+        try {
+            // Basic validation
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'event_type' => 'required|string',
+                'start_datetime' => 'required|date|after:now',
+                'end_datetime' => 'nullable|date|after:start_datetime',
+                'location' => 'nullable|string|max:255',
+                'description' => 'nullable|string|max:1000',
+                'ministry_id' => 'nullable|exists:ministries,id',
+                'status' => 'required|in:draft,published',
+            ]);
+            
+            $event = \App\Models\Event::create([
+                'title' => $request->title,
+                'description' => $request->description,
+                'event_type' => $request->event_type,
+                'start_datetime' => $request->start_datetime,
+                'end_datetime' => $request->end_datetime,
+                'location' => $request->location,
+                'ministry_id' => $request->ministry_id ?: null,
+                'organizer_id' => auth()->id() ?: 1, // Use authenticated user or default
+                'status' => $request->status, // User-selected status: draft or published
+                'requires_registration' => false,
+                'is_all_day' => false,
+            ]);
+            
+            return redirect('/events')->with('success', 'Event "' . $event->title . '" created successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->validator)->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Event creation failed: ' . $e->getMessage());
+            return back()->with('error', 'Error creating event. Please try again.')->withInput();
+        }
+    })->name('store.event');
+    
     // Ministries - View access for all users
     Route::get('/ministries', [\App\Http\Controllers\MinistryController::class, 'index'])->name('ministries.index');
     Route::get('/ministries/{ministry}', [\App\Http\Controllers\MinistryController::class, 'show'])->name('ministries.show');

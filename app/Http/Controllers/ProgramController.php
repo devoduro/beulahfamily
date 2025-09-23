@@ -191,11 +191,30 @@ class ProgramController extends Controller
             Storage::delete('public/' . $program->flyer_path);
         }
 
-        // Delete associated files
+        // Delete program images
+        if ($program->hasImages()) {
+            foreach ($program->images as $imagePath) {
+                if (Storage::exists('public/' . $imagePath)) {
+                    Storage::delete('public/' . $imagePath);
+                }
+            }
+        }
+
+        // Delete associated registration files before cascade delete
         if ($program->registrations()->exists()) {
             foreach ($program->registrations as $registration) {
+                // Delete legacy uploaded_files
                 if ($registration->uploaded_files) {
                     foreach ($registration->uploaded_files as $file) {
+                        if (isset($file['path']) && Storage::exists($file['path'])) {
+                            Storage::delete($file['path']);
+                        }
+                    }
+                }
+                
+                // Delete new files structure
+                if ($registration->files) {
+                    foreach ($registration->files as $file) {
                         if (isset($file['path']) && Storage::exists($file['path'])) {
                             Storage::delete($file['path']);
                         }

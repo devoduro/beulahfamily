@@ -300,7 +300,7 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" 
-                                                                class="inline-flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors" 
+                                                                class="delete-btn inline-flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors" 
                                                                 title="Delete Program">
                                                             <i class="fas fa-trash text-sm"></i>
                                                         </button>
@@ -428,7 +428,7 @@
                                       class="inline" onsubmit="return confirm('Are you sure?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="w-full inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-colors">
+                                    <button type="submit" class="delete-btn w-full inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-colors">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
@@ -540,8 +540,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Add loading states to buttons
-    const buttons = document.querySelectorAll('button[type="submit"]');
+    // Add loading states to buttons (exclude delete buttons)
+    const buttons = document.querySelectorAll('button[type="submit"]:not(.delete-btn)');
     buttons.forEach(button => {
         button.addEventListener('click', function() {
             if (!this.disabled) {

@@ -40,6 +40,9 @@ class ProgramRegistration extends Model
         'emergency_contact',
         'emergency_phone',
         'registration_data',
+        // New flexible fields
+        'form_data',
+        'files',
     ];
 
     protected $casts = [
@@ -47,6 +50,8 @@ class ProgramRegistration extends Model
         'registered_at' => 'datetime',
         'amount_paid' => 'decimal:2',
         'registration_data' => 'array',
+        'form_data' => 'array',
+        'files' => 'array',
     ];
 
     /**

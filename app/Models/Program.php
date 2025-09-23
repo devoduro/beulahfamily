@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Program extends Model
 {
@@ -14,6 +15,7 @@ class Program extends Model
         'name',
         'description',
         'type',
+        'program_type_id',
         'start_date',
         'end_date',
         'start_time',
@@ -34,6 +36,8 @@ class Program extends Model
         'flyer_path',
         'program_category',
         'registration_fields',
+        'custom_fields',
+        'images',
     ];
 
     protected $casts = [
@@ -49,7 +53,17 @@ class Program extends Model
         'max_file_size' => 'integer',
         'max_files' => 'integer',
         'registration_fields' => 'array',
+        'custom_fields' => 'array',
+        'images' => 'array',
     ];
+
+    /**
+     * Get the program type this program belongs to
+     */
+    public function programType(): BelongsTo
+    {
+        return $this->belongsTo(ProgramType::class);
+    }
 
     /**
      * Get all registrations for this program
@@ -238,7 +252,41 @@ class Program extends Model
      */
     public function hasFlyer(): bool
     {
-        return !empty($this->flyer_path);
+        return !empty($this->flyer_path) || $this->hasImages();
+    }
+
+    /**
+     * Check if program has images
+     */
+    public function hasImages(): bool
+    {
+        return !empty($this->images) && is_array($this->images) && count($this->images) > 0;
+    }
+
+    /**
+     * Get all program images URLs
+     */
+    public function getImageUrlsAttribute(): array
+    {
+        if (!$this->hasImages()) {
+            return [];
+        }
+
+        return array_map(function($imagePath) {
+            return asset('storage/' . $imagePath);
+        }, $this->images);
+    }
+
+    /**
+     * Get primary image URL (first image or flyer)
+     */
+    public function getPrimaryImageUrlAttribute(): ?string
+    {
+        if ($this->hasImages()) {
+            return asset('storage/' . $this->images[0]);
+        }
+        
+        return $this->flyer_url;
     }
 
     /**
@@ -246,6 +294,12 @@ class Program extends Model
      */
     public function getRegistrationFieldsForType(): array
     {
+        // If program has a program type, use its fields
+        if ($this->programType) {
+            return $this->programType->registration_fields;
+        }
+
+        // Fallback to legacy type-based fields for backward compatibility
         return match($this->type) {
             'ergates_conference' => [
                 'business_name' => ['required' => true, 'type' => 'text', 'label' => 'Business Name'],
@@ -260,23 +314,23 @@ class Program extends Model
                 'special_offers' => ['required' => false, 'type' => 'textarea', 'label' => 'Special Offers'],
                 'additional_info' => ['required' => false, 'type' => 'textarea', 'label' => 'Additional Information'],
             ],
-            'annual_retreat' => [
-                'participant_name' => ['required' => true, 'type' => 'text', 'label' => 'Name'],
-                'contact_phone' => ['required' => true, 'type' => 'tel', 'label' => 'Contact'],
-                'residential_address' => ['required' => true, 'type' => 'textarea', 'label' => 'Residential Address'],
+            'beulah_family_annual' => [
+                'full_name' => ['required' => true, 'type' => 'text', 'label' => 'Full Name'],
+                'phone_number' => ['required' => true, 'type' => 'tel', 'label' => 'Phone Number'],
                 'email' => ['required' => true, 'type' => 'email', 'label' => 'Email Address'],
-                'how_heard_about' => ['required' => true, 'type' => 'select', 'label' => 'How did you hear of the Retreat?', 'options' => [
-                    'radio_advert' => 'Radio Advert',
-                    'friend' => 'Friend',
-                    'family' => 'Family',
-                    'social_media' => 'Social Media',
+                'residential_address' => ['required' => true, 'type' => 'textarea', 'label' => 'Residential Address'],
+                'emergency_contact_name' => ['required' => true, 'type' => 'text', 'label' => 'Emergency Contact Name'],
+                'emergency_contact_phone' => ['required' => true, 'type' => 'tel', 'label' => 'Emergency Contact Phone'],
+                'dietary_requirements' => ['required' => false, 'type' => 'textarea', 'label' => 'Dietary Requirements'],
+                'how_heard_about' => ['required' => true, 'type' => 'select', 'label' => 'How did you hear about this program?', 'options' => [
                     'church_announcement' => 'Church Announcement',
-                    'website' => 'Website',
+                    'pastor' => 'Pastor/Church Leader',
+                    'friend' => 'Friend/Family Member',
+                    'social_media' => 'Social Media',
+                    'website' => 'Church Website',
+                    'flyer' => 'Flyer/Poster',
                     'other' => 'Other'
                 ]],
-                'dietary_requirements' => ['required' => false, 'type' => 'textarea', 'label' => 'Dietary Requirements'],
-                'emergency_contact' => ['required' => false, 'type' => 'text', 'label' => 'Emergency Contact'],
-                'emergency_phone' => ['required' => false, 'type' => 'tel', 'label' => 'Emergency Contact Phone'],
                 'additional_info' => ['required' => false, 'type' => 'textarea', 'label' => 'Additional Information'],
             ],
             default => $this->registration_fields ?? []
