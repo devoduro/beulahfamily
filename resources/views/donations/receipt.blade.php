@@ -260,7 +260,7 @@
             <!-- Amount Highlight -->
             <div class="amount-highlight">
                 <div class="label">Total Donation Amount</div>
-                <div class="amount">GHS {{ number_format($donation->amount, 2) }}</div>
+                <div class="amount">₵{{ number_format($donation->amount, 2) }}</div>
             </div>
             
             <!-- Receipt Details -->
@@ -386,17 +386,17 @@
                 @if($donation->net_amount && $donation->net_amount != $donation->amount)
                 <div class="detail-row">
                     <span class="detail-label">Gross Amount:</span>
-                    <span class="detail-value">GHS {{ number_format($donation->amount, 2) }}</span>
+                    <span class="detail-value">₵{{ number_format($donation->amount, 2) }}</span>
                 </div>
                 
                 <div class="detail-row">
                     <span class="detail-label">Transaction Fee:</span>
-                    <span class="detail-value">GHS {{ number_format($donation->transaction_fee ?? 0, 2) }}</span>
+                    <span class="detail-value">₵{{ number_format($donation->transaction_fee ?? 0, 2) }}</span>
                 </div>
                 
                 <div class="detail-row">
                     <span class="detail-label">Net Amount:</span>
-                    <span class="detail-value">GHS {{ number_format($donation->net_amount, 2) }}</span>
+                    <span class="detail-value">₵{{ number_format($donation->net_amount, 2) }}</span>
                 </div>
                 @endif
                 

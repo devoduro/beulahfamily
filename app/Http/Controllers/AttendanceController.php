@@ -90,16 +90,27 @@ class AttendanceController extends Controller
     }
 
     /**
-     * Display QR code for event
+     * Display QR code for event (public access)
      */
-    public function showQr(Event $event)
+    public function showQr(Event $event, Request $request)
     {
         $eventQr = EventQrCode::where('event_id', $event->id)
                              ->active()
                              ->first();
 
-        if (!$eventQr) {
+        // Only generate QR if user is authenticated (admin function)
+        if (!$eventQr && auth()->check()) {
             $eventQr = $this->qrCodeService->generateEventQrCode($event);
+        }
+
+        // Check if this is a print request
+        if ($request->has('print') || $request->has('autoprint')) {
+            return view('attendance.qr-print', compact('event', 'eventQr'));
+        }
+
+        // Use public view for unauthenticated users
+        if (!auth()->check()) {
+            return view('attendance.qr-public', compact('event', 'eventQr'));
         }
 
         return view('attendance.qr-display', compact('event', 'eventQr'));
@@ -124,7 +135,7 @@ class AttendanceController extends Controller
         // Log the scan attempt
         $eventQr->logScan(null, true);
 
-        return view('attendance.scan-form', compact('event', 'eventQr', 'token'));
+        return view('attendance.scan-form-public', compact('event', 'eventQr', 'token'));
     }
 
     /**

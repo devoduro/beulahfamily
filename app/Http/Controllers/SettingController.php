@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Document;
 use App\Models\DocumentCategory;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -269,166 +270,11 @@ class SettingController extends Controller
         }
     }
     
-    /**
-     * Display system settings.
-     */
-    public function system()
-    {
-        // Get system settings from DB or config
-        $settings = DB::table('settings')->where('category', 'system')->get();
-        
-        return view('settings.system', compact('settings'));
-    }
-    
-    /**
-     * Update system settings.
-     */
-    public function updateSystem(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'institution_name' => 'required|string|max:255',
-            'institution_code' => 'required|string|max:50',
-            'institution_address' => 'nullable|string',
-            'institution_contact' => 'nullable|string',
-            'transcript_prefix' => 'nullable|string|max:10',
-            'transcript_footer' => 'nullable|string',
-            'transcript_signature' => 'nullable|string|max:100',
-            'transcript_watermark' => 'nullable|string|max:50',
-            'email_from_address' => 'nullable|email',
-            'email_from_name' => 'nullable|string|max:100',
-        ]);
-        
-        if ($validator->fails()) {
-            return redirect()->route('settings.system')
-                ->withErrors($validator)
-                ->withInput();
-        }
-        
-        // Update or create settings in the database
-        $fields = [
-            'institution_name',
-            'institution_code',
-            'institution_address',
-            'institution_contact',
-            'transcript_prefix',
-            'transcript_footer',
-            'transcript_signature',
-            'transcript_watermark',
-            'email_from_address',
-            'email_from_name',
-        ];
-        
-        foreach ($fields as $field) {
-            DB::table('settings')->updateOrInsert(
-                ['key' => $field, 'category' => 'system'],
-                ['value' => $request->input($field), 'updated_at' => now()]
-            );
-        }
-        
-        return redirect()->route('settings.system')->with('success', 'System settings updated successfully.');
-    }
     
 
     
 
     
-/**
- * Display institution profile settings.
- */
-public function institution()
-{
-    // Get institution settings from DB
-    $settings = DB::table('settings')->where('category', 'institution')->get();
-    
-    return view('settings.institution', compact('settings'));
-}
-
-/**
- * Update institution profile settings.
- */
-public function updateInstitution(Request $request)
-{
-    try {
-        // Validate request
-        $validator = Validator::make($request->all(), [
-            'institution_name' => 'required|string|max:255',
-            'institution_slogan' => 'nullable|string|max:255',
-            'institution_address' => 'required|string',
-            'institution_phone' => 'required|string|max:20',
-            'institution_email' => 'required|email',
-            'institution_website' => 'nullable|url',
-            'institution_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'academic_affairs_signature' => 'nullable|image|mimes:jpeg,png|max:2048'
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->route('settings.institution')
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        // Update settings in database
-        $settings = [
-            'institution_name',
-            'institution_slogan',
-            'institution_address',
-            'institution_phone',
-            'institution_email',
-            'institution_website'
-        ];
-
-        foreach ($settings as $key) {
-            if ($request->has($key)) {
-                DB::table('settings')->updateOrInsert(
-                    ['key' => $key, 'category' => 'institution'],
-                    [
-                        'value' => $request->input($key),
-                        'type' => 'text'
-                    ]
-                );
-            }
-        }
-
-        // Handle logo upload if present
-        if ($request->hasFile('institution_logo')) {
-            $logo = $request->file('institution_logo');
-            $path = $logo->store('public/logos');
-            
-            // Update or insert logo path in settings
-            DB::table('settings')->updateOrInsert(
-                ['key' => 'institution_logo', 'category' => 'institution'],
-                [
-                    'value' => str_replace('public/', '', $path),
-                    'type' => 'image'
-                ]
-            );
-        }
-
-        // Handle academic affairs signature upload if present
-        if ($request->hasFile('academic_affairs_signature')) {
-            $signature = $request->file('academic_affairs_signature');
-            
-            // Store in public disk under signatures directory
-            $path = $signature->storeAs('signatures', $signature->hashName(), 'public');
-            
-            // Update or insert signature path in settings
-            DB::table('settings')->updateOrInsert(
-                ['key' => 'academic_affairs_signature', 'category' => 'institution'],
-                [
-                    'value' => $path,
-                    'type' => 'image'
-                ]
-            );
-        }
-
-        return redirect()->route('settings.institution')
-            ->with('success', 'Institution profile updated successfully.');
-                
-        } catch (\Exception $e) {
-            return redirect()->route('settings.institution')
-                ->with('error', 'Failed to update institution profile: ' . $e->getMessage());
-        }
-    }
     
     /**
      * Download a database backup.
@@ -549,6 +395,124 @@ public function updateInstitution(Request $request)
             
             return redirect()->route('settings.academic-years')
                 ->with('error', 'Failed to set academic year as current: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Display general settings.
+     */
+    public function general()
+    {
+        // Get both general and system settings for the merged view using consistent DB query
+        $generalSettings = DB::table('settings')->where('category', 'general')->get();
+        $systemSettings = DB::table('settings')->where('category', 'system')->get();
+        $settings = $generalSettings->merge($systemSettings);
+        
+        return view('settings.general', compact('settings'));
+    }
+
+    /**
+     * Update general settings.
+     */
+    public function updateGeneral(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'organization_name' => 'required|string|max:255',
+                'organization_slogan' => 'nullable|string|max:255',
+                'organization_description' => 'nullable|string|max:1000',
+                'organization_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'primary_color' => 'nullable|string|max:7',
+                'secondary_color' => 'nullable|string|max:7',
+                'organization_address' => 'nullable|string|max:500',
+                'organization_phone' => 'nullable|string|max:20',
+                'organization_email' => 'nullable|email|max:255',
+                'organization_website' => 'nullable|url|max:255',
+                'organization_city' => 'nullable|string|max:100',
+                'organization_state' => 'nullable|string|max:100',
+                'organization_country' => 'nullable|string|max:100',
+                'organization_postal_code' => 'nullable|string|max:20',
+                // System settings fields
+                'church_code' => 'nullable|string|max:50',
+                'bulletin_prefix' => 'nullable|string|max:10',
+                'bulletin_footer' => 'nullable|string',
+                'pastor_signature' => 'nullable|string|max:100',
+                'bulletin_watermark' => 'nullable|string|max:50',
+                'email_from_address' => 'nullable|email',
+                'email_from_name' => 'nullable|string|max:100',
+            ]);
+
+            if ($validator->fails()) {
+                return redirect()->route('settings.general')
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+
+            // Update general settings
+            $generalSettings = [
+                'organization_name',
+                'organization_slogan', 
+                'organization_description',
+                'primary_color',
+                'secondary_color',
+                'organization_address',
+                'organization_phone',
+                'organization_email',
+                'organization_website',
+                'organization_city',
+                'organization_state',
+                'organization_country',
+                'organization_postal_code'
+            ];
+
+            // Update system settings (church-focused)
+            $systemSettings = [
+                'church_code',
+                'bulletin_prefix',
+                'bulletin_footer',
+                'pastor_signature',
+                'bulletin_watermark',
+                'email_from_address',
+                'email_from_name'
+            ];
+
+            // Save general settings
+            foreach ($generalSettings as $key) {
+                if ($request->has($key)) {
+                    Setting::setValue($key, $request->input($key), 'general', 'text');
+                }
+            }
+
+            // Save system settings
+            foreach ($systemSettings as $key) {
+                if ($request->has($key)) {
+                    DB::table('settings')->updateOrInsert(
+                        ['key' => $key, 'category' => 'system'],
+                        ['value' => $request->input($key), 'updated_at' => now()]
+                    );
+                }
+            }
+
+            // Handle logo upload
+            if ($request->hasFile('organization_logo')) {
+                $logo = $request->file('organization_logo');
+                $path = $logo->store('logos', 'public');
+                
+                Setting::setValue(
+                    'organization_logo', 
+                    $path, 
+                    'general', 
+                    'image',
+                    'Organization logo image'
+                );
+            }
+
+            return redirect()->route('settings.general')
+                ->with('success', 'General settings updated successfully.');
+                
+        } catch (\Exception $e) {
+            return redirect()->route('settings.general')
+                ->with('error', 'Failed to update general settings: ' . $e->getMessage());
         }
     }
 }

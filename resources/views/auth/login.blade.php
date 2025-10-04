@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'ChurchCliq App') }} - Login</title>
+    <title>{{ \App\Models\Setting::getValue('organization_name', 'general', config('app.name', 'ChurchCliq App')) }} - Login</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -160,11 +160,21 @@
         <div class="w-full max-w-md animate-slide-up">
             <!-- Logo and Header -->
             <div class="text-center mb-8">
+                @php
+                    $orgLogo = \App\Models\Setting::getValue('organization_logo', 'general');
+                    $orgName = \App\Models\Setting::getValue('organization_name', 'general', 'ChurchCliq App');
+                    $orgSlogan = \App\Models\Setting::getValue('organization_slogan', 'general');
+                @endphp
+                
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl mb-4 animate-float">
-                    <i class="fas fa-print text-2xl text-white"></i>
+                    @if($orgLogo)
+                        <img src="{{ asset('storage/' . $orgLogo) }}" alt="{{ $orgName }} Logo" class="w-12 h-12 object-contain rounded-xl">
+                    @else
+                        <i class="fas fa-church text-2xl text-white"></i>
+                    @endif
                 </div>
-                <h1 class="text-4xl font-bold text-white mb-2">Welcome Back</h1>
-                <p class="text-white/80 text-lg">Sign in to your admin account</p>
+                <h1 class="text-4xl font-bold text-white mb-2">{{ $orgName }}</h1>
+                <p class="text-white/80 text-lg">{{ $orgSlogan ?: 'Sign in to your admin account' }}</p>
             </div>
             
             <!-- Login Card -->
@@ -270,7 +280,7 @@
             <!-- Footer -->
             <div class="mt-8 text-center">
                 <p class="text-white/80 text-sm">
-                    &copy; {{ date('Y') }} ChurchCliq App System. All rights reserved.
+                    &copy; {{ date('Y') }} {{ $orgName }}. All rights reserved.
                 </p>
             </div>
         </div>

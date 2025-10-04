@@ -53,20 +53,20 @@
                 <div class="space-y-4">
                     <div class="flex justify-between items-center py-3 border-b border-gray-100">
                         <span class="text-gray-600 font-medium">Amount</span>
-                        <span class="text-2xl font-bold text-green-600">GHS {{ number_format($donation->amount, 2) }}</span>
+                        <span class="text-2xl font-bold text-green-600">₵{{ number_format($donation->amount, 2) }}</span>
                     </div>
 
                     @if($donation->net_amount && $donation->net_amount != $donation->amount)
                     <div class="flex justify-between items-center py-3 border-b border-gray-100">
                         <span class="text-gray-600 font-medium">Net Amount</span>
-                        <span class="text-lg font-semibold text-gray-900">GHS {{ number_format($donation->net_amount, 2) }}</span>
+                        <span class="text-lg font-semibold text-gray-900">₵{{ number_format($donation->net_amount, 2) }}</span>
                     </div>
                     @endif
 
                     @if($donation->transaction_fee)
                     <div class="flex justify-between items-center py-3 border-b border-gray-100">
                         <span class="text-gray-600 font-medium">Transaction Fee</span>
-                        <span class="text-sm text-gray-500">GHS {{ number_format($donation->transaction_fee, 2) }}</span>
+                        <span class="text-sm text-gray-500">₵{{ number_format($donation->transaction_fee, 2) }}</span>
                     </div>
                     @endif
 

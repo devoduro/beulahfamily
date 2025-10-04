@@ -271,8 +271,8 @@
                                     @endif
                                     @if($event->registration_fee && $event->registration_fee > 0)
                                         <div class="flex items-center text-green-600 font-semibold bg-green-50 px-3 py-1 rounded-full">
-                                            <i class="fas fa-dollar-sign w-4 mr-1"></i>
-                                            <span>${{ number_format($event->registration_fee, 2) }}</span>
+                                            <i class="fas fa-money-bill w-4 mr-1"></i>
+                                            <span>₵{{ number_format($event->registration_fee, 2) }}</span>
                                         </div>
                                     @else
                                         <div class="flex items-center text-blue-600 font-medium bg-blue-50 px-3 py-1 rounded-full">
@@ -399,7 +399,7 @@
                         <div class="flex items-center justify-between text-xs text-gray-500">
                             <span>{{ $event->ministry->name ?? 'General Ministry' }}</span>
                             @if($event->registration_fee ?? 0 > 0)
-                                <span class="font-semibold text-green-600">${{ number_format($event->registration_fee ?? 0, 2) }}</span>
+                                <span class="font-semibold text-green-600">₵{{ number_format($event->registration_fee ?? 0, 2) }}</span>
                             @endif
                         </div>
                     </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Member Login - Beulah Family</title>
+    <title>Member Login - {{ \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -35,11 +35,21 @@
     <div class="w-full max-w-md relative z-10">
         <!-- Church Logo/Header -->
         <div class="text-center mb-8">
+            @php
+                $orgLogo = \App\Models\Setting::getValue('organization_logo', 'general');
+                $orgName = \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family');
+                $orgSlogan = \App\Models\Setting::getValue('organization_slogan', 'general');
+            @endphp
+            
             <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full shadow-lg mb-4">
-                <i class="fas fa-church text-3xl text-indigo-600"></i>
+                @if($orgLogo)
+                    <img src="{{ asset('storage/' . $orgLogo) }}" alt="{{ $orgName }} Logo" class="w-16 h-16 object-contain rounded-full">
+                @else
+                    <i class="fas fa-church text-3xl text-indigo-600"></i>
+                @endif
             </div>
-            <h1 class="text-3xl font-bold text-white mb-2">Beulah Family</h1>
-            <p class="text-indigo-100">Member Portal</p>
+            <h1 class="text-3xl font-bold text-white mb-2">{{ $orgName }}</h1>
+            <p class="text-indigo-100">{{ $orgSlogan ?: 'Member Portal' }}</p>
         </div>
 
         <!-- Login Form -->
@@ -144,7 +154,7 @@
         <!-- Footer -->
         <div class="text-center mt-8 text-indigo-100">
             <p class="text-sm">
-                © {{ date('Y') }} Beulah Family Church. All rights reserved.
+                © {{ date('Y') }} {{ $orgName }}. All rights reserved.
             </p>
         </div>
     </div>

@@ -33,21 +33,21 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Amount -->
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-800 mb-4">Donation Amount (GHS)</label>
+                        <label class="block text-sm font-semibold text-gray-800 mb-4">Donation Amount (₵)</label>
                         
                         <!-- Quick Amount Buttons -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                             <button type="button" class="amount-btn px-4 py-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors font-semibold" data-amount="50">
-                                GHS 50
+                                ₵50
                             </button>
                             <button type="button" class="amount-btn px-4 py-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors font-semibold" data-amount="100">
-                                GHS 100
+                                ₵100
                             </button>
                             <button type="button" class="amount-btn px-4 py-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors font-semibold" data-amount="200">
-                                GHS 200
+                                ₵200
                             </button>
                             <button type="button" class="amount-btn px-4 py-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors font-semibold" data-amount="500">
-                                GHS 500
+                                ₵500
                             </button>
                         </div>
 
@@ -56,7 +56,7 @@
                                    class="block w-full px-4 py-3 bg-white/50 backdrop-blur-sm border-2 border-gray-200/50 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-gray-900 font-medium shadow-sm hover:shadow-md text-lg" 
                                    placeholder="Enter custom amount">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                                <span class="text-gray-500 font-medium">GHS</span>
+                                <span class="text-gray-500 font-medium">₵</span>
                             </div>
                         </div>
                     </div>

@@ -48,7 +48,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 mb-1">Total Amount</p>
-                        <p class="text-3xl font-bold text-purple-600">GHS {{ number_format($stats['total_amount'], 2) }}</p>
+                        <p class="text-3xl font-bold text-purple-600">₵{{ number_format($stats['total_amount'], 2) }}</p>
                     </div>
                     <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
                         <i class="fas fa-coins text-purple-600 text-xl"></i>
@@ -60,7 +60,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 mb-1">Amount This Month</p>
-                        <p class="text-3xl font-bold text-orange-600">GHS {{ number_format($stats['amount_this_month'], 2) }}</p>
+                        <p class="text-3xl font-bold text-orange-600">₵{{ number_format($stats['amount_this_month'], 2) }}</p>
                     </div>
                     <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
                         <i class="fas fa-chart-line text-orange-600 text-xl"></i>
@@ -159,7 +159,7 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-semibold text-emerald-600">GHS {{ number_format($payment->amount, 2) }}</div>
+                                    <div class="text-sm font-semibold text-emerald-600">₵{{ number_format($payment->amount, 2) }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">

@@ -22,7 +22,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 mb-1">Income This Month</p>
-                        <p class="text-3xl font-bold text-green-600">GHS {{ number_format($stats['total_income_this_month'], 2) }}</p>
+                        <p class="text-3xl font-bold text-green-600">₵{{ number_format($stats['total_income_this_month'], 2) }}</p>
                     </div>
                     <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                         <i class="fas fa-arrow-up text-green-600 text-xl"></i>
@@ -35,7 +35,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 mb-1">Expenses This Month</p>
-                        <p class="text-3xl font-bold text-red-600">GHS {{ number_format($stats['total_expense_this_month'], 2) }}</p>
+                        <p class="text-3xl font-bold text-red-600">₵{{ number_format($stats['total_expense_this_month'], 2) }}</p>
                     </div>
                     <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
                         <i class="fas fa-arrow-down text-red-600 text-xl"></i>
@@ -49,7 +49,7 @@
                     <div>
                         <p class="text-sm font-medium text-gray-600 mb-1">Net Income This Month</p>
                         <p class="text-3xl font-bold {{ $stats['net_income_this_month'] >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                            GHS {{ number_format($stats['net_income_this_month'], 2) }}
+                            ₵{{ number_format($stats['net_income_this_month'], 2) }}
                         </p>
                     </div>
                     <div class="w-12 h-12 {{ $stats['net_income_this_month'] >= 0 ? 'bg-green-100' : 'bg-red-100' }} rounded-xl flex items-center justify-center">
@@ -142,7 +142,7 @@
                             </div>
                             <div class="text-right">
                                 <p class="font-semibold {{ $transaction->type === 'income' ? 'text-green-600' : 'text-red-600' }}">
-                                    {{ $transaction->type === 'income' ? '+' : '-' }}GHS {{ number_format($transaction->amount, 2) }}
+                                    {{ $transaction->type === 'income' ? '+' : '-' }}₵{{ number_format($transaction->amount, 2) }}
                                 </p>
                                 <span class="text-xs px-2 py-1 rounded-full {{ $transaction->status === 'approved' ? 'bg-green-100 text-green-800' : ($transaction->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
                                     {{ ucfirst($transaction->status) }}
@@ -202,7 +202,7 @@ const monthlyChart = new Chart(ctx, {
                 beginAtZero: true,
                 ticks: {
                     callback: function(value) {
-                        return 'GHS ' + value.toLocaleString();
+                        return '₵' + value.toLocaleString();
                     }
                 }
             }

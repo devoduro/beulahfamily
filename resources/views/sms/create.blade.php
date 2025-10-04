@@ -291,7 +291,7 @@
                                 </div>
                                 <div class="flex justify-between border-t border-green-200 pt-2">
                                     <span class="text-green-700">Estimated Cost:</span>
-                                    <span class="font-bold text-green-900" id="estimated-cost">GHS 0.00</span>
+                                    <span class="font-bold text-green-900" id="estimated-cost">₵0.00</span>
                                 </div>
                             </div>
                         </div>
@@ -1414,14 +1414,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const messageLength = messageTextarea.value.length;
         const smsCountValue = Math.ceil(messageLength / 160) || 1;
         const totalSms = recipientCount * smsCountValue;
-        const costPerSms = 0.05; // GHS 0.05 per SMS
+        const costPerSms = 0.05; // ₵0.05 per SMS
         const estimatedCost = totalSms * costPerSms;
         
         // Animate cost updates
         animateCostUpdate('recipient-count', recipientCount);
         animateCostUpdate('total-sms', totalSms);
-        animateCostUpdate('estimated-cost', `GHS ${estimatedCost.toFixed(2)}`);
-        animateCostUpdate('campaign-cost', `$${(estimatedCost * 0.27).toFixed(2)}`); // USD conversion
+        animateCostUpdate('estimated-cost', `₵${estimatedCost.toFixed(2)}`);
+        animateCostUpdate('campaign-cost', `₵${estimatedCost.toFixed(2)}`); // Cedis display
         
         // Update progress indicators
         updateProgressIndicators(recipientCount, totalSms, estimatedCost);

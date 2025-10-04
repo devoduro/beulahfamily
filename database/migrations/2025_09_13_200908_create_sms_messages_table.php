@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sms_messages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('template_id')->nullable()->constrained('sms_templates')->onDelete('set null');
+            $table->unsignedBigInteger('template_id')->nullable(); // Foreign key will be added later
             $table->string('title');
             $table->text('message');
             $table->enum('recipient_type', ['all', 'members', 'chapter', 'ministry', 'custom']);

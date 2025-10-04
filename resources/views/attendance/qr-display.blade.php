@@ -28,7 +28,25 @@
             <h2 class="text-2xl font-semibold text-gray-900 mb-6">Scan to Mark Attendance</h2>
             
             @if($eventQr)
-                <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-8 mb-6">
+                <!-- Print-optimized QR section -->
+                <div class="print-area">
+                    <div class="print-title">{{ $event->title }}</div>
+                    <div class="print-details">
+                        {{ $event->start_datetime->format('l, F j, Y \a\t g:i A') }}
+                        @if($event->location)
+                            <br>{{ $event->location }}
+                        @endif
+                    </div>
+                    <div class="print-qr-container">
+                        <img src="{{ asset('storage/' . $eventQr->qr_code_path) }}" 
+                             alt="QR Code for {{ $event->title }}" 
+                             class="w-64 h-64 mx-auto">
+                    </div>
+                    <div class="print-instruction">Scan this QR code to mark your attendance</div>
+                </div>
+                
+                <!-- Screen display version -->
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-8 mb-6 screen-only">
                     <div class="bg-white rounded-xl p-6 inline-block shadow-lg">
                         <img src="{{ asset('storage/' . $eventQr->qr_code_path) }}" 
                              alt="QR Code for {{ $event->title }}" 
@@ -72,10 +90,14 @@
                             Deactivate QR
                         </button>
                     @endif
-                    <button onclick="printQr()" class="inline-flex items-center px-6 py-3 bg-gray-600 text-white font-medium rounded-xl hover:bg-gray-700 transition-colors">
+                    <button onclick="printQr()" class="inline-flex items-center px-6 py-3 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition-colors">
                         <i class="fas fa-print mr-2"></i>
-                        Print QR Code
+                        Print QR Only
                     </button>
+                    <a href="{{ route('attendance.qr.show', $event) }}?print=1&autoprint=1" target="_blank" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition-colors">
+                        <i class="fas fa-external-link-alt mr-2"></i>
+                        Print-Only View
+                    </a>
                 </div>
             @else
                 <div class="text-center py-12">
@@ -253,21 +275,98 @@ function printQr() {
     window.print();
 }
 
-// Print styles
+// Enhanced Print styles - Only QR Code and Event Info
 const printStyles = `
     @media print {
+        /* Hide everything by default */
         body * {
             visibility: hidden;
         }
-        .bg-white.rounded-2xl.shadow-lg.border.border-gray-100.p-8,
-        .bg-white.rounded-2xl.shadow-lg.border.border-gray-100.p-8 * {
+        
+        /* Hide navigation, sidebar, and other layout elements */
+        nav, .sidebar, .header, .footer, .bg-gradient-to-br {
+            display: none !important;
+        }
+        
+        /* Show only the print area */
+        .print-area,
+        .print-area * {
             visibility: visible;
         }
-        .bg-white.rounded-2xl.shadow-lg.border.border-gray-100.p-8 {
+        
+        /* Position the print area */
+        .print-area {
             position: absolute;
             left: 0;
             top: 0;
             width: 100%;
+            background: white !important;
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 20px !important;
+            margin: 0 !important;
+        }
+        
+        /* Center and size the QR code */
+        .print-qr-container {
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        
+        .print-qr-container img {
+            width: 300px !important;
+            height: 300px !important;
+            margin: 20px auto !important;
+            display: block !important;
+        }
+        
+        /* Style the event title */
+        .print-title {
+            font-size: 24px !important;
+            font-weight: bold !important;
+            margin-bottom: 10px !important;
+            text-align: center !important;
+            color: black !important;
+        }
+        
+        /* Style the event details */
+        .print-details {
+            font-size: 16px !important;
+            margin-bottom: 20px !important;
+            text-align: center !important;
+            color: black !important;
+        }
+        
+        /* Style the scan instruction */
+        .print-instruction {
+            font-size: 18px !important;
+            font-weight: bold !important;
+            margin-top: 20px !important;
+            text-align: center !important;
+            color: black !important;
+        }
+        
+        /* Hide all buttons, stats, and screen-only elements */
+        button, .grid, .space-x-4, .bg-gray-50, .screen-only {
+            display: none !important;
+        }
+        
+        /* Hide instructions and other sections */
+        .bg-gradient-to-r, .bg-gradient-to-br:not(.print-area) {
+            display: none !important;
+        }
+        
+        /* Remove all backgrounds and shadows for print */
+        * {
+            background: transparent !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+        
+        /* Ensure page margins */
+        @page {
+            margin: 1cm;
         }
     }
 `;

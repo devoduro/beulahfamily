@@ -674,7 +674,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Get current filter parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const exportUrl = new URL('{{ route("members.export") }}', window.location.origin);
+        const exportUrl = new URL('/members/export', window.location.origin);
         
         // Add format parameter
         exportUrl.searchParams.set('format', format);
@@ -690,19 +690,57 @@ document.addEventListener('DOMContentLoaded', function() {
         button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Exporting...';
         button.disabled = true;
         
-        // Create a temporary link and trigger download
-        const link = document.createElement('a');
-        link.href = exportUrl.toString();
-        link.download = '';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Use fetch to handle the download properly with authentication
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
         
-        // Reset button after a delay
-        setTimeout(() => {
+        fetch(exportUrl.toString(), {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                ...(csrfToken && { 'X-CSRF-TOKEN': csrfToken })
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            // Get filename from Content-Disposition header
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filename = `members_export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch) {
+                    filename = filenameMatch[1];
+                }
+            }
+            
+            return response.blob().then(blob => ({ blob, filename }));
+        })
+        .then(({ blob, filename }) => {
+            // Create download link
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            showNotification(`Export completed! Downloaded ${filename}`, 'success');
+        })
+        .catch(error => {
+            console.error('Export error:', error);
+            console.error('Export URL:', exportUrl.toString());
+            showNotification(`Export failed: ${error.message}. Check browser console for details.`, 'error');
+        })
+        .finally(() => {
+            // Reset button
             button.innerHTML = originalContent;
             button.disabled = false;
-        }, 2000);
+        });
     };
     
     // Real-time search functionality

@@ -80,7 +80,7 @@
                         <div class="text-right">
                             <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
                                 <p class="text-white/80 text-sm font-medium mb-1">Amount Paid</p>
-                                <p class="text-4xl font-bold mb-3">GHS {{ number_format($payment->amount, 2) }}</p>
+                                <p class="text-4xl font-bold mb-3">₵{{ number_format($payment->amount, 2) }}</p>
                                 {!! $payment->status_badge !!}
                             </div>
                         </div>

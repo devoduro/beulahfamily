@@ -232,11 +232,11 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-gray-600">Total Donations</span>
-                        <span class="font-medium text-green-600">${{ number_format($member->total_donations ?? 0, 2) }}</span>
+                        <span class="font-medium text-green-600">₵{{ number_format($member->total_donations ?? 0, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-gray-600">This Year</span>
-                        <span class="font-medium text-green-600">${{ number_format($member->yearly_donations ?? 0, 2) }}</span>
+                        <span class="font-medium text-green-600">₵{{ number_format($member->yearly_donations ?? 0, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-gray-600">Active Ministries</span>

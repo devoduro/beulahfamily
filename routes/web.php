@@ -3,6 +3,10 @@
 // MEMBER CREATE, EDIT, UPDATE AND STORE ROUTES
 Route::get('/add-member', [\App\Http\Controllers\MemberController::class, 'create'])->middleware(['auth', 'admin'])->name('members.create');
 Route::post('/add-member', [\App\Http\Controllers\MemberController::class, 'store'])->middleware(['auth', 'admin'])->name('members.store');
+
+// MEMBER EXPORT ROUTE (must be before dynamic {member} routes)
+Route::get('/members/export', [\App\Http\Controllers\MemberController::class, 'export'])->middleware(['auth'])->name('members.export');
+
 Route::get('/members/{member}/edit', [\App\Http\Controllers\MemberController::class, 'edit'])->middleware(['auth', 'admin'])->name('members.edit');
 Route::put('/members/{member}', [\App\Http\Controllers\MemberController::class, 'update'])->middleware(['auth', 'admin'])->name('members.update');
 Route::get('/members/{member}', [\App\Http\Controllers\MemberController::class, 'show'])->name('members.show');
@@ -180,9 +184,7 @@ Route::prefix('attendance')->name('attendance.')->middleware(['auth'])->group(fu
     Route::post('/event/{event}/manual', [App\Http\Controllers\AttendanceController::class, 'manualEntry'])->name('manual-entry');
     Route::post('/event/{event}/bulk', [App\Http\Controllers\AttendanceController::class, 'bulkEntry'])->name('bulk-entry');
     
-    // QR Code routes
-    Route::get('/event/{event}/qr', [App\Http\Controllers\AttendanceController::class, 'showQr'])->name('qr.show');
-    Route::get('/qr-display/{qrCode}', [App\Http\Controllers\AttendanceController::class, 'displayQr'])->name('qr-display');
+    // QR Code management routes (admin only)
     Route::post('/event/{event}/qr/generate', [App\Http\Controllers\AttendanceController::class, 'generateQr'])->name('qr.generate');
     Route::post('/qr/{qrCode}/deactivate', [App\Http\Controllers\AttendanceController::class, 'deactivateQr'])->name('qr.deactivate');
     
@@ -193,6 +195,10 @@ Route::prefix('attendance')->name('attendance.')->middleware(['auth'])->group(fu
 // Public attendance scanning routes (no auth required)
 Route::get('/scan/{token}', [App\Http\Controllers\AttendanceController::class, 'scan'])->name('attendance.scan');
 Route::post('/mark-attendance', [App\Http\Controllers\AttendanceController::class, 'markAttendance'])->name('attendance.mark');
+
+// Public QR code display (no auth required for members to view QR codes)
+Route::get('/attendance/event/{event}/qr', [App\Http\Controllers\AttendanceController::class, 'showQr'])->name('attendance.qr.show');
+Route::get('/attendance/qr-display/{qrCode}', [App\Http\Controllers\AttendanceController::class, 'displayQr'])->name('attendance.qr-display');
 
 
 // Program Registration Routes (Public Access)
@@ -277,6 +283,8 @@ Route::middleware(['auth'])->group(function () {
     
     // Events - View and register access for all users
     Route::get('/events', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
+    Route::get('/events/create', [\App\Http\Controllers\EventController::class, 'create'])->name('events.create');
+    Route::post('/events', [\App\Http\Controllers\EventController::class, 'store'])->name('events.store');
     Route::get('/events/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
     Route::post('/events/{event}/register', [\App\Http\Controllers\EventController::class, 'register'])->name('events.register');
     
@@ -378,7 +386,6 @@ Route::middleware(['auth'])->group(function () {
         
         // Members Management (Admin Only) - Edit/Update routes moved to top level
         Route::delete('/members/{member}', [\App\Http\Controllers\MemberController::class, 'destroy'])->name('members.destroy');
-        Route::get('/members/export', [\App\Http\Controllers\MemberController::class, 'export'])->name('members.export');
         Route::get('/members/{member}/id-card', [\App\Http\Controllers\MemberController::class, 'generateIdCard'])->name('members.id-card');
         
         // Families Management (Admin Only)
@@ -400,7 +407,11 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('ministries', \App\Http\Controllers\MinistryController::class)->except(['index', 'show']);
         
         // Events Management (Admin Only)
-        Route::resource('events', \App\Http\Controllers\EventController::class)->except(['index', 'show']);
+        Route::get('/admin/events/create', [\App\Http\Controllers\EventController::class, 'create'])->name('admin.events.create');
+        Route::post('/admin/events', [\App\Http\Controllers\EventController::class, 'store'])->name('admin.events.store');
+        Route::get('/events/{event}/edit', [\App\Http\Controllers\EventController::class, 'edit'])->name('events.edit');
+        Route::put('/events/{event}', [\App\Http\Controllers\EventController::class, 'update'])->name('events.update');
+        Route::delete('/events/{event}', [\App\Http\Controllers\EventController::class, 'destroy'])->name('events.destroy');
         Route::post('/events/{event}/check-in/{attendance}', [\App\Http\Controllers\EventController::class, 'checkIn'])->name('events.check-in');
         
         // Donations Management (Admin Only)
@@ -468,6 +479,16 @@ Route::middleware(['auth'])->group(function () {
         
         // Settings
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::get('/settings/general', [SettingController::class, 'general'])->name('settings.general');
+        Route::put('/settings/general', [SettingController::class, 'updateGeneral'])->name('settings.general.update');
+
+        // Activity Logs & Security
+        Route::prefix('security')->name('security.')->group(function () {
+            Route::get('/dashboard', [ActivityLogController::class, 'dashboard'])->name('dashboard');
+            Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
+            Route::get('/logs/{log}', [ActivityLogController::class, 'show'])->name('logs.show');
+            Route::post('/logs/cleanup', [ActivityLogController::class, 'cleanup'])->name('logs.cleanup');
+        });
                
         // Database Backup
         Route::get('/settings/backup', [SettingController::class, 'backup'])->name('settings.backup');
@@ -485,13 +506,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/settings/backup/{filename}/download', [SettingController::class, 'downloadBackup'])->name('settings.backup.download');
         Route::delete('/settings/backup/{filename}', [SettingController::class, 'destroyBackup'])->name('settings.backup.destroy');
         
-        // System Settings
-        Route::get('/settings/system', [SettingController::class, 'system'])->name('settings.system');
-        Route::put('/settings/system', [SettingController::class, 'updateSystem'])->name('settings.system.update');
         
-        // Institution Settings
-        Route::get('/settings/institution', [SettingController::class, 'institution'])->name('settings.institution');
-        Route::put('/settings/institution', [SettingController::class, 'updateInstitution'])->name('settings.institution.update');
         
         // SMS Configuration
         Route::get('/sms-config', [\App\Http\Controllers\Admin\SmsConfigController::class, 'index'])->name('admin.sms-config');

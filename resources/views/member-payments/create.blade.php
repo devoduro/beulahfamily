@@ -105,12 +105,12 @@
                                 <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mr-3">
                                     <i class="fas fa-coins text-white text-sm"></i>
                                 </div>
-                                Amount (GHS) *
+                                Amount (₵) *
                             </div>
                         </label>
                         <div class="relative">
                             <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500 font-semibold">
-                                GHS
+                                ₵
                             </div>
                             <input type="number" name="amount" id="amount" value="{{ old('amount') }}" step="0.01" min="0.01" required 
                                    class="w-full rounded-2xl border-2 border-slate-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 py-4 pl-16 pr-5 text-slate-700 font-semibold text-lg bg-white/80 backdrop-blur-sm @error('amount') border-red-400 focus:border-red-500 focus:ring-red-100 @enderror"

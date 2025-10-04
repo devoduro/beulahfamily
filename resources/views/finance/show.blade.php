@@ -52,7 +52,7 @@
                     </div>
                     <div class="text-right">
                         <p class="text-3xl font-bold">
-                            {{ $transaction->type === 'income' ? '+' : '-' }}GHS {{ number_format($transaction->amount, 2) }}
+                            {{ $transaction->type === 'income' ? '+' : '-' }}₵{{ number_format($transaction->amount, 2) }}
                         </p>
                         {!! $transaction->status_badge !!}
                     </div>

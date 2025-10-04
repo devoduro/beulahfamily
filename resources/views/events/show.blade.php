@@ -245,7 +245,7 @@
                     @if($event->registration_fee)
                         <div>
                             <label class="text-sm font-medium text-gray-600">Registration Fee</label>
-                            <p class="text-gray-900">GHS {{ number_format($event->registration_fee, 2) }}</p>
+                            <p class="text-gray-900">₵{{ number_format($event->registration_fee, 2) }}</p>
                         </div>
                     @endif
                     
