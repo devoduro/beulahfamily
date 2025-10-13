@@ -55,7 +55,14 @@ class Member extends Authenticatable
         'receive_newsletter',
         'receive_sms',
         'is_active',
+        'approval_status',
+        'rejection_reason',
+        'approved_at',
+        'approved_by',
         'password',
+        'force_password_change',
+        'password_changed_at',
+        'registration_token',
         'remember_token'
     ];
 
@@ -69,6 +76,8 @@ class Member extends Authenticatable
         'membership_date' => 'date',
         'baptism_date' => 'date',
         'confirmation_date' => 'date',
+        'approved_at' => 'datetime',
+        'password_changed_at' => 'datetime',
         'skills_talents' => 'array',
         'interests' => 'array',
         'is_baptized' => 'boolean',
@@ -76,7 +85,7 @@ class Member extends Authenticatable
         'receive_newsletter' => 'boolean',
         'receive_sms' => 'boolean',
         'is_active' => 'boolean',
-        'password' => 'hashed'
+        'force_password_change' => 'boolean'
     ];
 
     // Relationships
@@ -204,6 +213,48 @@ class Member extends Authenticatable
         }
         
         return false;
+    }
+
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    // Scopes for approval status
+    public function scopePending($query)
+    {
+        return $query->where('approval_status', 'pending');
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('approval_status', 'approved');
+    }
+
+    public function scopeRejected($query)
+    {
+        return $query->where('approval_status', 'rejected');
+    }
+
+    // Helper methods
+    public function isPending()
+    {
+        return $this->approval_status === 'pending';
+    }
+
+    public function isApproved()
+    {
+        return $this->approval_status === 'approved';
+    }
+
+    public function isRejected()
+    {
+        return $this->approval_status === 'rejected';
+    }
+
+    public function needsPasswordChange()
+    {
+        return $this->force_password_change;
     }
 
     protected static function boot()

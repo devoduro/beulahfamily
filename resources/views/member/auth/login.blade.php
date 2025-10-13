@@ -130,21 +130,22 @@
             <!-- Divider -->
             <div class="my-6 flex items-center">
                 <div class="flex-1 border-t border-gray-300"></div>
-                <span class="px-4 text-sm text-gray-500">Need help?</span>
+                <span class="px-4 text-sm text-gray-500">New Member?</span>
                 <div class="flex-1 border-t border-gray-300"></div>
             </div>
 
-            <!-- Help Section -->
-            <div class="text-center space-y-3">
-                <p class="text-sm text-gray-600">
-                    <i class="fas fa-info-circle mr-1 text-indigo-600"></i>
-                    New member? Contact the church office for your login credentials.
-                </p>
+            <!-- Registration Section -->
+            <div class="text-center space-y-4">
+                <a href="{{ route('member.register') }}" 
+                   class="block w-full bg-white border-2 border-indigo-600 text-indigo-600 py-3 px-4 rounded-lg font-medium hover:bg-indigo-50 transition-all duration-200">
+                    <i class="fas fa-user-plus mr-2"></i>Register as a New Member
+                </a>
+                
                 <div class="flex justify-center space-x-6 text-sm">
-                    <a href="tel:+1234567890" class="text-indigo-600 hover:text-indigo-800 transition-colors">
+                    <a href="tel:+1234567890" class="text-indigo-100 hover:text-white transition-colors">
                         <i class="fas fa-phone mr-1"></i>Call Office
                     </a>
-                    <a href="mailto:info@beulahfamily.org" class="text-indigo-600 hover:text-indigo-800 transition-colors">
+                    <a href="mailto:info@beulahfamily.org" class="text-indigo-100 hover:text-white transition-colors">
                         <i class="fas fa-envelope mr-1"></i>Email Us
                     </a>
                 </div>
@@ -159,7 +160,50 @@
         </div>
     </div>
 
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
     <script>
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container');
+            
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `transform transition-all duration-500 ease-in-out translate-x-full`;
+            
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            
+            toast.innerHTML = `
+                <div class="${bgColor} text-white px-6 py-4 rounded-lg shadow-2xl flex items-center space-x-3 min-w-[300px] max-w-md">
+                    <i class="fas ${icon} text-2xl"></i>
+                    <div class="flex-1">
+                        <p class="font-semibold">${type === 'success' ? 'Success!' : type === 'error' ? 'Error!' : type === 'warning' ? 'Warning!' : 'Info'}</p>
+                        <p class="text-sm opacity-90">${message}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+                toast.classList.add('translate-x-0');
+            }, 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }, 5000);
+        }
+
         function togglePassword() {
             const passwordField = document.getElementById('password');
             const toggleIcon = document.getElementById('toggleIcon');
@@ -175,9 +219,22 @@
             }
         }
 
-        // Auto-focus on login field
+        // Auto-focus on login field and show toasts
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('login').focus();
+            
+            // Show toast messages
+            @if(session('success'))
+                showToast("{{ session('success') }}", 'success');
+            @endif
+
+            @if(session('error'))
+                showToast("{{ session('error') }}", 'error');
+            @endif
+
+            @if(session('warning'))
+                showToast("{{ session('warning') }}", 'warning');
+            @endif
         });
 
         // Form validation feedback

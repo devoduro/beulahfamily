@@ -7,7 +7,11 @@ use App\Models\Family;
 use App\Models\Ministry;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\MembersExport;
@@ -525,5 +529,130 @@ class MemberController extends Controller
         ];
         
         return response()->json($stats);
+    }
+
+    /**
+     * Show pending member registrations
+     */
+    public function pendingApprovals()
+    {
+        $pendingMembers = Member::pending()
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('members.pending-approvals', compact('pendingMembers'));
+    }
+
+    /**
+     * Approve a member registration
+     */
+    public function approve(Request $request, Member $member)
+    {
+        if ($member->approval_status !== 'pending') {
+            return back()->with('error', 'This member has already been processed.');
+        }
+
+        // Generate a fresh password for the member
+        $newPassword = strtolower($member->first_name) . substr($member->phone, -4);
+
+        $member->update([
+            'approval_status' => 'approved',
+            'approved_at' => now(),
+            'approved_by' => Auth::id(),
+            'is_active' => true,
+            'password' => Hash::make($newPassword),
+            'force_password_change' => true,
+        ]);
+
+        // Send approval email with password
+        try {
+            Mail::send('emails.member-approved', [
+                'member' => $member,
+                'password' => $newPassword,
+            ], function ($message) use ($member) {
+                $message->to($member->email)
+                    ->subject('Member Registration Approved - Login Details');
+            });
+        } catch (\Exception $e) {
+            \Log::error('Failed to send approval email: ' . $e->getMessage());
+        }
+
+        return back()->with('success', '✅ Member approved successfully! An email has been sent to ' . $member->email . ' with login instructions and password.');
+    }
+
+    /**
+     * Reject a member registration
+     */
+    public function reject(Request $request, Member $member)
+    {
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500',
+        ]);
+
+        if ($member->approval_status !== 'pending') {
+            return back()->with('error', 'This member has already been processed.');
+        }
+
+        $member->update([
+            'approval_status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
+            'approved_at' => now(),
+            'approved_by' => Auth::id(),
+        ]);
+
+        // Send rejection email
+        try {
+            Mail::send('emails.member-rejected', [
+                'member' => $member,
+                'reason' => $request->rejection_reason,
+            ], function ($message) use ($member) {
+                $message->to($member->email)
+                    ->subject('Member Registration Status');
+            });
+        } catch (\Exception $e) {
+            \Log::error('Failed to send rejection email: ' . $e->getMessage());
+        }
+
+        return back()->with('success', '❌ Member registration rejected. An email has been sent to ' . $member->email . ' with the reason.');
+    }
+
+    /**
+     * Reset member password
+     */
+    public function resetPassword(Request $request, Member $member)
+    {
+        // Generate new password (first name + last 4 digits of phone)
+        $newPassword = strtolower($member->first_name) . substr($member->phone, -4);
+
+        $member->update([
+            'password' => Hash::make($newPassword),
+            'force_password_change' => true,
+            'password_changed_at' => null,
+        ]);
+
+        // Send password reset email
+        try {
+            Mail::send('emails.member-password-reset', [
+                'member' => $member,
+                'password' => $newPassword,
+            ], function ($message) use ($member) {
+                $message->to($member->email)
+                    ->subject('Password Reset - Beulah Family Church');
+            });
+        } catch (\Exception $e) {
+            \Log::error('Failed to send password reset email: ' . $e->getMessage());
+            return back()->with('error', 'Failed to send password reset email.');
+        }
+
+        return back()->with('success', 'Password reset successfully. New password sent to member\'s email.');
+    }
+
+    /**
+     * Generate and send registration link
+     */
+    public function getRegistrationLink()
+    {
+        $link = route('member.register');
+        return response()->json(['link' => $link]);
     }
 }

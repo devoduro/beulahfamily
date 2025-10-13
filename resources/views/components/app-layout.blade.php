@@ -127,7 +127,13 @@
                         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
                             <i class="fas fa-users text-white text-sm"></i>
                         </div>
-                        <span>Members</span>
+                        <span class="flex-1">Members</span>
+                        @php
+                            $pendingCount = \App\Models\Member::where('approval_status', 'pending')->count();
+                        @endphp
+                        @if($pendingCount > 0)
+                            <span class="bg-yellow-500 text-white text-xs font-bold rounded-full px-2 py-0.5 animate-pulse">{{ $pendingCount }}</span>
+                        @endif
                     </a>
                     
                     <a href="{{ route('families.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-green-50 hover:text-green-600 rounded-xl {{ request()->routeIs('families.*') ? 'bg-green-50 text-green-600 font-medium shadow-sm' : '' }}">

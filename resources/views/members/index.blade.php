@@ -8,7 +8,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         <!-- Analytics Dashboard -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
             <div class="group bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:rotate-1 relative overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div class="relative z-10">
@@ -96,6 +96,33 @@
                     </div>
                 </div>
             </div>
+
+            @php
+                $pendingCount = \App\Models\Member::where('approval_status', 'pending')->count();
+            @endphp
+            <a href="{{ route('members.pending-approvals') }}" class="group bg-gradient-to-br from-yellow-500 via-amber-600 to-orange-600 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:rotate-1 relative overflow-hidden cursor-pointer">
+                <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="p-4 bg-white/20 rounded-2xl backdrop-blur-sm group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300 shadow-lg">
+                            <i class="fas fa-user-clock text-3xl group-hover:rotate-12 transition-transform duration-300"></i>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-yellow-100 text-sm font-medium uppercase tracking-wider">Pending Approval</p>
+                            <p class="text-4xl font-bold group-hover:scale-110 transition-transform duration-300">{{ $pendingCount }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-yellow-100">
+                        <div class="flex items-center">
+                            <i class="fas fa-clock mr-2 group-hover:animate-pulse"></i>
+                            <span class="text-sm font-medium">{{ $pendingCount > 0 ? 'Click to review' : 'All approved' }}</span>
+                        </div>
+                        @if($pendingCount > 0)
+                            <div class="w-3 h-3 bg-yellow-300 rounded-full animate-pulse"></div>
+                        @endif
+                    </div>
+                </div>
+            </a>
         </div>
 
         <!-- Chapter Statistics -->
@@ -191,6 +218,18 @@
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Pending Approvals Button -->
+                <a href="{{ route('members.pending-approvals') }}" class="flex items-center px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    <i class="fas fa-user-clock mr-2"></i>
+                    <span class="font-semibold">Pending Approvals</span>
+                    @php
+                        $pendingCount = \App\Models\Member::where('approval_status', 'pending')->count();
+                    @endphp
+                    @if($pendingCount > 0)
+                        <span class="ml-2 bg-white text-orange-600 rounded-full px-2.5 py-0.5 text-xs font-bold animate-pulse">{{ $pendingCount }}</span>
+                    @endif
+                </a>
+                
                 <!-- View Toggle -->
                 <div class="flex items-center bg-white/80 backdrop-blur-sm rounded-2xl p-1 shadow-lg border border-white/50">
                     <button onclick="toggleView('grid')" id="grid-btn" class="flex items-center px-4 py-2 rounded-xl transition-all duration-200 bg-blue-600 text-white shadow-md">

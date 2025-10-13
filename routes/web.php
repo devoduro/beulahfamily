@@ -4,11 +4,20 @@
 Route::get('/add-member', [\App\Http\Controllers\MemberController::class, 'create'])->middleware(['auth', 'admin'])->name('members.create');
 Route::post('/add-member', [\App\Http\Controllers\MemberController::class, 'store'])->middleware(['auth', 'admin'])->name('members.store');
 
-// MEMBER EXPORT ROUTE (must be before dynamic {member} routes)
+// MEMBER SPECIFIC ROUTES (must be before dynamic {member} routes)
 Route::get('/members/export', [\App\Http\Controllers\MemberController::class, 'export'])->middleware(['auth'])->name('members.export');
+Route::get('/members/pending-approvals', [\App\Http\Controllers\MemberController::class, 'pendingApprovals'])->middleware(['auth', 'admin'])->name('members.pending-approvals');
+Route::get('/members/statistics', [\App\Http\Controllers\MemberController::class, 'statistics'])->middleware(['auth'])->name('members.statistics');
+Route::get('/members/registration-link', [\App\Http\Controllers\MemberController::class, 'getRegistrationLink'])->middleware(['auth', 'admin'])->name('members.registration-link');
 
+// MEMBER DYNAMIC ROUTES (with {member} parameter)
 Route::get('/members/{member}/edit', [\App\Http\Controllers\MemberController::class, 'edit'])->middleware(['auth', 'admin'])->name('members.edit');
+Route::get('/members/{member}/id-card', [\App\Http\Controllers\MemberController::class, 'generateIdCard'])->middleware(['auth', 'admin'])->name('members.id-card');
 Route::put('/members/{member}', [\App\Http\Controllers\MemberController::class, 'update'])->middleware(['auth', 'admin'])->name('members.update');
+Route::delete('/members/{member}', [\App\Http\Controllers\MemberController::class, 'destroy'])->middleware(['auth', 'admin'])->name('members.destroy');
+Route::post('/members/{member}/approve', [\App\Http\Controllers\MemberController::class, 'approve'])->middleware(['auth', 'admin'])->name('members.approve');
+Route::post('/members/{member}/reject', [\App\Http\Controllers\MemberController::class, 'reject'])->middleware(['auth', 'admin'])->name('members.reject');
+Route::post('/members/{member}/reset-password', [\App\Http\Controllers\MemberController::class, 'resetPassword'])->middleware(['auth', 'admin'])->name('members.reset-password');
 Route::get('/members/{member}', [\App\Http\Controllers\MemberController::class, 'show'])->name('members.show');
 
 
@@ -224,6 +233,8 @@ Route::prefix('member')->name('member.')->group(function () {
     Route::middleware('guest:member')->group(function () {
         Route::get('/login', [App\Http\Controllers\MemberAuthController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [App\Http\Controllers\MemberAuthController::class, 'login']);
+        Route::get('/register', [App\Http\Controllers\MemberAuthController::class, 'showRegistrationForm'])->name('register');
+        Route::post('/register', [App\Http\Controllers\MemberAuthController::class, 'register']);
     });
 
     // Authenticated member routes
@@ -233,6 +244,10 @@ Route::prefix('member')->name('member.')->group(function () {
         Route::get('/profile', [App\Http\Controllers\MemberAuthController::class, 'profile'])->name('profile');
         Route::put('/profile', [App\Http\Controllers\MemberAuthController::class, 'updateProfile'])->name('profile.update');
         Route::post('/password/change', [App\Http\Controllers\MemberAuthController::class, 'changePassword'])->name('password.change');
+        
+        // Forced password change routes
+        Route::get('/password/change-required', [App\Http\Controllers\MemberAuthController::class, 'showPasswordChangeForm'])->name('password.change.form');
+        Route::post('/password/update', [App\Http\Controllers\MemberAuthController::class, 'updatePassword'])->name('password.update');
         
         // Member portal routes
         Route::get('/donations', function () { return view('member.donations.index'); })->name('donations.index');
@@ -279,7 +294,6 @@ Route::middleware(['auth'])->group(function () {
     
     // Members - View access for all users
     Route::get('/members', [\App\Http\Controllers\MemberController::class, 'index'])->name('members.index');
-    Route::get('/members/statistics', [\App\Http\Controllers\MemberController::class, 'statistics'])->name('members.statistics');
     
     // Events - View and register access for all users
     Route::get('/events', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
@@ -383,10 +397,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/users/{user}/update-password', [UserController::class, 'updatePassword'])->name('users.update-password');
 
         // Church Management - Admin Only Routes
-        
-        // Members Management (Admin Only) - Edit/Update routes moved to top level
-        Route::delete('/members/{member}', [\App\Http\Controllers\MemberController::class, 'destroy'])->name('members.destroy');
-        Route::get('/members/{member}/id-card', [\App\Http\Controllers\MemberController::class, 'generateIdCard'])->name('members.id-card');
+        // Note: Member routes moved to top of file to prevent route conflicts
         
         // Families Management (Admin Only)
         Route::resource('families', \App\Http\Controllers\FamilyController::class)->except(['index', 'show']);
