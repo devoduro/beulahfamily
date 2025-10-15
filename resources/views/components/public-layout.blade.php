@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Beulah Family Church')</title>
+    @php
+        $pageOrgName = \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family');
+    @endphp
+    <title>@yield('title', $pageOrgName)</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -110,11 +113,19 @@
                 <!-- Logo -->
                 <div class="flex items-center">
                     <a href="{{ route('programs.index') }}" class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-church text-white text-lg"></i>
-                        </div>
+                        @php
+                            $orgLogo = \App\Models\Setting::getValue('organization_logo', 'general');
+                            $orgName = \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family');
+                        @endphp
+                        @if($orgLogo)
+                            <img src="{{ asset('storage/' . $orgLogo) }}" alt="{{ $orgName }}" class="h-10 w-10 rounded-lg object-cover">
+                        @else
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-church text-white text-lg"></i>
+                            </div>
+                        @endif
                         <div>
-                            <h1 class="text-xl font-bold text-gray-900">Beulah Family Church</h1>
+                            <h1 class="text-xl font-bold text-gray-900">{{ $orgName }}</h1>
                             <p class="text-xs text-gray-600">Programs & Events</p>
                         </div>
                     </a>
@@ -123,7 +134,13 @@
                 <!-- Navigation Links -->
                 <div class="hidden md:flex items-center space-x-6">
                     <a href="{{ route('programs.index') }}" class="text-gray-700 hover:text-blue-600 transition-colors font-medium">
-                        <i class="fas fa-calendar-alt mr-2"></i>Programs
+                        <i class="fas fa-graduation-cap mr-2"></i>Programs
+                    </a>
+                    <a href="{{ route('events.index') }}" class="text-gray-700 hover:text-blue-600 transition-colors font-medium">
+                        <i class="fas fa-calendar-alt mr-2"></i>Events
+                    </a>
+                    <a href="{{ route('announcements.index') }}" class="text-gray-700 hover:text-blue-600 transition-colors font-medium">
+                        <i class="fas fa-bullhorn mr-2"></i>Announcements
                     </a>
                     
                     @auth
@@ -164,7 +181,13 @@
         <div class="md:hidden border-t border-gray-200" x-data="{ open: false }" x-on:toggle-mobile-menu.window="open = !open" x-show="open" x-cloak>
             <div class="px-4 py-3 space-y-3">
                 <a href="{{ route('programs.index') }}" class="block text-gray-700 hover:text-blue-600 transition-colors font-medium">
-                    <i class="fas fa-calendar-alt mr-2"></i>Programs
+                    <i class="fas fa-graduation-cap mr-2"></i>Programs
+                </a>
+                <a href="{{ route('events.index') }}" class="block text-gray-700 hover:text-blue-600 transition-colors font-medium">
+                    <i class="fas fa-calendar-alt mr-2"></i>Events
+                </a>
+                <a href="{{ route('announcements.index') }}" class="block text-gray-700 hover:text-blue-600 transition-colors font-medium">
+                    <i class="fas fa-bullhorn mr-2"></i>Announcements
                 </a>
                 
                 @auth
@@ -249,13 +272,22 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- Church Info -->
                 <div class="md:col-span-2">
+                    @php
+                        $footerLogo = \App\Models\Setting::getValue('organization_logo', 'general');
+                        $footerName = \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family Church');
+                        $footerSlogan = \App\Models\Setting::getValue('organization_slogan', 'general', 'Building Lives, Transforming Communities');
+                    @endphp
                     <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-church text-white"></i>
-                        </div>
+                        @if($footerLogo)
+                            <img src="{{ asset('storage/' . $footerLogo) }}" alt="{{ $footerName }}" class="h-10 w-10 rounded-lg object-cover">
+                        @else
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-church text-white"></i>
+                            </div>
+                        @endif
                         <div>
-                            <h3 class="text-xl font-bold">Beulah Family Church</h3>
-                            <p class="text-gray-300">Building Lives, Transforming Communities</p>
+                            <h3 class="text-xl font-bold">{{ $footerName }}</h3>
+                            <p class="text-gray-300">{{ $footerSlogan }}</p>
                         </div>
                     </div>
                     <p class="text-gray-300 leading-relaxed">
@@ -269,6 +301,8 @@
                     <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
                     <ul class="space-y-2">
                         <li><a href="{{ route('programs.index') }}" class="text-gray-300 hover:text-white transition-colors">Programs</a></li>
+                        <li><a href="{{ route('events.index') }}" class="text-gray-300 hover:text-white transition-colors">Events</a></li>
+                        <li><a href="{{ route('announcements.index') }}" class="text-gray-300 hover:text-white transition-colors">Announcements</a></li>
                         <li><a href="{{ route('member.login') }}" class="text-gray-300 hover:text-white transition-colors">Member Portal</a></li>
                         <li><a href="{{ route('login') }}" class="text-gray-300 hover:text-white transition-colors">Admin Login</a></li>
                     </ul>
@@ -286,7 +320,7 @@
             </div>
 
             <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
-                <p>&copy; {{ date('Y') }} Beulah Family Church. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} {{ $footerName ?? 'Beulah Family Church' }}. All rights reserved.</p>
             </div>
         </div>
     </footer>

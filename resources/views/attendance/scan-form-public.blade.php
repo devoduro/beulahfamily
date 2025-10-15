@@ -63,7 +63,12 @@
                 
                 <!-- Member Selection -->
                 <div>
-                    <label for="member_search" class="block text-sm font-medium text-gray-700 mb-3">Find Your Name</label>
+                    <div class="flex justify-between items-center mb-3">
+                        <label for="member_search" class="block text-sm font-medium text-gray-700">Find Your Name</label>
+                        <button type="button" onclick="showGuestForm()" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                            <i class="fas fa-user-plus mr-1"></i>New Visitor?
+                        </button>
+                    </div>
                     <div class="relative">
                         <input type="text" 
                                id="member_search" 
@@ -112,9 +117,76 @@
             </form>
         </div>
 
+        <!-- Guest Registration Form -->
+        <div id="guest_form" class="hidden bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mt-6">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-user-plus text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">Register as New Member/Guest</h3>
+                <p class="text-sm text-gray-500">Please fill in your details to mark attendance</p>
+            </div>
+
+            <form id="guestRegistrationForm" class="space-y-4">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="token" value="{{ $token }}">
+                <input type="hidden" name="is_guest" value="1">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                        <input type="text" name="first_name" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                        <input type="text" name="last_name" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                    <input type="tel" name="phone" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="e.g., 0241234567">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email (Optional)</label>
+                    <input type="email" name="email"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="your@email.com">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">I am a: *</label>
+                    <select name="guest_type" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Select...</option>
+                        <option value="first_timer">First Time Visitor</option>
+                        <option value="guest">Guest</option>
+                        <option value="new_member">New Member</option>
+                        <option value="returning_member">Returning Member</option>
+                    </select>
+                </div>
+
+                <div class="flex space-x-3 pt-4">
+                    <button type="button" onclick="hideGuestForm()"
+                            class="flex-1 py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Back
+                    </button>
+                    <button type="submit" id="guest_submit_btn"
+                            class="flex-1 py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-check mr-2"></i>Register & Mark Attendance
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <!-- Success Message -->
         <div id="success_message" class="hidden bg-green-50 border border-green-200 rounded-xl p-6 mt-6">
-            <div class="flex items-center">
+            <div class="flex items-center mb-3">
                 <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mr-4">
                     <i class="fas fa-check text-white text-xl"></i>
                 </div>
@@ -122,6 +194,12 @@
                     <h3 class="text-lg font-semibold text-green-900">Attendance Marked Successfully!</h3>
                     <p class="text-green-700">Thank you for attending <strong>{{ $event->title }}</strong></p>
                 </div>
+            </div>
+            <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800">
+                    <i class="fas fa-envelope mr-2"></i>
+                    A confirmation email has been sent to your email address with the event details.
+                </p>
             </div>
         </div>
 
@@ -175,7 +253,14 @@
 
         function displaySearchResults(members) {
             if (members.length === 0) {
-                memberResults.innerHTML = '<div class="p-4 text-gray-500 text-center">No members found</div>';
+                memberResults.innerHTML = `
+                    <div class="p-4 text-center">
+                        <p class="text-gray-500 mb-3">No member found with that name</p>
+                        <button type="button" onclick="showGuestForm()" class="text-green-600 hover:text-green-700 font-medium">
+                            <i class="fas fa-user-plus mr-2"></i>Register as New Member/Guest
+                        </button>
+                    </div>
+                `;
             } else {
                 memberResults.innerHTML = members.map(member => `
                     <div class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0" 
@@ -280,6 +365,58 @@
             if (!memberSearch.contains(e.target) && !memberResults.contains(e.target)) {
                 memberResults.classList.add('hidden');
             }
+        });
+
+        // Guest form functions
+        function showGuestForm() {
+            document.getElementById('attendanceForm').parentElement.classList.add('hidden');
+            document.getElementById('guest_form').classList.remove('hidden');
+            memberResults.classList.add('hidden');
+        }
+
+        function hideGuestForm() {
+            document.getElementById('guest_form').classList.add('hidden');
+            document.getElementById('attendanceForm').parentElement.classList.remove('hidden');
+            memberSearch.value = '';
+        }
+
+        // Guest registration form submission
+        document.getElementById('guestRegistrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const guestSubmitBtn = document.getElementById('guest_submit_btn');
+            
+            // Show loading state
+            guestSubmitBtn.disabled = true;
+            guestSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Registering...';
+            
+            const formData = new FormData(this);
+            
+            fetch('/mark-attendance', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess();
+                    document.getElementById('guest_form').style.display = 'none';
+                } else {
+                    showError(data.message || 'Failed to register and mark attendance. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('An error occurred. Please try again.');
+            })
+            .finally(() => {
+                // Reset button
+                guestSubmitBtn.disabled = false;
+                guestSubmitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Register & Mark Attendance';
+            });
         });
     </script>
 </body>

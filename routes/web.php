@@ -252,7 +252,7 @@ Route::prefix('member')->name('member.')->group(function () {
         // Member portal routes
         Route::get('/donations', function () { return view('member.donations.index'); })->name('donations.index');
         Route::get('/donations/create', function () { return view('member.donations.create'); })->name('donations.create');
-        Route::get('/events', function () { return view('member.events.index'); })->name('events.index');
+        Route::get('/events', [\App\Http\Controllers\MemberAuthController::class, 'events'])->name('events.index');
         Route::get('/events/{event}', function () { return view('member.events.show'); })->name('events.show');
         Route::get('/ministries', function () { return view('member.ministries.index'); })->name('ministries.index');
         
@@ -363,9 +363,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/families', [\App\Http\Controllers\FamilyController::class, 'index'])->name('families.index');
     Route::get('/families/{family}', [\App\Http\Controllers\FamilyController::class, 'show'])->name('families.show');
     
-    // Announcements - View access for all users
+    // Announcements - Public and Admin access
     Route::get('/announcements', [\App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::get('/announcements/create', [\App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create')->middleware('auth');
+    Route::post('/announcements', [\App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store')->middleware('auth');
     Route::get('/announcements/{announcement}', [\App\Http\Controllers\AnnouncementController::class, 'show'])->name('announcements.show');
+    Route::get('/announcements/{announcement}/edit', [\App\Http\Controllers\AnnouncementController::class, 'edit'])->name('announcements.edit')->middleware('auth');
+    Route::put('/announcements/{announcement}', [\App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update')->middleware('auth');
+    Route::delete('/announcements/{announcement}', [\App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy')->middleware('auth');
     
     // User Dashboard and Portal Routes
     Route::get('/user/dashboard', [UserController::class, 'dashboard'])->name('users.dashboard');
@@ -430,9 +435,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/donations/{donation}/send-receipt', [\App\Http\Controllers\DonationController::class, 'sendReceipt'])->name('donations.send-receipt');
         Route::post('/donations/{donation}/generate-receipt', [\App\Http\Controllers\DonationController::class, 'generateReceipt'])->name('donations.generate-receipt');
         Route::get('/donations/{donation}/receipt/download', [\App\Http\Controllers\DonationController::class, 'downloadReceipt'])->name('donations.receipt.download');
-        
-        // Announcements Management (Admin Only)
-        Route::resource('announcements', \App\Http\Controllers\AnnouncementController::class)->except(['index', 'show']);
         
         // Testimonies Management (Admin Only)
         Route::prefix('admin/testimonies')->name('admin.testimonies.')->group(function () {

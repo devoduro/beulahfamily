@@ -68,6 +68,11 @@ class AnnouncementController extends Controller
      */
     public function create()
     {
+        // Check if user is admin
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+        
         return view('announcements.create');
     }
 
@@ -76,6 +81,11 @@ class AnnouncementController extends Controller
      */
     public function store(Request $request)
     {
+        // Check if user is admin
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+        
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -90,6 +100,7 @@ class AnnouncementController extends Controller
             'display_on_screens' => 'boolean',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'attachment' => 'nullable|file|max:10240',
+            'status' => 'nullable|in:draft,published,expired,archived',
             'notes' => 'nullable|string',
         ]);
 
@@ -106,6 +117,11 @@ class AnnouncementController extends Controller
         $announcementData = $request->all();
         $announcementData['created_by'] = auth()->id();
         $announcementData['target_audience'] = $request->get('target_audience', []);
+        
+        // Set status based on button clicked or default to published
+        if (!isset($announcementData['status'])) {
+            $announcementData['status'] = 'published';
+        }
 
         // Handle image upload
         if ($request->hasFile('image')) {
@@ -121,9 +137,9 @@ class AnnouncementController extends Controller
 
         $announcement = Announcement::create($announcementData);
 
-        // Auto-publish if publish date is now or in the past
-        if ($announcement->publish_date <= now()) {
-            $announcement->publish();
+        // Send email notifications if requested
+        if ($request->boolean('send_email') && $announcement->status === 'published') {
+            $this->sendEmailNotifications($announcement);
         }
 
         if ($request->ajax()) {
@@ -134,8 +150,13 @@ class AnnouncementController extends Controller
             ]);
         }
 
+        $message = 'Announcement created successfully!';
+        if ($request->boolean('send_email') && $announcement->status === 'published') {
+            $message .= ' Email notifications are being sent to members.';
+        }
+
         return redirect()->route('announcements.show', $announcement)
-                        ->with('success', 'Announcement created successfully!');
+                        ->with('success', $message);
     }
 
     /**
@@ -156,6 +177,11 @@ class AnnouncementController extends Controller
      */
     public function edit(Announcement $announcement)
     {
+        // Check if user is admin
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+        
         return view('announcements.edit', compact('announcement'));
     }
 
@@ -164,6 +190,11 @@ class AnnouncementController extends Controller
      */
     public function update(Request $request, Announcement $announcement)
     {
+        // Check if user is admin
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+        
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -234,6 +265,11 @@ class AnnouncementController extends Controller
      */
     public function destroy(Announcement $announcement)
     {
+        // Check if user is admin
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+        
         // Delete associated files
         if ($announcement->image_path) {
             Storage::disk('public')->delete($announcement->image_path);
@@ -339,18 +375,17 @@ class AnnouncementController extends Controller
      */
     public function sendNotifications(Announcement $announcement)
     {
-        // This would typically integrate with email and SMS services
         $emailSent = false;
         $smsSent = false;
 
         if ($announcement->send_email) {
-            // Send email notifications
-            $emailSent = true; // Placeholder
+            $this->sendEmailNotifications($announcement);
+            $emailSent = true;
         }
 
         if ($announcement->send_sms) {
-            // Send SMS notifications
-            $smsSent = true; // Placeholder
+            // Send SMS notifications - to be implemented
+            $smsSent = true;
         }
 
         return response()->json([
@@ -359,5 +394,82 @@ class AnnouncementController extends Controller
             'email_sent' => $emailSent,
             'sms_sent' => $smsSent
         ]);
+    }
+
+    /**
+     * Send email notifications to members based on target audience.
+     */
+    protected function sendEmailNotifications(Announcement $announcement)
+    {
+        // Get members who want to receive newsletters
+        $query = \App\Models\Member::where('receive_newsletter', true)
+                                   ->where('is_active', true)
+                                   ->whereNotNull('email');
+
+        // Filter by target audience if specified
+        if ($announcement->target_audience && is_array($announcement->target_audience) && count($announcement->target_audience) > 0) {
+            // If "all_members" is not in the array, apply filters
+            if (!in_array('all_members', $announcement->target_audience)) {
+                $query->where(function ($q) use ($announcement) {
+                    foreach ($announcement->target_audience as $audience) {
+                        switch ($audience) {
+                            case 'youth':
+                                // Members aged 13-25
+                                $q->orWhereBetween('date_of_birth', [
+                                    now()->subYears(25),
+                                    now()->subYears(13)
+                                ]);
+                                break;
+                            case 'adults':
+                                // Members aged 26+
+                                $q->orWhere('date_of_birth', '<=', now()->subYears(26));
+                                break;
+                            case 'children':
+                                // Members aged 0-12
+                                $q->orWhere('date_of_birth', '>=', now()->subYears(12));
+                                break;
+                        }
+                    }
+                });
+            }
+        }
+
+        $members = $query->get();
+
+        // Send emails in chunks to avoid overwhelming the mail server
+        $successCount = 0;
+        $failureCount = 0;
+        
+        $members->chunk(50)->each(function ($memberChunk) use ($announcement, &$successCount, &$failureCount) {
+            foreach ($memberChunk as $member) {
+                try {
+                    \Mail::to($member->email)->send(new \App\Mail\AnnouncementNotification($announcement));
+                    $successCount++;
+                    \Log::info('Email sent successfully to: ' . $member->email);
+                } catch (\Exception $e) {
+                    $failureCount++;
+                    // Log the full error with stack trace
+                    \Log::error('Failed to send announcement email', [
+                        'email' => $member->email,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                }
+            }
+        });
+
+        // Log the activity with detailed results
+        \Log::info('Announcement email sending completed', [
+            'announcement_id' => $announcement->id,
+            'total_recipients' => $members->count(),
+            'successful_sends' => $successCount,
+            'failed_sends' => $failureCount
+        ]);
+
+        return [
+            'total' => $members->count(),
+            'success' => $successCount,
+            'failed' => $failureCount
+        ];
     }
 }

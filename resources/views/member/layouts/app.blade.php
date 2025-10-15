@@ -23,12 +23,23 @@
     <!-- Sidebar -->
     <div id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform -translate-x-full lg:translate-x-0 sidebar-transition">
         <!-- Sidebar Header -->
-        <div class="flex items-center justify-between h-16 px-6 gradient-bg">
+        <div class="flex items-center justify-between h-20 px-6 gradient-bg">
             <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                    <i class="fas fa-church text-indigo-600"></i>
+                @php
+                    $orgLogo = \App\Models\Setting::getValue('organization_logo', 'general');
+                    $orgName = \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family');
+                @endphp
+                @if($orgLogo)
+                    <img src="{{ asset('storage/' . $orgLogo) }}" alt="{{ $orgName }}" class="h-12 w-12 rounded-lg object-cover">
+                @else
+                    <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
+                        <i class="fas fa-church text-indigo-600 text-xl"></i>
+                    </div>
+                @endif
+                <div>
+                    <h1 class="text-white font-bold text-base leading-tight">{{ $orgName }}</h1>
+                    <p class="text-white/80 text-xs">Member Portal</p>
                 </div>
-                <h1 class="text-white font-bold text-lg">Beulah Family</h1>
             </div>
             <button id="close-sidebar" class="text-white lg:hidden">
                 <i class="fas fa-times"></i>
@@ -38,9 +49,9 @@
         <!-- Member Info -->
         <div class="p-6 border-b border-gray-200">
             <div class="flex items-center space-x-3">
-                <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                    @if(auth('member')->user()->photo_path)
-                        <img src="{{ asset('storage/' . auth('member')->user()->photo_path) }}" alt="{{ auth('member')->user()->full_name }}" class="w-10 h-10 rounded-full object-cover">
+                <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                    @if(auth('member')->user()->photo)
+                        <img src="{{ asset('storage/' . auth('member')->user()->photo) }}?v={{ time() }}" alt="{{ auth('member')->user()->full_name }}" class="w-full h-full object-cover">
                     @else
                         <i class="fas fa-user text-gray-500"></i>
                     @endif
@@ -83,18 +94,6 @@
                 <a href="{{ route('programs.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('programs*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100' }} transition-colors">
                     <i class="fas fa-graduation-cap mr-3"></i>
                     Programs
-                </a>
-
-                <!-- Ministries -->
-                <a href="{{ route('member.ministries.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('member.ministries*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100' }} transition-colors">
-                    <i class="fas fa-users mr-3"></i>
-                    My Ministries
-                </a>
-
-                <!-- Family -->
-                <a href="{{ route('member.family.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('member.family*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100' }} transition-colors">
-                    <i class="fas fa-home mr-3"></i>
-                    My Family
                 </a>
 
                 <!-- Testimonies -->

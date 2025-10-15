@@ -94,6 +94,24 @@ class EventController extends Controller
             ]);
         }
 
+        // Return public view for non-authenticated users
+        if (!auth()->check()) {
+            // For public, show only published events
+            $events = Event::where('status', 'published')
+                          ->with(['ministry', 'organizer', 'attendances'])
+                          ->orderBy('start_datetime', 'asc')
+                          ->paginate(12);
+            
+            // Add attendance counts to events
+            $events->getCollection()->transform(function ($event) {
+                $event->registered_count = $event->attendances->count();
+                $event->checked_in_count = $event->attendances->where('checked_in_at', '!=', null)->count();
+                return $event;
+            });
+            
+            return view('events.public-index', compact('events', 'eventStats'));
+        }
+
         return view('events.index', compact('events', 'eventStats'));
     }
 

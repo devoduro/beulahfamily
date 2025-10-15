@@ -251,7 +251,25 @@ class ProgramRegistrationController extends Controller
                           ->orderBy('start_date')
                           ->get();
 
-        return view('programs.index', compact('programs'));
+        // Get upcoming events (next 30 days)
+        $events = \App\Models\Event::where('status', 'published')
+                                   ->where('start_datetime', '>=', now())
+                                   ->where('start_datetime', '<=', now()->addDays(30))
+                                   ->orderBy('start_datetime')
+                                   ->limit(6)
+                                   ->get();
+
+        // Get recent announcements (published and not expired)
+        $announcements = \App\Models\Announcement::where('status', 'published')
+                                                 ->where(function($query) {
+                                                     $query->whereNull('expire_date')
+                                                           ->orWhere('expire_date', '>=', now());
+                                                 })
+                                                 ->orderBy('created_at', 'desc')
+                                                 ->limit(5)
+                                                 ->get();
+
+        return view('programs.index', compact('programs', 'events', 'announcements'));
     }
 
     /**

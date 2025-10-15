@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -93,58 +94,44 @@ class MemberAuthController extends Controller
     {
         $member = Auth::guard('member')->user();
         
-        // Get member statistics (with safe defaults for missing relationships)
+        // Get real member statistics from database
         $stats = [
-            'total_donations' => 0, // $member->donations()->sum('amount') ?? 0,
-            'yearly_donations' => 0, // $member->donations()->whereYear('donation_date', now()->year)->sum('amount') ?? 0,
-            'donation_count' => 0, // $member->donations()->count() ?? 0,
-            'events_attended' => 0, // $member->eventAttendances()->count() ?? 0,
-            'active_ministries' => 0, // $member->activeMinistries()->count() ?? 0,
+            'total_donations' => \DB::table('donations')->where('member_id', $member->id)->sum('amount') ?? 0,
+            'yearly_donations' => \DB::table('donations')->where('member_id', $member->id)->whereYear('donation_date', now()->year)->sum('amount') ?? 0,
+            'events_attended' => \DB::table('event_attendances')->where('member_id', $member->id)->count() ?? 0,
+            'active_ministries' => \DB::table('member_ministry')->where('member_id', $member->id)->where('is_active', true)->count() ?? 0,
         ];
 
-        // Get recent activities (with safe defaults)
-        $recentDonations = collect(); // Empty collection for now
-        $recentEvents = collect(); // Empty collection for now
+        // Get recent donations from database
+        $recentDonations = \DB::table('donations')
+            ->where('member_id', $member->id)
+            ->orderBy('donation_date', 'desc')
+            ->limit(5)
+            ->get();
 
-        // Get upcoming events (with safe defaults)
-        $upcomingEvents = collect(); // Empty collection for now
-        
-        // Try to get events if they exist
-        try {
-            if (class_exists('\App\Models\Event')) {
-                $upcomingEvents = \App\Models\Event::where('start_datetime', '>=', now())
-                                              ->where('status', 'published')
-                                              ->orderBy('start_datetime')
-                                              ->take(3)
-                                              ->get();
-            }
-        } catch (\Exception $e) {
-            $upcomingEvents = collect();
-        }
+        // Get upcoming events from database
+        $upcomingEvents = \DB::table('events')
+            ->where('start_datetime', '>=', now())
+            ->where('status', 'published')
+            ->orderBy('start_datetime')
+            ->limit(5)
+            ->get();
 
-        // Get active programs (with safe defaults)
-        $activePrograms = collect(); // Empty collection for now
-        
-        // Try to get programs if the model exists
-        try {
-            if (class_exists('\App\Models\Program')) {
-                $activePrograms = \App\Models\Program::where('status', 'published')
-                                               ->where('end_date', '>=', now())
-                                               ->orderBy('start_date')
-                                               ->take(3)
-                                               ->get();
-            }
-        } catch (\Exception $e) {
-            $activePrograms = collect();
-        }
+        // Get recent events member attended
+        $recentEvents = \DB::table('event_attendances')
+            ->join('events', 'event_attendances.event_id', '=', 'events.id')
+            ->where('event_attendances.member_id', $member->id)
+            ->select('events.*', 'event_attendances.created_at as attended_at')
+            ->orderBy('event_attendances.created_at', 'desc')
+            ->limit(5)
+            ->get();
 
         return view('member.dashboard', compact(
             'member', 
             'stats', 
             'recentDonations', 
             'recentEvents', 
-            'upcomingEvents',
-            'activePrograms'
+            'upcomingEvents'
         ));
     }
 
@@ -165,22 +152,24 @@ class MemberAuthController extends Controller
         $member = Auth::guard('member')->user();
 
         $validated = $request->validate([
+            'title' => 'nullable|string|max:20',
             'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'date_of_birth' => 'nullable|date',
+            'gender' => 'nullable|in:male,female',
+            'marital_status' => 'nullable|in:single,married,divorced,widowed',
             'email' => 'required|email|unique:members,email,' . $member->id,
             'phone' => 'nullable|string|max:20',
             'whatsapp_phone' => 'nullable|string|max:20',
+            'alternate_phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'city' => 'nullable|string|max:255',
             'state' => 'nullable|string|max:255',
             'postal_code' => 'nullable|string|max:20',
+            'country' => 'nullable|string|max:255',
             'occupation' => 'nullable|string|max:255',
             'employer' => 'nullable|string|max:255',
-            'emergency_contact_name' => 'nullable|string|max:255',
-            'emergency_contact_phone' => 'nullable|string|max:20',
-            'receive_newsletter' => 'boolean',
-            'receive_sms' => 'boolean',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -329,5 +318,50 @@ class MemberAuthController extends Controller
 
         return redirect()->route('member.dashboard')
             ->with('success', 'Password changed successfully. You can now access your dashboard.');
+    }
+
+    /**
+     * Show member events page with real data
+     */
+    public function events(Request $request)
+    {
+        $member = Auth::guard('member')->user();
+        
+        // Get upcoming events from database
+        $upcomingEvents = \DB::table('events')
+            ->where('start_datetime', '>=', now())
+            ->where('status', 'published')
+            ->orderBy('start_datetime', 'asc')
+            ->get();
+        
+        // Get past events member attended
+        $pastEvents = \DB::table('event_attendances')
+            ->join('events', 'event_attendances.event_id', '=', 'events.id')
+            ->where('event_attendances.member_id', $member->id)
+            ->where('events.start_datetime', '<', now())
+            ->select('events.*', 'event_attendances.checked_in_at', 'event_attendances.created_at as registered_at')
+            ->orderBy('events.start_datetime', 'desc')
+            ->limit(10)
+            ->get();
+        
+        // Get member's registered upcoming events
+        $registeredEvents = \DB::table('event_attendances')
+            ->join('events', 'event_attendances.event_id', '=', 'events.id')
+            ->where('event_attendances.member_id', $member->id)
+            ->where('events.start_datetime', '>=', now())
+            ->select('events.*', 'event_attendances.created_at as registered_at')
+            ->orderBy('events.start_datetime', 'asc')
+            ->get();
+        
+        // Get stats
+        $stats = [
+            'total_events_attended' => \DB::table('event_attendances')
+                ->where('member_id', $member->id)
+                ->count(),
+            'upcoming_events' => $upcomingEvents->count(),
+            'registered_events' => $registeredEvents->count(),
+        ];
+        
+        return view('member.events.index', compact('upcomingEvents', 'pastEvents', 'registeredEvents', 'stats', 'member'));
     }
 }

@@ -3,353 +3,195 @@
 @section('title', 'Settings')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Header -->
-    <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900">Settings</h1>
-        <p class="text-gray-600">Manage your account preferences and privacy settings</p>
-    </div>
-
-    <div class="space-y-6">
-        <!-- Account Settings -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div class="p-6 border-b border-gray-100">
-                <h2 class="text-lg font-semibold text-gray-900">
-                    <i class="fas fa-user-cog text-blue-600 mr-2"></i>Account Settings
-                </h2>
-            </div>
-            <div class="p-6 space-y-6">
-                <!-- Profile Photo -->
-                <div class="flex items-center">
-                    <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mr-6">
-                        <i class="fas fa-user text-gray-500 text-2xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-medium text-gray-900">Profile Photo</h3>
-                        <p class="text-sm text-gray-600 mb-3">Update your profile picture</p>
-                        <div class="flex space-x-3">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                                Upload Photo
-                            </button>
-                            <button class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                                Remove
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Basic Information -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Display Name</label>
-                        <input type="text" value="John Doe" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                        <input type="email" value="john.doe@example.com" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                        <input type="tel" value="+233 24 123 4567" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">WhatsApp Number</label>
-                        <input type="tel" value="+233 24 123 4567" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                </div>
-
-                <div class="pt-4 border-t border-gray-200">
-                    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                        Save Changes
-                    </button>
-                </div>
-            </div>
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
+            <p class="text-gray-600">Manage your account and preferences</p>
         </div>
 
-        <!-- Communication Preferences -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div class="p-6 border-b border-gray-100">
-                <h2 class="text-lg font-semibold text-gray-900">
-                    <i class="fas fa-bell text-green-600 mr-2"></i>Communication Preferences
-                </h2>
-            </div>
-            <div class="p-6 space-y-6">
-                <!-- Email Notifications -->
-                <div>
-                    <h3 class="font-medium text-gray-900 mb-4">Email Notifications</h3>
-                    <div class="space-y-3">
-                        <label class="flex items-center">
-                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Church announcements and updates</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Event invitations and reminders</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Ministry updates and opportunities</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Donation receipts and confirmations</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Newsletter and devotionals</span>
-                        </label>
+        <!-- Settings Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Profile Settings -->
+            <a href="{{ route('member.profile') }}" class="bg-white rounded-xl shadow-md border border-gray-100 p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-user-edit text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Profile Settings</h3>
                     </div>
                 </div>
+                <p class="text-sm text-gray-600 mb-4">Update your personal information, photo, and contact details</p>
+                <div class="flex items-center text-blue-600 text-sm font-medium">
+                    <span>Manage Profile</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
 
-                <!-- SMS Notifications -->
-                <div>
-                    <h3 class="font-medium text-gray-900 mb-4">SMS Notifications</h3>
-                    <div class="space-y-3">
-                        <label class="flex items-center">
-                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Emergency alerts and urgent announcements</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Event reminders (24 hours before)</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Ministry schedule changes</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Prayer requests</span>
-                        </label>
+            <!-- Password & Security -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-lock text-green-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Password & Security</h3>
                     </div>
                 </div>
+                <p class="text-sm text-gray-600 mb-4">Change your password and manage security settings</p>
+                <button onclick="document.getElementById('passwordModal').classList.remove('hidden')" class="flex items-center text-green-600 text-sm font-medium hover:text-green-700">
+                    <span>Change Password</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
 
-                <div class="pt-4 border-t border-gray-200">
-                    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                        Update Preferences
-                    </button>
+            <!-- Notification Preferences -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-bell text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Notifications</h3>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">Control how you receive updates and announcements</p>
+                <div class="space-y-3">
+                    <label class="flex items-center">
+                        <input type="checkbox" checked class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                        <span class="ml-3 text-sm text-gray-700">Email notifications</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" checked class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                        <span class="ml-3 text-sm text-gray-700">SMS alerts</span>
+                    </label>
                 </div>
             </div>
+
+            <!-- Account Information -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-info-circle text-orange-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Account Info</h3>
+                    </div>
+                </div>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Member ID:</span>
+                        <span class="font-medium text-gray-900">{{ Auth::guard('member')->user()->member_id }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Status:</span>
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                            {{ ucfirst(Auth::guard('member')->user()->membership_status) }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Chapter:</span>
+                        <span class="font-medium text-gray-900">{{ Auth::guard('member')->user()->chapter }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Member Since:</span>
+                        <span class="font-medium text-gray-900">
+                            {{ Auth::guard('member')->user()->created_at->format('M Y') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Family Management -->
+            <a href="{{ route('member.family.index') }}" class="bg-white rounded-xl shadow-md border border-gray-100 p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-users text-pink-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Family Management</h3>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">Manage your family members and relationships</p>
+                <div class="flex items-center text-pink-600 text-sm font-medium">
+                    <span>View Family</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Help & Support -->
+            <a href="{{ route('member.help.index') }}" class="bg-white rounded-xl shadow-md border border-gray-100 p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-question-circle text-indigo-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Help & Support</h3>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">Get help and contact support</p>
+                <div class="flex items-center text-indigo-600 text-sm font-medium">
+                    <span>Get Help</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
         </div>
 
-        <!-- Privacy Settings -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div class="p-6 border-b border-gray-100">
-                <h2 class="text-lg font-semibold text-gray-900">
-                    <i class="fas fa-shield-alt text-purple-600 mr-2"></i>Privacy Settings
-                </h2>
-            </div>
-            <div class="p-6 space-y-6">
-                <!-- Profile Visibility -->
-                <div>
-                    <h3 class="font-medium text-gray-900 mb-4">Profile Visibility</h3>
-                    <div class="space-y-3">
-                        <label class="flex items-center">
-                            <input type="radio" name="profile_visibility" value="public" checked class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Public - Visible to all church members</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="profile_visibility" value="limited" class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
-                            <span class="ml-3 text-gray-700">Limited - Visible to ministry members only</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="profile_visibility" value="private" class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Private - Visible to leadership only</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Contact Information -->
-                <div>
-                    <h3 class="font-medium text-gray-900 mb-4">Contact Information Sharing</h3>
-                    <div class="space-y-3">
-                        <label class="flex items-center">
-                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Allow other members to see my phone number</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Allow other members to see my email address</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Include me in the church directory</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-3 text-sm text-gray-700">Allow ministry leaders to contact me directly</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="pt-4 border-t border-gray-200">
-                    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                        Save Privacy Settings
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Security Settings -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div class="p-6 border-b border-gray-100">
-                <h2 class="text-lg font-semibold text-gray-900">
-                    <i class="fas fa-lock text-red-600 mr-2"></i>Security Settings
-                </h2>
-            </div>
-            <div class="p-6 space-y-6">
-                <!-- Password -->
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="font-medium text-gray-900">Password</h3>
-                        <p class="text-sm text-gray-600">Last changed 3 months ago</p>
-                    </div>
-                    <a href="{{ route('member.profile') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                        Change Password
-                    </a>
-                </div>
-
-                <!-- Two-Factor Authentication -->
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="font-medium text-gray-900">Two-Factor Authentication</h3>
-                        <p class="text-sm text-gray-600">Add an extra layer of security to your account</p>
-                    </div>
-                    <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                        Enable 2FA
-                    </button>
-                </div>
-
-                <!-- Login Activity -->
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="font-medium text-gray-900">Login Activity</h3>
-                        <p class="text-sm text-gray-600">View recent login attempts and active sessions</p>
-                    </div>
-                    <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                        View Activity
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Data & Export -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div class="p-6 border-b border-gray-100">
-                <h2 class="text-lg font-semibold text-gray-900">
-                    <i class="fas fa-download text-indigo-600 mr-2"></i>Data & Export
-                </h2>
-            </div>
-            <div class="p-6 space-y-6">
-                <!-- Data Export -->
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="font-medium text-gray-900">Export My Data</h3>
-                        <p class="text-sm text-gray-600">Download a copy of your personal data and activity</p>
-                    </div>
-                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                        Request Export
-                    </button>
-                </div>
-
-                <!-- Donation History -->
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="font-medium text-gray-900">Donation History</h3>
-                        <p class="text-sm text-gray-600">Export your complete donation records for tax purposes</p>
-                    </div>
-                    <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                        Export Donations
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Account Actions -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div class="p-6 border-b border-gray-100">
-                <h2 class="text-lg font-semibold text-gray-900">
-                    <i class="fas fa-exclamation-triangle text-orange-600 mr-2"></i>Account Actions
-                </h2>
-            </div>
-            <div class="p-6 space-y-6">
-                <!-- Deactivate Account -->
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="font-medium text-gray-900">Deactivate Account</h3>
-                        <p class="text-sm text-gray-600">Temporarily disable your account access</p>
-                    </div>
-                    <button class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                        Deactivate
-                    </button>
-                </div>
-
-                <!-- Delete Account -->
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="font-medium text-gray-900">Delete Account</h3>
-                        <p class="text-sm text-gray-600">Permanently delete your account and all associated data</p>
-                    </div>
-                    <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                        Delete Account
-                    </button>
-                </div>
-            </div>
+        <!-- Logout Section -->
+        <div class="mt-8 bg-white rounded-xl shadow-md border border-gray-100 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Account Actions</h3>
+            <form method="POST" action="{{ route('member.logout') }}">
+                @csrf
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
+            </form>
         </div>
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle form submissions
-    const forms = document.querySelectorAll('form');
-    forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            
-            // Show loading state
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
-            submitBtn.disabled = true;
-            
-            // Simulate API call
-            setTimeout(() => {
-                // Show success message
-                const successDiv = document.createElement('div');
-                successDiv.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4';
-                successDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Settings updated successfully!';
+<!-- Password Change Modal -->
+<div id="passwordModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="if(event.target === this) this.classList.add('hidden')">
+    <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-900">Change Password</h3>
+            <button onclick="document.getElementById('passwordModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <form method="POST" action="{{ route('member.password.change') }}">
+            @csrf
+            <div class="space-y-4">
+                <div>
+                    <label for="current_password" class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                    <input type="password" id="current_password" name="current_password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
                 
-                this.insertBefore(successDiv, this.firstChild);
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                    <input type="password" id="password" name="password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
                 
-                // Reset button
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
+                <div>
+                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
                 
-                // Remove success message after 3 seconds
-                setTimeout(() => {
-                    successDiv.remove();
-                }, 3000);
-            }, 1000);
-        });
-    });
-    
-    // Handle dangerous actions with confirmation
-    const dangerousButtons = document.querySelectorAll('.bg-red-600, .bg-orange-600');
-    dangerousButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const action = this.textContent.trim();
-            const confirmed = confirm(`Are you sure you want to ${action.toLowerCase()}? This action cannot be undone.`);
-            
-            if (confirmed) {
-                // Handle the action
-                alert(`${action} functionality would be implemented here with proper backend integration.`);
-            }
-        });
-    });
-});
-</script>
+                <div class="flex items-center justify-end space-x-3 pt-4">
+                    <button type="button" onclick="document.getElementById('passwordModal').classList.add('hidden')" class="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium">
+                        Cancel
+                    </button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                        Update Password
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection

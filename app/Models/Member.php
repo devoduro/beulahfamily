@@ -45,6 +45,7 @@ class Member extends Authenticatable
         'medical_conditions',
         'special_needs',
         'photo_path',
+        'photo',
         'notes',
         'is_baptized',
         'baptism_date',

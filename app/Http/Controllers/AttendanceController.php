@@ -143,6 +143,11 @@ class AttendanceController extends Controller
      */
     public function markAttendance(Request $request)
     {
+        // Check if this is a guest registration or regular member attendance
+        if ($request->boolean('is_guest')) {
+            return $this->markGuestAttendance($request);
+        }
+
         $request->validate([
             'token' => 'required|string',
             'member_id' => 'required|exists:members,id'
@@ -188,6 +193,24 @@ class AttendanceController extends Controller
 
             DB::commit();
 
+            // Send email confirmation if member has email
+            if ($member->email) {
+                try {
+                    \Mail::to($member->email)->send(new \App\Mail\AttendanceConfirmation($attendance, $event, $member));
+                    Log::info('Attendance confirmation email sent', [
+                        'member_id' => $member->id,
+                        'email' => $member->email,
+                        'event_id' => $event->id
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Failed to send attendance confirmation email', [
+                        'member_id' => $member->id,
+                        'email' => $member->email,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Attendance marked successfully',
@@ -205,6 +228,159 @@ class AttendanceController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to mark attendance'
+            ], 500);
+        }
+    }
+
+    /**
+     * Mark attendance for guest/new member with registration
+     */
+    protected function markGuestAttendance(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'guest_type' => 'required|in:first_timer,guest,new_member,returning_member'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $validation = $this->qrCodeService->validateToken($request->token);
+
+            if (!$validation['valid']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validation['message']
+                ], 400);
+            }
+
+            $event = $validation['event'];
+
+            // Check if member exists by phone or email
+            $existingMember = Member::where('phone', $request->phone)
+                                   ->orWhere(function($query) use ($request) {
+                                       if ($request->email) {
+                                           $query->where('email', $request->email);
+                                       }
+                                   })
+                                   ->first();
+
+            if ($existingMember) {
+                // Use existing member
+                $member = $existingMember;
+            } else {
+                // Map guest_type to database enum values
+                $membershipTypeMap = [
+                    'first_timer' => 'visitor',
+                    'guest' => 'visitor',
+                    'new_member' => 'member',
+                    'returning_member' => 'member'
+                ];
+                
+                $membershipStatusMap = [
+                    'first_timer' => 'active',
+                    'guest' => 'active',
+                    'new_member' => 'active',
+                    'returning_member' => 'active'
+                ];
+                
+                // Create new guest/member record
+                $member = Member::create([
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'phone' => $request->phone,
+                    'email' => $request->email,
+                    'membership_status' => $membershipStatusMap[$request->guest_type] ?? 'active',
+                    'membership_type' => $membershipTypeMap[$request->guest_type] ?? 'visitor',
+                    'is_active' => true,
+                    'approval_status' => 'pending',
+                    'notes' => 'Registered as ' . ucfirst(str_replace('_', ' ', $request->guest_type)) . ' via attendance QR code',
+                    'membership_date' => now()
+                ]);
+
+                Log::info('New guest/member registered via QR attendance', [
+                    'member_id' => $member->id,
+                    'name' => $member->full_name,
+                    'type' => $request->guest_type,
+                    'event_id' => $event->id
+                ]);
+            }
+
+            // Check if attendance already marked
+            $existingAttendance = Attendance::where('event_id', $event->id)
+                                          ->where('member_id', $member->id)
+                                          ->first();
+
+            if ($existingAttendance) {
+                DB::commit();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Welcome back! Your attendance was already marked for this event.',
+                    'attendance' => [
+                        'member_name' => $member->full_name,
+                        'event_title' => $event->title,
+                        'checked_in_at' => $existingAttendance->checked_in_at->format('Y-m-d H:i:s')
+                    ]
+                ]);
+            }
+
+            // Create attendance record
+            $attendance = Attendance::create([
+                'event_id' => $event->id,
+                'member_id' => $member->id,
+                'checked_in_at' => now(),
+                'attendance_method' => 'qr_code_guest',
+                'device_info' => $request->userAgent(),
+                'ip_address' => $request->ip(),
+                'is_verified' => true,
+                'notes' => 'Registered as ' . ucfirst(str_replace('_', ' ', $request->guest_type))
+            ]);
+
+            DB::commit();
+
+            // Send welcome email confirmation if member has email
+            if ($member->email) {
+                try {
+                    \Mail::to($member->email)->send(new \App\Mail\AttendanceConfirmation($attendance, $event, $member));
+                    Log::info('Guest attendance confirmation email sent', [
+                        'member_id' => $member->id,
+                        'email' => $member->email,
+                        'event_id' => $event->id,
+                        'guest_type' => $request->guest_type
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Failed to send guest attendance confirmation email', [
+                        'member_id' => $member->id,
+                        'email' => $member->email,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Welcome! Your attendance has been marked successfully.',
+                'attendance' => [
+                    'member_name' => $member->full_name,
+                    'event_title' => $event->title,
+                    'checked_in_at' => $attendance->checked_in_at->format('Y-m-d H:i:s')
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Guest attendance marking failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to register and mark attendance. Please try again.'
             ], 500);
         }
     }
@@ -244,6 +420,24 @@ class AttendanceController extends Controller
                 'ip_address' => $request->ip(),
                 'is_verified' => true
             ]);
+
+            // Send email confirmation if member has email
+            if ($member->email) {
+                try {
+                    \Mail::to($member->email)->send(new \App\Mail\AttendanceConfirmation($attendance, $event, $member));
+                    Log::info('Manual attendance confirmation email sent', [
+                        'member_id' => $member->id,
+                        'email' => $member->email,
+                        'event_id' => $event->id
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Failed to send manual attendance confirmation email', [
+                        'member_id' => $member->id,
+                        'email' => $member->email,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
 
             return response()->json([
                 'success' => true,

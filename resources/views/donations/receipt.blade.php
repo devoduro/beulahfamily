@@ -244,7 +244,7 @@
             <div class="church-logo">
                 🏛️
             </div>
-            <div class="church-name">Beulah Family Church</div>
+            <div class="church-name">Beulah Family</div>
             <div class="church-subtitle">Building Lives, Transforming Communities</div>
             <div class="receipt-title">DONATION RECEIPT</div>
         </div>
