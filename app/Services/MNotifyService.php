@@ -35,16 +35,22 @@ class MNotifyService
             $response = Http::timeout(30)->get($url);
             $responseData = $response->json();
 
-            if ($response->successful() && isset($responseData['code']) && $responseData['code'] === '1000') {
+            // Check for success - code can be string '1000' or integer 1000
+            $isSuccess = $response->successful() && 
+                         isset($responseData['code']) && 
+                         (($responseData['code'] === '1000') || ($responseData['code'] === 1000));
+
+            if ($isSuccess) {
                 Log::info('SMS sent successfully', [
                     'recipient' => $recipient,
-                    'message_id' => $responseData['message_id'] ?? null,
-                    'cost' => $responseData['cost'] ?? null
+                    'message_id' => $responseData['data']['key'] ?? $responseData['message_id'] ?? null,
+                    'campaign_id' => $responseData['data']['campaign_id'] ?? null
                 ]);
 
                 return [
                     'success' => true,
-                    'message_id' => $responseData['message_id'] ?? null,
+                    'message_id' => $responseData['data']['key'] ?? $responseData['message_id'] ?? null,
+                    'campaign_id' => $responseData['data']['campaign_id'] ?? null,
                     'cost' => $responseData['cost'] ?? 0,
                     'response' => $responseData
                 ];

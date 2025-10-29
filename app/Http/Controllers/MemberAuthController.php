@@ -302,7 +302,24 @@ class MemberAuthController extends Controller
             }
         }
 
-        // Notify admins (optional - can be implemented later)
+        // Notify admin about new registration
+        try {
+            $adminEmail = 'ghanabeulahfamily@gmail.com';
+            
+            Mail::send('emails.admin-new-registration', [
+                'member' => $member,
+            ], function ($message) use ($member, $adminEmail) {
+                $message->to($adminEmail)
+                    ->subject('🎉 New Member Registration - ' . $member->first_name . ' ' . $member->last_name);
+            });
+            
+            \Log::info('Admin notification email sent for new registration', [
+                'member_id' => $member->id,
+                'admin_email' => $adminEmail
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to send admin notification email: ' . $e->getMessage());
+        }
 
         return redirect()->route('member.login')
             ->with('success', '🎉 Registration Successful! Check your email and SMS for login credentials. Your account is pending admin approval.');
