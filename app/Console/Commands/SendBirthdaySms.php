@@ -112,7 +112,7 @@ class SendBirthdaySms extends Command
                         'last_name' => $member->last_name,
                         'full_name' => $member->first_name . ' ' . $member->last_name,
                         'age' => $age,
-                        'church_name' => 'Beulah Family Church'
+                        'church_name' => 'Beulah Family'
                     ];
 
                     $message = $template->renderMessage($variables);

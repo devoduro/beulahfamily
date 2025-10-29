@@ -120,7 +120,7 @@ class PrayerRequestController extends Controller
         ]);
 
         return redirect()->route('member.prayer-requests.show', $prayerRequest)
-                        ->with('success', 'Your prayer request has been submitted. The church family will pray for you!');
+                        ->with('success', 'Your prayer request has been submitted. The Beulah family will pray for you!');
     }
 
     /**

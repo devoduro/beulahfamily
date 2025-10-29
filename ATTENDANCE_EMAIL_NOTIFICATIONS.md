@@ -157,7 +157,7 @@ MAIL_USERNAME=your_mailtrap_username
 MAIL_PASSWORD=your_mailtrap_password
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS=noreply@beulahfamily.org
-MAIL_FROM_NAME="Beulah Family Church"
+MAIL_FROM_NAME="Beulah Family"
 ```
 
 ### **For Production (SendGrid):**
@@ -169,7 +169,7 @@ MAIL_USERNAME=apikey
 MAIL_PASSWORD=your_sendgrid_api_key
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS=noreply@yourchurch.org
-MAIL_FROM_NAME="Beulah Family Church"
+MAIL_FROM_NAME="Beulah Family"
 ```
 
 **See `EMAIL_SETUP.md` for complete email configuration guide.**
@@ -247,7 +247,7 @@ MAIL_FROM_NAME="Beulah Family Church"
 │  [View Event Details] →           │ ← Call to action
 │                                    │
 ├────────────────────────────────────┤
-│  Beulah Family Church             │ ← Footer
+│  Beulah Family             │ ← Footer
 │  ✉ church@example.com             │
 │  📞 0241234567                     │
 └────────────────────────────────────┘

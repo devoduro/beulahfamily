@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Member;
+use App\Services\MNotifyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -277,10 +278,34 @@ class MemberAuthController extends Controller
             \Log::error('Failed to send registration email: ' . $e->getMessage());
         }
 
+        // Send welcome SMS to member
+        if ($member->phone && $member->receive_sms) {
+            try {
+                $smsService = new MNotifyService();
+                $smsMessage = "Welcome to Beulah Family, {$member->first_name}! Your registration is pending approval. You'll receive another SMS once approved. Login: {$member->email}, Password: {$defaultPassword}";
+                
+                $smsResult = $smsService->sendSMS($member->phone, $smsMessage);
+                
+                if ($smsResult['success']) {
+                    \Log::info('Registration SMS sent successfully', [
+                        'member_id' => $member->id,
+                        'phone' => $member->phone
+                    ]);
+                } else {
+                    \Log::warning('Failed to send registration SMS', [
+                        'member_id' => $member->id,
+                        'error' => $smsResult['error'] ?? 'Unknown error'
+                    ]);
+                }
+            } catch (\Exception $e) {
+                \Log::error('SMS service error during registration: ' . $e->getMessage());
+            }
+        }
+
         // Notify admins (optional - can be implemented later)
 
         return redirect()->route('member.login')
-            ->with('success', '🎉 Registration Successful! Check your email for login credentials. Your account is pending admin approval.');
+            ->with('success', '🎉 Registration Successful! Check your email and SMS for login credentials. Your account is pending admin approval.');
     }
 
     /**

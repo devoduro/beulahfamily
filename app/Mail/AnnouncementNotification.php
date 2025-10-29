@@ -23,7 +23,7 @@ class AnnouncementNotification extends Mailable
     public function __construct(Announcement $announcement)
     {
         $this->announcement = $announcement;
-        $this->churchName = \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family Church');
+        $this->churchName = \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family');
     }
 
     /**

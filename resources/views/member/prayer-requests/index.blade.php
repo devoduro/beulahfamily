@@ -1,7 +1,7 @@
 @extends('member.layouts.app')
 
 @section('title', 'Prayer Requests')
-@section('subtitle', 'Join our church family in prayer and submit your own requests')
+@section('subtitle', 'Join Beulah family in prayer and submit your own requests')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50 py-8">
@@ -206,7 +206,7 @@
                     @if(request()->hasAny(['search', 'category', 'urgency']))
                         No prayer requests match your search criteria. Try adjusting your filters.
                     @else
-                        Be the first to submit a prayer request and let our church family pray with you.
+                        Be the first to submit a prayer request and let Beulah family pray with you.
                     @endif
                 </p>
                 <div class="space-y-4">

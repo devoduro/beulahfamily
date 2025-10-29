@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\MembersExport;
+use App\Services\MNotifyService;
 
 class MemberController extends Controller
 {
@@ -341,10 +342,45 @@ class MemberController extends Controller
             Storage::disk('public')->delete($member->photo_path);
         }
         
-        $member->delete();
+        // Permanently delete the member (bypass soft delete)
+        $member->forceDelete();
         
         return redirect()->route('members.index')
-                        ->with('success', 'Member deleted successfully.');
+                        ->with('success', 'Member deleted permanently.');
+    }
+
+    /**
+     * Bulk delete members
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'member_ids' => 'required|array|min:1',
+            'member_ids.*' => 'exists:members,id'
+        ]);
+
+        $memberIds = $request->member_ids;
+        $deletedCount = 0;
+
+        foreach ($memberIds as $memberId) {
+            $member = Member::withTrashed()->find($memberId);
+            if ($member) {
+                // Delete photo if exists
+                if ($member->photo_path) {
+                    Storage::disk('public')->delete($member->photo_path);
+                }
+                
+                // Permanently delete the member (bypass soft delete)
+                $member->forceDelete();
+                $deletedCount++;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$deletedCount} member(s) deleted successfully.",
+            'deleted_count' => $deletedCount
+        ]);
     }
 
     /**
@@ -577,7 +613,31 @@ class MemberController extends Controller
             \Log::error('Failed to send approval email: ' . $e->getMessage());
         }
 
-        return back()->with('success', '✅ Member approved successfully! An email has been sent to ' . $member->email . ' with login instructions and password.');
+        // Send approval SMS to member
+        if ($member->phone && $member->receive_sms) {
+            try {
+                $smsService = new MNotifyService();
+                $smsMessage = "Congratulations {$member->first_name}! Your Beulah Family membership has been APPROVED. Login at: {$member->email}, Password: {$newPassword}. Please change your password after first login. Welcome to the family!";
+                
+                $smsResult = $smsService->sendSMS($member->phone, $smsMessage);
+                
+                if ($smsResult['success']) {
+                    \Log::info('Approval SMS sent successfully', [
+                        'member_id' => $member->id,
+                        'phone' => $member->phone
+                    ]);
+                } else {
+                    \Log::warning('Failed to send approval SMS', [
+                        'member_id' => $member->id,
+                        'error' => $smsResult['error'] ?? 'Unknown error'
+                    ]);
+                }
+            } catch (\Exception $e) {
+                \Log::error('SMS service error during approval: ' . $e->getMessage());
+            }
+        }
+
+        return back()->with('success', '✅ Member approved successfully! An email and SMS have been sent to ' . $member->email . ' with login instructions and password.');
     }
 
     /**
@@ -637,7 +697,7 @@ class MemberController extends Controller
                 'password' => $newPassword,
             ], function ($message) use ($member) {
                 $message->to($member->email)
-                    ->subject('Password Reset - Beulah Family Church');
+                    ->subject('Password Reset - Beulah Family');
             });
         } catch (\Exception $e) {
             \Log::error('Failed to send password reset email: ' . $e->getMessage());

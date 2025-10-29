@@ -83,7 +83,7 @@
             
             <p>Dear {{ $member->first_name }} {{ $member->last_name }},</p>
             
-            <p>Thank you for registering as a member of {{ \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family') }}. We're excited to have you join our church family!</p>
+            <p>Thank you for registering as a member of {{ \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family') }}. We're excited to have you join Beulah family!</p>
             
             <div class="info-box">
                 <strong>⏳ Your Registration Status: Pending Approval</strong>

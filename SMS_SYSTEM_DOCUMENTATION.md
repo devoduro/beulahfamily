@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Beulah Family church management system now includes a comprehensive SMS credit system with automated birthday messaging functionality. This system allows users to purchase SMS credits via Paystack and automatically sends birthday wishes to members daily.
+The Beulah Family management system now includes a comprehensive SMS credit system with automated birthday messaging functionality. This system allows users to purchase SMS credits via Paystack and automatically sends birthday wishes to members daily.
 
 ## Features Implemented
 

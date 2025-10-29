@@ -127,7 +127,7 @@
                 <li>📅 Access upcoming events and programs</li>
                 <li>💰 Make donations securely online</li>
                 <li>🙏 Join ministries and volunteer opportunities</li>
-                <li>👥 Connect with your church family</li>
+                <li>👥 Connect with Beulah family</li>
                 <li>📖 Access exclusive member content</li>
             </ul>
             

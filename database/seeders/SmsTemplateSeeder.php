@@ -35,7 +35,7 @@ class SmsTemplateSeeder extends Seeder
             [
                 'name' => 'Welcome New Member',
                 'category' => 'welcome',
-                'message' => 'Welcome to {{church_name}}, {{first_name}}! We are excited to have you join our church family. God bless you!',
+                'message' => 'Welcome to {{church_name}}, {{first_name}}! We are excited to have you join Beulah family. God bless you!',
                 'description' => 'Welcome message for new church members',
                 'is_active' => true,
                 'variables' => ['first_name', 'church_name'],

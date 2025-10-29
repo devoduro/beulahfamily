@@ -1,7 +1,7 @@
 @extends('components.app-layout')
 
 @section('title', 'Members')
-@section('subtitle', 'Manage church members and their information')
+@section('subtitle', 'Manage Beulah Family members and their information')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8">
@@ -218,6 +218,13 @@
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Bulk Delete Button (Hidden by default) -->
+                <button id="bulk-delete-btn" onclick="confirmBulkDelete()" class="hidden items-center px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    <i class="fas fa-trash-alt mr-2"></i>
+                    <span class="font-semibold">Delete Selected</span>
+                    <span id="selected-count" class="ml-2 bg-white text-red-600 rounded-full px-2.5 py-0.5 text-xs font-bold">0</span>
+                </button>
+                
                 <!-- Pending Approvals Button -->
                 <a href="{{ route('members.pending-approvals') }}" class="flex items-center px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                     <i class="fas fa-user-clock mr-2"></i>
@@ -452,7 +459,12 @@
             <!-- Grid View (Default) -->
             <div id="grid-view" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                 @forelse($members ?? [] as $member)
-                    <div class="member-card group bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/30 p-8 hover:shadow-2xl transition-all duration-500 hover:bg-white/90 hover:-translate-y-2 hover:scale-105">
+                    <div class="member-card group relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/30 p-8 hover:shadow-2xl transition-all duration-500 hover:bg-white/90 hover:-translate-y-2 hover:scale-105">
+                        <!-- Checkbox for bulk selection -->
+                        <div class="absolute top-4 left-4 z-10">
+                            <input type="checkbox" class="member-checkbox w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer" data-member-id="{{ $member->id }}" onchange="updateBulkDeleteButton()">
+                        </div>
+                        
                         <div class="flex items-start justify-between mb-6">
                             <div class="flex items-center space-x-4">
                                 <div class="relative">
@@ -480,6 +492,9 @@
                                 <a href="{{ route('members.edit', $member->id ?? 1) }}" class="p-3 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300 hover:scale-110" title="Edit Member">
                                     <i class="fas fa-edit text-lg"></i>
                                 </a>
+                                <button onclick="confirmSingleDelete({{ $member->id }}, '{{ $member->full_name }}')" class="p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 hover:scale-110" title="Delete Member">
+                                    <i class="fas fa-trash-alt text-lg"></i>
+                                </button>
                             </div>
                         </div>
                         
@@ -564,6 +579,10 @@
                 @forelse($members ?? [] as $member)
                     <div class="member-row bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-white/30 p-6 hover:shadow-xl transition-all duration-300 hover:bg-white/90">
                         <div class="flex items-center justify-between">
+                            <!-- Checkbox for bulk selection -->
+                            <div class="mr-4">
+                                <input type="checkbox" class="member-checkbox w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer" data-member-id="{{ $member->id }}" onchange="updateBulkDeleteButton()">
+                            </div>
                             <div class="flex items-center space-x-6 flex-1">
                                 <!-- Photo and Basic Info -->
                                 <div class="flex items-center space-x-4">
@@ -624,6 +643,9 @@
                                 <a href="{{ route('members.edit', $member->id ?? 1) }}" class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Edit Member">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                <button onclick="confirmSingleDelete({{ $member->id }}, '{{ $member->full_name }}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Member">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -879,6 +901,155 @@ document.addEventListener('DOMContentLoaded', function() {
             shortcutHints.style.opacity = '0';
         });
     }
+    
+    // Bulk Delete Functionality
+    window.updateBulkDeleteButton = function() {
+        const checkboxes = document.querySelectorAll('.member-checkbox:checked');
+        const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+        const selectedCount = document.getElementById('selected-count');
+        
+        if (checkboxes.length > 0) {
+            bulkDeleteBtn.classList.remove('hidden');
+            bulkDeleteBtn.classList.add('flex');
+            selectedCount.textContent = checkboxes.length;
+        } else {
+            bulkDeleteBtn.classList.add('hidden');
+            bulkDeleteBtn.classList.remove('flex');
+        }
+    };
+    
+    window.confirmBulkDelete = function() {
+        const checkboxes = document.querySelectorAll('.member-checkbox:checked');
+        const memberIds = Array.from(checkboxes).map(cb => cb.dataset.memberId);
+        
+        if (memberIds.length === 0) {
+            showNotification('Please select at least one member to delete', 'error');
+            return;
+        }
+        
+        if (confirm(`Are you sure you want to delete ${memberIds.length} member(s)? This action cannot be undone.`)) {
+            bulkDeleteMembers(memberIds);
+        }
+    };
+    
+    function bulkDeleteMembers(memberIds) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+        const originalContent = bulkDeleteBtn.innerHTML;
+        
+        // Show loading state
+        bulkDeleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deleting...';
+        bulkDeleteBtn.disabled = true;
+        
+        fetch('/members/bulk-delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ member_ids: memberIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                // Reload page after short delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showNotification(data.message || 'Failed to delete members', 'error');
+                bulkDeleteBtn.innerHTML = originalContent;
+                bulkDeleteBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Bulk delete error:', error);
+            showNotification('An error occurred while deleting members', 'error');
+            bulkDeleteBtn.innerHTML = originalContent;
+            bulkDeleteBtn.disabled = false;
+        });
+    }
+    
+    // Single Delete Functionality
+    window.confirmSingleDelete = function(memberId, memberName) {
+        if (confirm(`Are you sure you want to delete ${memberName}? This action cannot be undone.`)) {
+            deleteSingleMember(memberId);
+        }
+    };
+    
+    function deleteSingleMember(memberId) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        
+        fetch(`/members/${memberId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                return response.json();
+            }
+        })
+        .then(data => {
+            if (data && data.success) {
+                showNotification('Member deleted successfully', 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            showNotification('An error occurred while deleting the member', 'error');
+        });
+    }
 });
+
+// Notification Helper Function
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.custom-notification');
+    existingNotifications.forEach(n => n.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `custom-notification fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-2xl transform transition-all duration-300 translate-x-0 ${
+        type === 'success' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' :
+        type === 'error' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
+        'bg-gradient-to-r from-blue-500 to-indigo-600 text-white'
+    }`;
+    
+    notification.innerHTML = `
+        <div class="flex items-center space-x-3">
+            <i class="fas ${
+                type === 'success' ? 'fa-check-circle' :
+                type === 'error' ? 'fa-exclamation-circle' :
+                'fa-info-circle'
+            } text-xl"></i>
+            <span class="font-semibold">${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 5000);
+}
 </script>
 @endsection

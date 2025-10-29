@@ -46,9 +46,9 @@ class TestEmailCommand extends Command
         $this->newLine();
 
         try {
-            Mail::raw('This is a test email from Beulah Family Church Management System. If you receive this, your email configuration is working correctly!', function ($message) use ($email) {
+            Mail::raw('This is a test email from Beulah Family Management System. If you receive this, your email configuration is working correctly!', function ($message) use ($email) {
                 $message->to($email)
-                        ->subject('Test Email from Church Management System')
+                        ->subject('Test Email from Beulah Family Management System')
                         ->from(config('mail.from.address'), config('mail.from.name'));
             });
 

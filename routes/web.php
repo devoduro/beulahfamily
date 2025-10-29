@@ -15,6 +15,7 @@ Route::get('/members/{member}/edit', [\App\Http\Controllers\MemberController::cl
 Route::get('/members/{member}/id-card', [\App\Http\Controllers\MemberController::class, 'generateIdCard'])->middleware(['auth', 'admin'])->name('members.id-card');
 Route::put('/members/{member}', [\App\Http\Controllers\MemberController::class, 'update'])->middleware(['auth', 'admin'])->name('members.update');
 Route::delete('/members/{member}', [\App\Http\Controllers\MemberController::class, 'destroy'])->middleware(['auth', 'admin'])->name('members.destroy');
+Route::post('/members/bulk-delete', [\App\Http\Controllers\MemberController::class, 'bulkDestroy'])->middleware(['auth', 'admin'])->name('members.bulk-destroy');
 Route::post('/members/{member}/approve', [\App\Http\Controllers\MemberController::class, 'approve'])->middleware(['auth', 'admin'])->name('members.approve');
 Route::post('/members/{member}/reject', [\App\Http\Controllers\MemberController::class, 'reject'])->middleware(['auth', 'admin'])->name('members.reject');
 Route::post('/members/{member}/reset-password', [\App\Http\Controllers\MemberController::class, 'resetPassword'])->middleware(['auth', 'admin'])->name('members.reset-password');

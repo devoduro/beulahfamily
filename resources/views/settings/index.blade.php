@@ -17,7 +17,7 @@
                 <div class="inline-flex items-center justify-center w-20 h-20 bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl mb-6">
                     <i class="fas fa-church text-3xl text-white"></i>
                 </div>
-                <h1 class="text-5xl font-bold text-white mb-4">Church Management</h1>
+                <h1 class="text-5xl font-bold text-white mb-4">Beulah Family Management</h1>
                 <p class="text-xl text-white opacity-90 mb-8 max-w-2xl mx-auto">
                     Streamline your church operations with our comprehensive management system
                 </p>
@@ -120,8 +120,8 @@
                     <div class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
                         <i class="fas fa-church text-2xl text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Church Configuration</h3>
-                    <p class="text-gray-600 mb-6 leading-relaxed">Complete church management setup including branding, contact information, and system preferences.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Management Configuration</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">Complete management setup including branding, contact information, and system preferences.</p>
                     <div class="space-y-3">
                         <a href="{{ route('settings.general') }}" class="block w-full text-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
                             <i class="fas fa-cog mr-2"></i>Configure Church

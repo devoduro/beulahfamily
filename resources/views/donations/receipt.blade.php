@@ -434,10 +434,10 @@
         <div class="receipt-footer">
             <div class="thank-you">Thank you for your generous donation!</div>
             <div class="footer-text">
-                This receipt serves as acknowledgment of your donation to Beulah Family Church.<br>
+                This receipt serves as acknowledgment of your donation to Beulah Family.<br>
                 Please keep this receipt for your records and tax purposes.<br><br>
                 
-                <strong>Beulah Family Church</strong><br>
+                <strong>Beulah Family</strong><br>
                 Building Lives, Transforming Communities<br>
                 Generated on: {{ now()->format('F d, Y \a\t g:i A') }}
             </div>

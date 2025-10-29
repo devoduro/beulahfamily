@@ -234,7 +234,7 @@ class MemberPaymentController extends Controller
 
             $message = "Dear {$member->first_name}, your {$payment->payment_type_display} payment of GHS " . 
                       number_format($payment->amount, 2) . " has been received. " .
-                      "Reference: {$payment->payment_reference}. Thank you! - Beulah Family Church";
+                      "Reference: {$payment->payment_reference}. Thank you! - Beulah Family";
 
             $result = $this->mnotifyService->sendSms($member->phone, $message);
 

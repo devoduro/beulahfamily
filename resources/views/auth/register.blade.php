@@ -151,7 +151,7 @@
         </div>
         
         <div class="mt-8 text-center text-sm text-gray-500">
-            &copy; {{ date('Y') }} Church Management System. All rights reserved.
+            &copy; {{ date('Y') }} Beulah Family Management System. All rights reserved.
         </div>
     </div>
 </body>

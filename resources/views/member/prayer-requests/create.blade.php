@@ -1,7 +1,7 @@
 @extends('member.layouts.app')
 
 @section('title', 'Submit Prayer Request')
-@section('subtitle', 'Let our church family pray with you')
+@section('subtitle', 'Let Beulah family pray with you')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50 py-8">
@@ -29,7 +29,7 @@
                     <i class="fas fa-hands text-white text-xl"></i>
                     <h2 class="text-2xl font-bold text-white">Share Your Prayer Need</h2>
                 </div>
-                <p class="text-purple-100 mt-2">Our church family is here to pray with you. Share your request below.</p>
+                <p class="text-purple-100 mt-2">Beulah family is here to pray with you. Share your request below.</p>
             </div>
 
             <form action="{{ route('member.prayer-requests.store') }}" method="POST" class="p-8 space-y-8">
@@ -109,7 +109,7 @@
                                   name="description" 
                                   rows="8" 
                                   class="block w-full px-4 py-3 bg-white/50 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 text-gray-900 font-medium shadow-sm hover:shadow-md resize-none @error('description') border-red-300 @enderror" 
-                                  placeholder="Please share the details of your prayer request. Be as specific as you feel comfortable sharing so our church family can pray effectively for your situation."
+                                  placeholder="Please share the details of your prayer request. Be as specific as you feel comfortable sharing so Beulah family can pray effectively for your situation."
                                   required>{{ old('description') }}</textarea>
                         <div class="absolute bottom-3 right-3 text-xs text-gray-400" id="char-count">
                             <span id="current-count">0</span> / 20 minimum
@@ -188,7 +188,7 @@
                         <div>
                             <h4 class="font-bold text-purple-800 mb-2">You Are Not Alone</h4>
                             <p class="text-sm text-purple-700 leading-relaxed">
-                                Our church family is here to support you in prayer. Remember that God hears every prayer and cares deeply about your needs. "Cast all your anxiety on him because he cares for you." - 1 Peter 5:7
+                                Beulah family is here to support you in prayer. Remember that God hears every prayer and cares deeply about your needs. "Cast all your anxiety on him because he cares for you." - 1 Peter 5:7
                             </p>
                         </div>
                     </div>

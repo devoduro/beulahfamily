@@ -27,7 +27,7 @@
             @endif
         </h1>
         <p class="mt-1 text-sm text-gray-600">
-            Add a new document to your Church management system
+            Add a new document to Beulah Family management system
             @if($selectedCategory)
                 in the {{ $selectedCategory->isFolder() ? 'folder' : 'category' }} "{{ $selectedCategory->name }}"
             @endif

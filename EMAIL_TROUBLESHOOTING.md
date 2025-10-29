@@ -54,7 +54,7 @@ MAIL_USERNAME=your-email@gmail.com
 MAIL_PASSWORD=xxxx xxxx xxxx xxxx    # The 16-character app password (remove spaces)
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS=your-email@gmail.com
-MAIL_FROM_NAME="Beulah Family Church"
+MAIL_FROM_NAME="Beulah Family"
 ```
 
 8. Run: `php artisan config:clear`
@@ -109,7 +109,7 @@ MAIL_USERNAME=your_mailtrap_username
 MAIL_PASSWORD=your_mailtrap_password
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS=noreply@beulahfamily.org
-MAIL_FROM_NAME="Beulah Family Church"
+MAIL_FROM_NAME="Beulah Family"
 ```
 
 5. Run: `php artisan config:clear`

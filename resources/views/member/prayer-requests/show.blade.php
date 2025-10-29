@@ -121,7 +121,7 @@
                         </div>
                         <div>
                             <h3 class="text-xl font-bold text-gray-900">Anonymous Request</h3>
-                            <p class="text-gray-600">A member of our church family</p>
+                            <p class="text-gray-600">A member of Beulah family</p>
                         </div>
                     </div>
                 </div>
@@ -236,7 +236,7 @@
             <div class="max-w-2xl mx-auto">
                 <h3 class="text-2xl font-bold text-white mb-4">Need prayer too?</h3>
                 <p class="text-purple-100 mb-6 text-lg">
-                    Our church family is here to support you. Don't carry your burdens alone - let us pray with you.
+                    Beulah family is here to support you. Don't carry your burdens alone - let us pray with you.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="{{ route('member.prayer-requests.create') }}" class="inline-flex items-center px-8 py-4 bg-white text-purple-600 font-bold rounded-xl hover:bg-purple-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">

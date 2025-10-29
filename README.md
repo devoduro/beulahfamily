@@ -1,2 +1,2 @@
 # beulahfamily
-Church Management System
+ Management System

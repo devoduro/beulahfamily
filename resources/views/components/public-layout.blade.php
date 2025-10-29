@@ -274,7 +274,7 @@
                 <div class="md:col-span-2">
                     @php
                         $footerLogo = \App\Models\Setting::getValue('organization_logo', 'general');
-                        $footerName = \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family Church');
+                        $footerName = \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family');
                         $footerSlogan = \App\Models\Setting::getValue('organization_slogan', 'general', 'Building Lives, Transforming Communities');
                     @endphp
                     <div class="flex items-center space-x-3 mb-4">
@@ -320,7 +320,7 @@
             </div>
 
             <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
-                <p>&copy; {{ date('Y') }} {{ $footerName ?? 'Beulah Family Church' }}. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} {{ $footerName ?? 'Beulah Family' }}. All rights reserved.</p>
             </div>
         </div>
     </footer>

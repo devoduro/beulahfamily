@@ -354,8 +354,8 @@ class ChurchManagementSeeder extends Seeder
         // Create sample announcements
         $announcements = [
             [
-                'title' => 'Welcome to Our Church Management System',
-                'content' => 'We are excited to announce the launch of our new church management system. This platform will help us better serve our congregation and manage church activities more efficiently.',
+                'title' => 'Welcome to Beulah Family Management System',
+                'content' => 'We are excited to announce the launch of our new Beulah Family management system. This platform will help us better serve our congregation and manage church activities more efficiently.',
                 'type' => 'general',
                 'priority' => 'high',
                 'created_by' => 1,
@@ -390,6 +390,6 @@ class ChurchManagementSeeder extends Seeder
             Announcement::create($announcementData);
         }
 
-        $this->command->info('Church management sample data seeded successfully!');
+        $this->command->info('Beulah Family management sample data seeded successfully!');
     }
 }

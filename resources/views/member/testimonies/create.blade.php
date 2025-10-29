@@ -29,7 +29,7 @@
                     <i class="fas fa-edit text-white text-xl"></i>
                     <h2 class="text-2xl font-bold text-white">Tell Your Story</h2>
                 </div>
-                <p class="text-amber-100 mt-2">Fill out the form below to share your testimony with the church family.</p>
+                <p class="text-amber-100 mt-2">Fill out the form below to share your testimony with the Beulah family.</p>
             </div>
 
             <form action="{{ route('member.testimonies.store') }}" method="POST" class="p-8 space-y-8">
@@ -151,7 +151,7 @@
                         <div>
                             <h4 class="font-bold text-amber-800 mb-2">Review Process</h4>
                             <p class="text-sm text-amber-700 leading-relaxed">
-                                Your testimony will be reviewed by church leadership before being published. This ensures all content is appropriate and encouraging for our church family. You'll be notified once it's approved.
+                                Your testimony will be reviewed by church leadership before being published. This ensures all content is appropriate and encouraging for Beulah family. You'll be notified once it's approved.
                             </p>
                         </div>
                     </div>

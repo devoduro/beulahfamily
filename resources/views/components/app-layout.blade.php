@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Beulah Family Church') }}</title>
+    <title>{{ config('app.name', 'Beulah Family') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -101,7 +101,7 @@
                     </div>
                     <div>
                         <h1 class="text-lg font-bold gradient-text">Beulah Family</h1>
-                        <p class="text-xs text-gray-500">Church Management</p>
+                        <p class="text-xs text-gray-500">Beulah Family Management</p>
                     </div>
                 </div>
             </div>
@@ -113,7 +113,7 @@
                 <!-- Church Management Section -->
                 <div class="mb-6">
                     <div class="px-2 mb-3">
-                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Church Management</h3>
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Beulah Family Management</h3>
                     </div>
                     
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl {{ request()->routeIs('dashboard') ? 'bg-indigo-50 text-indigo-600 font-medium shadow-sm' : '' }}">
@@ -474,7 +474,7 @@
                 @else
                     <div class="py-2 mt-1">
                         <h1 class="text-2xl font-bold text-gray-800">@yield('title', 'Dashboard')</h1>
-                        <p class="text-sm text-gray-500">@yield('subtitle', 'Welcome to the Church Management System')</p>
+                        <p class="text-sm text-gray-500">@yield('subtitle', 'Welcome to the Beulah Family Management System')</p>
                     </div>
                 @endif
                 
@@ -490,7 +490,7 @@
             <footer class="py-4 px-6 border-t border-gray-200">
                 <div class="flex flex-col md:flex-row justify-between items-center">
                     <p class="text-sm text-gray-500">
-                        &copy; {{ date('Y') }} Church Management System. All rights reserved.
+                        &copy; {{ date('Y') }} Beulah Family Management System. All rights reserved.
                     </p>
                     <div class="mt-2 md:mt-0">
                         <a href="#" class="text-sm text-gray-500 hover:text-primary-600 mr-4">Privacy Policy</a>

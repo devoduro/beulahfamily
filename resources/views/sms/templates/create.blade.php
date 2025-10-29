@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .replace(/\{\{first_name\}\}/g, 'John')
                 .replace(/\{\{last_name\}\}/g, 'Doe')
                 .replace(/\{\{full_name\}\}/g, 'John Doe')
-                .replace(/\{\{church_name\}\}/g, 'Beulah Family Church')
+                .replace(/\{\{church_name\}\}/g, 'Beulah Family')
                 .replace(/\{\{event_name\}\}/g, 'Sunday Service')
                 .replace(/\{\{event_date\}\}/g, 'December 25, 2024')
                 .replace(/\{\{event_time\}\}/g, '9:00 AM')

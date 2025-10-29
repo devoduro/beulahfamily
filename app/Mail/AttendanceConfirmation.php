@@ -28,7 +28,7 @@ class AttendanceConfirmation extends Mailable
         $this->attendance = $attendance;
         $this->event = $event;
         $this->member = $member;
-        $this->churchName = \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family Church');
+        $this->churchName = \App\Models\Setting::getValue('organization_name', 'general', 'Beulah Family');
     }
 
     /**

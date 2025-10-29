@@ -6,7 +6,7 @@
 @section('content')
 <div class="bg-white rounded-lg shadow-sm p-6">
     <div class="mb-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-2">Church Management Settings</h2>
+        <h2 class="text-xl font-bold text-gray-800 mb-2">Beulah Family Management Settings</h2>
         <p class="text-gray-600">Configure your church's information, branding, contact details, and system preferences all in one place.</p>
     </div>
 

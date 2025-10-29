@@ -1,7 +1,7 @@
 @extends('components.app-layout')
 
 @section('title', 'Church Dashboard')
-@section('subtitle', 'Welcome to Beulah Family Church Management System')
+@section('subtitle', 'Welcome to Beulah Family Management System')
 
 @section('content')
 <div class="space-y-8">
@@ -22,7 +22,7 @@
                         </div>
                         <div>
                             <h1 class="text-4xl font-bold">Welcome to Beulah Family</h1>
-                            <p class="text-lg opacity-90">Church Management System</p>
+                            <p class="text-lg opacity-90">Beulah Family Management System</p>
                         </div>
                     </div>
                     <p class="text-xl opacity-90 mb-8 max-w-2xl">Empowering our congregation through digital ministry management and community connection</p>

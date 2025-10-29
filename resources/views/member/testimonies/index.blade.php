@@ -1,7 +1,7 @@
 @extends('member.layouts.app')
 
 @section('title', 'Testimonies')
-@section('subtitle', 'Share and read inspiring testimonies from our church family')
+@section('subtitle', 'Share and read inspiring testimonies from Beulah family')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8">
@@ -18,7 +18,7 @@
                 Testimonies of Faith
             </h1>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Witness the amazing works of God in the lives of our church family. Be inspired, encouraged, and strengthened in your faith.
+                Witness the amazing works of God in the lives of Beulah family. Be inspired, encouraged, and strengthened in your faith.
             </p>
         </div>
 

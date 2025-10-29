@@ -1,7 +1,7 @@
 @extends('components.app-layout')
 
 @section('title', 'Add New Family')
-@section('subtitle', 'Create a new church family record')
+@section('subtitle', 'Create a new Beulah family record')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
