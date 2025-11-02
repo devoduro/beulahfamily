@@ -121,6 +121,27 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Event Details -->
         <div class="lg:col-span-2 space-y-6">
+            <!-- Event Flyer -->
+            @if($event->flyer_path)
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Event Flyer</h3>
+                    <div class="relative">
+                        <img src="{{ asset('storage/' . $event->flyer_path) }}" 
+                             alt="{{ $event->title }} Flyer" 
+                             class="w-full h-auto rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+                             onclick="openFlyerModal()">
+                        <div class="absolute top-2 right-2">
+                            <a href="{{ asset('storage/' . $event->flyer_path) }}" 
+                               download="{{ $event->title }}_flyer.{{ pathinfo($event->flyer_path, PATHINFO_EXTENSION) }}"
+                               class="inline-flex items-center px-3 py-1 bg-black bg-opacity-50 text-white text-xs rounded-lg hover:bg-opacity-70 transition-all">
+                                <i class="fas fa-download mr-1"></i>
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Description -->
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Event Description</h3>
@@ -258,6 +279,28 @@
                 </div>
             </div>
 
+            <!-- Event Documents -->
+            @if($event->program_outline_path)
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Event Documents</h3>
+                    <div class="space-y-3">
+                        <a href="{{ asset('storage/' . $event->program_outline_path) }}" 
+                           download="{{ $event->title }}_program_outline.pdf"
+                           class="w-full inline-flex items-center justify-center px-4 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-file-pdf mr-2"></i>
+                            Download Program Outline
+                        </a>
+                        
+                        <a href="{{ asset('storage/' . $event->program_outline_path) }}" 
+                           target="_blank"
+                           class="w-full inline-flex items-center justify-center px-4 py-2 bg-white border border-blue-300 text-blue-700 font-medium rounded-xl hover:bg-blue-50 transition-colors">
+                            <i class="fas fa-eye mr-2"></i>
+                            View Program Outline
+                        </a>
+                    </div>
+                </div>
+            @endif
+
             <!-- QR Code Quick Actions -->
             <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border border-purple-100 p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">QR Attendance</h3>
@@ -313,6 +356,20 @@
     </div>
 </div>
 
+<!-- Flyer Modal -->
+@if($event->flyer_path)
+    <div id="flyerModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+        <div class="relative max-w-4xl max-h-full">
+            <button onclick="closeFlyerModal()" class="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl">
+                <i class="fas fa-times"></i>
+            </button>
+            <img src="{{ asset('storage/' . $event->flyer_path) }}" 
+                 alt="{{ $event->title }} Flyer" 
+                 class="max-w-full max-h-full object-contain rounded-lg">
+        </div>
+    </div>
+@endif
+
 @push('scripts')
 <script>
 function generateQrCode() {
@@ -353,6 +410,31 @@ function deleteEvent() {
         alert('Event deletion functionality will be implemented');
     }
 }
+
+// Flyer modal functions
+function openFlyerModal() {
+    document.getElementById('flyerModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeFlyerModal() {
+    document.getElementById('flyerModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+// Close modal when clicking outside the image
+document.getElementById('flyerModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeFlyerModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeFlyerModal();
+    }
+});
 </script>
 @endpush
 @endsection

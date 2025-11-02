@@ -168,6 +168,77 @@
                         </div>
                     </div>
 
+                    <!-- Event Media & Documents -->
+                    <div class="mb-8">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-images text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">Media & Documents</h3>
+                                <p class="text-gray-600">Upload event flyer and program outline</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Event Flyer -->
+                            <div>
+                                <label for="flyer" class="block text-sm font-medium text-gray-700 mb-2">Event Flyer</label>
+                                <div class="relative">
+                                    <input type="file" id="flyer" name="flyer" accept="image/*"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('flyer') border-red-500 @enderror">
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-image text-gray-400"></i>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Upload JPG, PNG, or GIF. Max size: 5MB</p>
+                                @error('flyer')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                                
+                                <!-- Flyer Preview -->
+                                <div id="flyerPreview" class="mt-3 hidden">
+                                    <div class="relative inline-block">
+                                        <img id="flyerImage" src="" alt="Flyer Preview" class="w-32 h-32 object-cover rounded-lg border border-gray-300">
+                                        <button type="button" onclick="removeFlyerPreview()" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Program Outline PDF -->
+                            <div>
+                                <label for="program_outline" class="block text-sm font-medium text-gray-700 mb-2">Program Outline (PDF)</label>
+                                <div class="relative">
+                                    <input type="file" id="program_outline" name="program_outline" accept=".pdf"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('program_outline') border-red-500 @enderror">
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-file-pdf text-gray-400"></i>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Upload PDF file. Max size: 10MB</p>
+                                @error('program_outline')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                                
+                                <!-- PDF Preview -->
+                                <div id="pdfPreview" class="mt-3 hidden">
+                                    <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg border border-gray-300">
+                                        <i class="fas fa-file-pdf text-red-500 text-2xl"></i>
+                                        <div class="flex-1">
+                                            <p id="pdfFileName" class="text-sm font-medium text-gray-900"></p>
+                                            <p id="pdfFileSize" class="text-xs text-gray-500"></p>
+                                        </div>
+                                        <button type="button" onclick="removePdfPreview()" class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Form Actions -->
                     <div class="flex items-center justify-between pt-6 border-t border-gray-200">
                         <a href="/events" class="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors">
@@ -298,6 +369,70 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // File upload handling
+    const flyerInput = document.getElementById('flyer');
+    const pdfInput = document.getElementById('program_outline');
+    
+    // Flyer preview
+    flyerInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showToast('Please select a valid image file', 'error');
+                this.value = '';
+                return;
+            }
+            
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Image file size must be less than 5MB', 'error');
+                this.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('flyerImage').src = e.target.result;
+                document.getElementById('flyerPreview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // PDF preview
+    pdfInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            if (file.type !== 'application/pdf') {
+                showToast('Please select a valid PDF file', 'error');
+                this.value = '';
+                return;
+            }
+            
+            // Validate file size (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('PDF file size must be less than 10MB', 'error');
+                this.value = '';
+                return;
+            }
+            
+            document.getElementById('pdfFileName').textContent = file.name;
+            document.getElementById('pdfFileSize').textContent = formatFileSize(file.size);
+            document.getElementById('pdfPreview').classList.remove('hidden');
+        }
+    });
+    
+    // Helper function to format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
     // Toast notification function
     function showToast(message, type = 'info') {
         const toast = document.createElement('div');
@@ -326,5 +461,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
 });
+
+// Global functions for preview removal
+function removeFlyerPreview() {
+    document.getElementById('flyer').value = '';
+    document.getElementById('flyerPreview').classList.add('hidden');
+}
+
+function removePdfPreview() {
+    document.getElementById('program_outline').value = '';
+    document.getElementById('pdfPreview').classList.add('hidden');
+}
 </script>
 @endsection

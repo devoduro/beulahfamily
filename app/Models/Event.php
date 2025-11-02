@@ -34,6 +34,8 @@ class Event extends Model
         'recurrence_end_date',
         'recurrence_days',
         'image_path',
+        'flyer_path',
+        'program_outline_path',
         'send_reminders',
         'reminder_days_before'
     ];

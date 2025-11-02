@@ -154,6 +154,8 @@ class EventController extends Controller
             'send_reminders' => 'boolean',
             'reminder_days_before' => 'nullable|integer|min:1',
             'notes' => 'nullable|string',
+            'flyer' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max
+            'program_outline' => 'nullable|file|mimes:pdf|max:10240', // 10MB max
         ]);
 
         if ($validator->fails()) {
@@ -169,6 +171,27 @@ class EventController extends Controller
         $eventData = $request->all();
         $eventData['required_items'] = $request->get('required_items', []);
         $eventData['recurrence_days'] = $request->get('recurrence_days', []);
+        
+        // Remove organizer_id if it's empty or null to avoid foreign key constraint issues
+        if (empty($eventData['organizer_id'])) {
+            unset($eventData['organizer_id']);
+        }
+
+        // Handle flyer upload
+        if ($request->hasFile('flyer')) {
+            $flyer = $request->file('flyer');
+            $flyerName = 'event_flyer_' . time() . '_' . uniqid() . '.' . $flyer->getClientOriginalExtension();
+            $flyerPath = $flyer->storeAs('events/flyers', $flyerName, 'public');
+            $eventData['flyer_path'] = $flyerPath;
+        }
+
+        // Handle program outline upload
+        if ($request->hasFile('program_outline')) {
+            $programOutline = $request->file('program_outline');
+            $outlineName = 'program_outline_' . time() . '_' . uniqid() . '.pdf';
+            $outlinePath = $programOutline->storeAs('events/program-outlines', $outlineName, 'public');
+            $eventData['program_outline_path'] = $outlinePath;
+        }
 
         $event = Event::create($eventData);
 

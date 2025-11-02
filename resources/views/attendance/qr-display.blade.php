@@ -79,7 +79,7 @@
                 </div>
                 
                 <!-- Actions -->
-                <div class="flex justify-center space-x-4">
+                <div class="flex justify-center space-x-4 flex-wrap gap-2">
                     <button onclick="generateNewQr()" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors">
                         <i class="fas fa-sync-alt mr-2"></i>
                         Generate New QR
@@ -98,6 +98,14 @@
                         <i class="fas fa-external-link-alt mr-2"></i>
                         Print-Only View
                     </a>
+                    @if($event->program_outline_path)
+                        <a href="{{ asset('storage/' . $event->program_outline_path) }}" 
+                           download="{{ $event->title }}_program_outline.pdf"
+                           class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors">
+                            <i class="fas fa-file-pdf mr-2"></i>
+                            Download Program
+                        </a>
+                    @endif
                 </div>
             @else
                 <div class="text-center py-12">
