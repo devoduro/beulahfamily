@@ -57,6 +57,26 @@ class Event extends Model
         'recurrence_days' => 'array'
     ];
 
+    /**
+     * Boot the model and add event listeners
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Before creating an event, validate organizer_id
+        static::creating(function ($event) {
+            if (isset($event->organizer_id)) {
+                // Check if the organizer exists in members table
+                $organizerExists = Member::where('id', $event->organizer_id)->exists();
+                if (!$organizerExists) {
+                    // Set to null if organizer doesn't exist
+                    $event->organizer_id = null;
+                }
+            }
+        });
+    }
+
     // Relationships
     public function ministry()
     {

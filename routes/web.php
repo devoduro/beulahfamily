@@ -321,9 +321,11 @@ Route::middleware(['auth'])->group(function () {
                 'description' => 'nullable|string|max:1000',
                 'ministry_id' => 'nullable|exists:ministries,id',
                 'status' => 'required|in:draft,published',
+                'flyer' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max
+                'program_outline' => 'nullable|file|mimes:pdf|max:10240', // 10MB max
             ]);
             
-            $event = \App\Models\Event::create([
+            $eventData = [
                 'title' => $request->title,
                 'description' => $request->description,
                 'event_type' => $request->event_type,
@@ -331,11 +333,29 @@ Route::middleware(['auth'])->group(function () {
                 'end_datetime' => $request->end_datetime,
                 'location' => $request->location,
                 'ministry_id' => $request->ministry_id ?: null,
-                'organizer_id' => auth()->id() ?: 1, // Use authenticated user or default
-                'status' => $request->status, // User-selected status: draft or published
+                'organizer_id' => null, // Will be set by Event model boot method
+                'status' => $request->status,
                 'requires_registration' => false,
                 'is_all_day' => false,
-            ]);
+            ];
+            
+            // Handle flyer upload
+            if ($request->hasFile('flyer')) {
+                $flyer = $request->file('flyer');
+                $flyerName = 'event_flyer_' . time() . '_' . uniqid() . '.' . $flyer->getClientOriginalExtension();
+                $flyerPath = $flyer->storeAs('events/flyers', $flyerName, 'public');
+                $eventData['flyer_path'] = $flyerPath;
+            }
+            
+            // Handle program outline upload
+            if ($request->hasFile('program_outline')) {
+                $programOutline = $request->file('program_outline');
+                $outlineName = 'program_outline_' . time() . '_' . uniqid() . '.pdf';
+                $outlinePath = $programOutline->storeAs('events/program-outlines', $outlineName, 'public');
+                $eventData['program_outline_path'] = $outlinePath;
+            }
+            
+            $event = \App\Models\Event::create($eventData);
             
             return redirect('/events')->with('success', 'Event "' . $event->title . '" created successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {

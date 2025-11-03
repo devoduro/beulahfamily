@@ -44,6 +44,35 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Main Content -->
             <div class="lg:col-span-2">
+                <!-- Program Flyer -->
+                @if($program->flyer_path)
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg shadow-lg border border-blue-200 p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-image text-blue-600 mr-2"></i>
+                            Program Flyer
+                        </h2>
+                        <a href="{{ asset('storage/' . $program->flyer_path) }}" 
+                           download="{{ $program->name }}_flyer.{{ pathinfo($program->flyer_path, PATHINFO_EXTENSION) }}"
+                           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-md">
+                            <i class="fas fa-download mr-2"></i>
+                            Download Flyer
+                        </a>
+                    </div>
+                    <div class="relative bg-white rounded-lg p-2 shadow-md">
+                        <img src="{{ asset('storage/' . $program->flyer_path) }}" 
+                             alt="{{ $program->name }} Flyer" 
+                             class="w-full h-auto rounded-lg cursor-pointer hover:opacity-95 transition-opacity"
+                             onclick="openFlyerModal()">
+                        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 opacity-0 hover:opacity-100 transition-opacity">
+                            <button onclick="openFlyerModal()" class="bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                <i class="fas fa-search-plus mr-2"></i>Click to View Full Size
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                
                 <!-- Program Description -->
                 @if($program->description)
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
@@ -268,4 +297,47 @@
         </div>
     </div>
 </div>
+
+<!-- Flyer Modal -->
+@if($program->flyer_path)
+    <div id="flyerModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+        <div class="relative max-w-4xl max-h-full">
+            <button onclick="closeFlyerModal()" class="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl">
+                <i class="fas fa-times"></i>
+            </button>
+            <img src="{{ asset('storage/' . $program->flyer_path) }}" 
+                 alt="{{ $program->name }} Flyer" 
+                 class="max-w-full max-h-full object-contain rounded-lg">
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+    // Flyer modal functions
+    function openFlyerModal() {
+        document.getElementById('flyerModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeFlyerModal() {
+        document.getElementById('flyerModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside the image
+    document.getElementById('flyerModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeFlyerModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeFlyerModal();
+        }
+    });
+    </script>
+    @endpush
+@endif
 @endsection

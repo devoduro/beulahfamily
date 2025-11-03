@@ -110,12 +110,16 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($events as $event)
                         <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1">
-                            @if($event->banner)
-                                <div class="h-40 overflow-hidden">
+                            @if($event->flyer_path)
+                                <div class="h-48 overflow-hidden">
+                                    <img src="{{ asset('storage/' . $event->flyer_path) }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
+                                </div>
+                            @elseif($event->banner)
+                                <div class="h-48 overflow-hidden">
                                     <img src="{{ asset('storage/' . $event->banner) }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
                                 </div>
                             @else
-                                <div class="h-40 bg-gradient-to-r from-green-500 to-teal-500 flex items-center justify-center">
+                                <div class="h-48 bg-gradient-to-r from-green-500 to-teal-500 flex items-center justify-center">
                                     <i class="fas fa-calendar-day text-white text-4xl"></i>
                                 </div>
                             @endif
@@ -178,46 +182,72 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($programs as $program)
                     <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                        <!-- Program Flyer -->
-                        @if($program->hasFlyer())
-                            <div class="h-48 overflow-hidden">
-                                <img src="{{ $program->flyer_url }}" alt="{{ $program->name }} Flyer" class="w-full h-full object-cover">
+                        @if($program->flyer_path)
+                            <!-- Program Card with Flyer Background -->
+                            <div class="relative h-64 overflow-hidden">
+                                <img src="{{ asset('storage/' . $program->flyer_path) }}" 
+                                     alt="{{ $program->name }} Flyer" 
+                                     class="w-full h-full object-cover">
+                                <!-- Overlay with gradient for text readability -->
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                                
+                                <!-- Program Info Overlay -->
+                                <div class="absolute bottom-0 left-0 right-0 px-6 py-4">
+                                    <div class="flex justify-between items-end">
+                                        <div>
+                                            <h3 class="text-xl font-bold text-white mb-2 drop-shadow-lg">{{ $program->name }}</h3>
+                                            <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-gray-900 backdrop-blur-sm">
+                                                {{ $program->formatted_type }}
+                                            </span>
+                                        </div>
+                                        @if($program->registration_fee > 0)
+                                            <div class="text-right bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2">
+                                                <div class="text-xl font-bold text-gray-900">₵{{ number_format($program->registration_fee, 2) }}</div>
+                                                <div class="text-xs text-gray-600">Fee</div>
+                                            </div>
+                                        @else
+                                            <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-green-500 text-white shadow-lg">
+                                                FREE
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <!-- Program Header with Gradient (No Flyer) -->
+                            @php
+                                $headerColors = [
+                                    'ergates_conference' => 'from-orange-600 via-red-600 to-pink-600',
+                                    'annual_retreat' => 'from-green-600 via-teal-600 to-blue-600',
+                                    'conference' => 'from-blue-600 via-purple-600 to-indigo-600',
+                                    'workshop' => 'from-yellow-600 via-orange-600 to-red-600',
+                                    'seminar' => 'from-purple-600 via-pink-600 to-red-600',
+                                    'retreat' => 'from-green-600 via-emerald-600 to-teal-600',
+                                    'other' => 'from-gray-600 via-slate-600 to-zinc-600'
+                                ];
+                                $headerColor = $headerColors[$program->type] ?? $headerColors['other'];
+                            @endphp
+                            <div class="bg-gradient-to-r {{ $headerColor }} px-6 py-4">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="text-xl font-bold text-white mb-2">{{ $program->name }}</h3>
+                                        <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+                                            {{ $program->formatted_type }}
+                                        </span>
+                                    </div>
+                                    @if($program->registration_fee > 0)
+                                        <div class="text-right">
+                                            <div class="text-2xl font-bold text-white">₵{{ number_format($program->registration_fee, 2) }}</div>
+                                            <div class="text-xs text-blue-100">Registration Fee</div>
+                                        </div>
+                                    @else
+                                        <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-green-500 text-white">
+                                            FREE
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                         @endif
-                        
-                        <!-- Program Header -->
-                        @php
-                            $headerColors = [
-                                'ergates_conference' => 'from-orange-600 via-red-600 to-pink-600',
-                                'annual_retreat' => 'from-green-600 via-teal-600 to-blue-600',
-                                'conference' => 'from-blue-600 via-purple-600 to-indigo-600',
-                                'workshop' => 'from-yellow-600 via-orange-600 to-red-600',
-                                'seminar' => 'from-purple-600 via-pink-600 to-red-600',
-                                'retreat' => 'from-green-600 via-emerald-600 to-teal-600',
-                                'other' => 'from-gray-600 via-slate-600 to-zinc-600'
-                            ];
-                            $headerColor = $headerColors[$program->type] ?? $headerColors['other'];
-                        @endphp
-                        <div class="bg-gradient-to-r {{ $headerColor }} px-6 py-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="text-xl font-bold text-white mb-2">{{ $program->name }}</h3>
-                                    <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
-                                        {{ $program->formatted_type }}
-                                    </span>
-                                </div>
-                                @if($program->registration_fee > 0)
-                                    <div class="text-right">
-                                        <div class="text-2xl font-bold text-white">₵{{ number_format($program->registration_fee, 2) }}</div>
-                                        <div class="text-xs text-blue-100">Registration Fee</div>
-                                    </div>
-                                @else
-                                    <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-green-500 text-white">
-                                        FREE
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
                         
                         <div class="p-6">
                             @if($program->description)

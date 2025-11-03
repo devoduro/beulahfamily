@@ -34,6 +34,55 @@
 
     <!-- Main Content -->
     <div class="max-w-2xl mx-auto px-4 py-8">
+        <!-- Event Flyer -->
+        @if($event->flyer_path)
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl shadow-lg border border-blue-200 p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                    <i class="fas fa-image text-blue-600 mr-2"></i>
+                    Event Flyer
+                </h3>
+                <a href="{{ asset('storage/' . $event->flyer_path) }}" 
+                   download="{{ $event->title }}_flyer.{{ pathinfo($event->flyer_path, PATHINFO_EXTENSION) }}"
+                   class="inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                    <i class="fas fa-download mr-2"></i>
+                    Download
+                </a>
+            </div>
+            <div class="bg-white rounded-lg p-2 shadow-md">
+                <img src="{{ asset('storage/' . $event->flyer_path) }}" 
+                     alt="{{ $event->title }} Flyer" 
+                     class="w-full h-auto rounded-lg">
+            </div>
+        </div>
+        @endif
+
+        <!-- Program Outline -->
+        @if($event->program_outline_path)
+        <div class="bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl shadow-lg border border-purple-200 p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                    <i class="fas fa-file-pdf text-purple-600 mr-2"></i>
+                    Program Outline
+                </h3>
+                <div class="flex space-x-2">
+                    <a href="{{ asset('storage/' . $event->program_outline_path) }}" 
+                       target="_blank"
+                       class="inline-flex items-center px-3 py-2 bg-white border border-purple-300 text-purple-700 text-sm font-medium rounded-lg hover:bg-purple-50 transition-colors">
+                        <i class="fas fa-eye mr-2"></i>
+                        View
+                    </a>
+                    <a href="{{ asset('storage/' . $event->program_outline_path) }}" 
+                       download="{{ $event->title }}_program_outline.pdf"
+                       class="inline-flex items-center px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors">
+                        <i class="fas fa-download mr-2"></i>
+                        Download
+                    </a>
+                </div>
+            </div>
+        </div>
+        @endif
+        
         <!-- Event Info -->
         <div class="text-center mb-6">
             <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ $event->title }}</h2>

@@ -168,48 +168,100 @@ class EventController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $eventData = $request->all();
+        // Debug: Log all request data
+        \Log::info('Event creation request data:', $request->all());
+        
+        $eventData = $request->except(['_token', '_method', 'flyer', 'program_outline']);
         $eventData['required_items'] = $request->get('required_items', []);
         $eventData['recurrence_days'] = $request->get('recurrence_days', []);
         
-        // Remove organizer_id if it's empty or null to avoid foreign key constraint issues
-        if (empty($eventData['organizer_id'])) {
-            unset($eventData['organizer_id']);
+        // Debug: Log eventData before organizer check
+        \Log::info('Event data before organizer check:', $eventData);
+        
+        // Handle organizer_id - set to current user if not provided or invalid
+        if (isset($eventData['organizer_id'])) {
+            if (empty($eventData['organizer_id']) || !is_numeric($eventData['organizer_id'])) {
+                unset($eventData['organizer_id']);
+            } else {
+                // Verify the organizer exists in the members table
+                $organizerExists = \App\Models\Member::where('id', $eventData['organizer_id'])->exists();
+                if (!$organizerExists) {
+                    unset($eventData['organizer_id']);
+                }
+            }
         }
+        
+        // Set organizer to current authenticated user if available and no organizer set
+        if (!isset($eventData['organizer_id']) && auth()->check()) {
+            // Check if current user has a member record
+            $currentMember = \App\Models\Member::where('user_id', auth()->id())->first();
+            if ($currentMember) {
+                $eventData['organizer_id'] = $currentMember->id;
+            }
+        }
+        
+        // Debug: Log final eventData before creation
+        \Log::info('Final event data before creation:', $eventData);
 
         // Handle flyer upload
         if ($request->hasFile('flyer')) {
+            \Log::info('Flyer file detected, processing upload...');
             $flyer = $request->file('flyer');
             $flyerName = 'event_flyer_' . time() . '_' . uniqid() . '.' . $flyer->getClientOriginalExtension();
             $flyerPath = $flyer->storeAs('events/flyers', $flyerName, 'public');
             $eventData['flyer_path'] = $flyerPath;
+            \Log::info('Flyer uploaded successfully', ['path' => $flyerPath]);
+        } else {
+            \Log::info('No flyer file in request');
         }
 
         // Handle program outline upload
         if ($request->hasFile('program_outline')) {
+            \Log::info('Program outline file detected, processing upload...');
             $programOutline = $request->file('program_outline');
             $outlineName = 'program_outline_' . time() . '_' . uniqid() . '.pdf';
             $outlinePath = $programOutline->storeAs('events/program-outlines', $outlineName, 'public');
             $eventData['program_outline_path'] = $outlinePath;
+            \Log::info('Program outline uploaded successfully', ['path' => $outlinePath]);
+        } else {
+            \Log::info('No program outline file in request');
         }
+        
+        \Log::info('Event data with files before creation:', $eventData);
 
-        $event = Event::create($eventData);
+        try {
+            $event = Event::create($eventData);
 
-        // Generate recurring events if needed
-        if ($request->is_recurring && $request->recurrence_type) {
-            $event->generateRecurringEvents();
+            // Generate recurring events if needed
+            if ($request->is_recurring && $request->recurrence_type) {
+                $event->generateRecurringEvents();
+            }
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'event' => $event->load(['ministry', 'organizer']),
+                    'message' => 'Event created successfully!'
+                ]);
+            }
+
+            return redirect()->route('events.show', $event)
+                            ->with('success', 'Event created successfully!');
+        } catch (\Exception $e) {
+            \Log::error('Event creation failed: ' . $e->getMessage());
+            
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to create event. Please check all fields and try again.',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->back()
+                            ->withErrors(['error' => 'Failed to create event. Please ensure all required fields are filled correctly.'])
+                            ->withInput();
         }
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'event' => $event->load(['ministry', 'organizer']),
-                'message' => 'Event created successfully!'
-            ]);
-        }
-
-        return redirect()->route('events.show', $event)
-                        ->with('success', 'Event created successfully!');
     }
 
     /**
