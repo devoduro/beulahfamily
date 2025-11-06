@@ -92,12 +92,16 @@ class SmsController extends Controller
      */
     public function store(Request $request)
     {
+        // Get valid chapters from database
+        $validChapters = Member::distinct()->pluck('chapter')->filter()->toArray();
+        $chapterValidation = !empty($validChapters) ? 'nullable|required_if:recipient_type,chapter|in:' . implode(',', $validChapters) : 'nullable|required_if:recipient_type,chapter|string';
+        
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'message' => 'required|string|max:1600',
             'recipient_type' => 'required|in:all,members,chapter,custom',
-            'chapter' => 'required_if:recipient_type,chapter|in:ACCRA,KUMASI,NEW JESSY',
-            'custom_recipients' => 'required_if:recipient_type,custom|array',
+            'chapter' => $chapterValidation,
+            'custom_recipients' => 'nullable|required_if:recipient_type,custom|array',
             'custom_recipients.*' => 'exists:members,id',
             'template_id' => 'nullable|exists:sms_templates,id',
             'sender_name' => 'nullable|string|max:11',
@@ -205,42 +209,120 @@ class SmsController extends Controller
         try {
             $smsMessage->update(['status' => 'sending']);
 
-            $recipients = $smsMessage->recipients()->pluck('phone_number')->toArray();
+            $recipients = $smsMessage->recipients()->with('member')->get();
+            $successCount = 0;
+            $failCount = 0;
+            $totalCost = 0;
             
-            $result = $this->mnotifyService->sendBulkSMS(
-                $recipients,
-                $smsMessage->message,
-                $smsMessage->sender_name
-            );
-
-            if ($result['success']) {
-                $smsMessage->markAsSent($result['message_id'], $result['cost']);
+            // Check if message has placeholders
+            $hasPlaceholders = preg_match('/\{\{[^}]+\}\}/', $smsMessage->message);
+            
+            if ($hasPlaceholders) {
+                // Send personalized messages individually
+                foreach ($recipients as $recipient) {
+                    $personalizedMessage = $this->replacePlaceholders(
+                        $smsMessage->message, 
+                        $recipient->member
+                    );
+                    
+                    $result = $this->mnotifyService->sendSMS(
+                        $recipient->phone_number,
+                        $personalizedMessage,
+                        $smsMessage->sender_name
+                    );
+                    
+                    if ($result['success']) {
+                        $recipient->update([
+                            'status' => 'sent',
+                            'sent_at' => now(),
+                            'cost' => $result['cost']
+                        ]);
+                        $successCount++;
+                        $totalCost += $result['cost'];
+                    } else {
+                        $recipient->update([
+                            'status' => 'failed',
+                            'failed_at' => now(),
+                            'failure_reason' => $result['error']
+                        ]);
+                        $failCount++;
+                    }
+                }
                 
-                // Update all recipients as sent
-                $smsMessage->recipients()->update([
-                    'status' => 'sent',
-                    'sent_at' => now(),
-                    'cost' => $result['cost'] / count($recipients)
-                ]);
-
-                $smsMessage->updateDeliveryStats(count($recipients), 0);
+                // Update message with aggregated results
+                if ($successCount > 0) {
+                    $smsMessage->markAsSent(null, $totalCost);
+                } else {
+                    $smsMessage->markAsFailed('All messages failed to send');
+                }
+                
             } else {
-                $smsMessage->markAsFailed($result['error']);
+                // Send bulk SMS without personalization
+                $phoneNumbers = $recipients->pluck('phone_number')->toArray();
                 
-                // Mark all recipients as failed
-                $smsMessage->recipients()->update([
-                    'status' => 'failed',
-                    'failed_at' => now(),
-                    'failure_reason' => $result['error']
-                ]);
+                $result = $this->mnotifyService->sendBulkSMS(
+                    $phoneNumbers,
+                    $smsMessage->message,
+                    $smsMessage->sender_name
+                );
 
-                $smsMessage->updateDeliveryStats(0, count($recipients));
+                if ($result['success']) {
+                    $smsMessage->markAsSent($result['message_id'], $result['cost']);
+                    
+                    // Update all recipients as sent
+                    $smsMessage->recipients()->update([
+                        'status' => 'sent',
+                        'sent_at' => now(),
+                        'cost' => $result['cost'] / count($phoneNumbers)
+                    ]);
+                    $successCount = count($phoneNumbers);
+                } else {
+                    $smsMessage->markAsFailed($result['error']);
+                    
+                    // Mark all recipients as failed
+                    $smsMessage->recipients()->update([
+                        'status' => 'failed',
+                        'failed_at' => now(),
+                        'failure_reason' => $result['error']
+                    ]);
+                    $failCount = count($phoneNumbers);
+                }
             }
+
+            $smsMessage->updateDeliveryStats($successCount, $failCount);
 
         } catch (\Exception $e) {
             Log::error('SMS sending failed: ' . $e->getMessage());
             $smsMessage->markAsFailed($e->getMessage());
         }
+    }
+    
+    /**
+     * Replace placeholders in message with actual member data.
+     */
+    private function replacePlaceholders($message, $member)
+    {
+        if (!$member) {
+            return $message;
+        }
+        
+        // Get church name from settings
+        $churchName = \App\Models\Setting::getValue('organization_name', 'general', config('app.name', 'Beulah Family'));
+        
+        $replacements = [
+            '{{first_name}}' => $member->first_name ?? '',
+            '{{last_name}}' => $member->last_name ?? '',
+            '{{full_name}}' => trim(($member->first_name ?? '') . ' ' . ($member->last_name ?? '')),
+            '{{phone}}' => $member->phone ?? '',
+            '{{email}}' => $member->email ?? '',
+            '{{chapter}}' => $member->chapter ?? '',
+            '{{gender}}' => $member->gender ?? '',
+            '{{marital_status}}' => $member->marital_status ?? '',
+            '{{church_name}}' => $churchName,
+            '{{organization_name}}' => $churchName,
+        ];
+        
+        return str_replace(array_keys($replacements), array_values($replacements), $message);
     }
 
     /**

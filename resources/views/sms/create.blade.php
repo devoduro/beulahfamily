@@ -261,6 +261,25 @@
                                     <span id="sms-count">0</span> SMS
                                 </span>
                             </div>
+                            
+                            <!-- Placeholder Guide -->
+                            <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                                <div class="flex items-start">
+                                    <i class="fas fa-info-circle text-blue-600 mt-0.5 mr-2"></i>
+                                    <div class="flex-1">
+                                        <p class="text-xs font-semibold text-blue-900 mb-1">Available Placeholders:</p>
+                                        <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-blue-700">
+                                            <code class="bg-blue-100 px-1.5 py-0.5 rounded">@{{ '{' }}{{ '{' }}first_name}}</code>
+                                            <code class="bg-blue-100 px-1.5 py-0.5 rounded">@{{ '{' }}{{ '{' }}last_name}}</code>
+                                            <code class="bg-blue-100 px-1.5 py-0.5 rounded">@{{ '{' }}{{ '{' }}full_name}}</code>
+                                            <code class="bg-blue-100 px-1.5 py-0.5 rounded">@{{ '{' }}{{ '{' }}chapter}}</code>
+                                            <code class="bg-blue-100 px-1.5 py-0.5 rounded">@{{ '{' }}{{ '{' }}church_name}}</code>
+                                            <code class="bg-blue-100 px-1.5 py-0.5 rounded">@{{ '{' }}{{ '{' }}phone}}</code>
+                                        </div>
+                                        <p class="text-xs text-blue-600 mt-1.5">Placeholders will be replaced with actual member data when sent.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Sender Name -->
@@ -283,7 +302,7 @@
                             <div class="space-y-3">
                                 <div class="flex justify-between">
                                     <span class="text-green-700">Recipients:</span>
-                                    <span class="font-semibold text-green-900" id="recipient-count">0</span>
+                                    <span class="font-semibold text-green-900" id="cost-recipient-count">0</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-green-700">SMS Count:</span>
@@ -483,7 +502,7 @@
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent" id="recipient-count">0</div>
+                                <div class="text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent" id="preview-recipient-count">0</div>
                                 <div class="text-sm text-slate-500">Recipients</div>
                             </div>
                         </div>
@@ -506,9 +525,9 @@
                         <label for="chapter" class="block text-sm font-semibold text-gray-800 mb-2">Select Chapter</label>
                         <select name="chapter" id="chapter" class="block w-full md:w-1/2 px-4 py-3 bg-white/50 backdrop-blur-sm border-2 border-gray-200/50 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-gray-900 font-medium shadow-sm hover:shadow-md">
                             <option value="">Select Chapter</option>
-                            <option value="ACCRA">ACCRA</option>
-                            <option value="KUMASI">KUMASI</option>
-                            <option value="NEW JESSY">NEW JESSY</option>
+                            @foreach($chapters as $chapter)
+                                <option value="{{ $chapter }}">{{ $chapter }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -872,6 +891,27 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!recipientType) {
             errors.push('Please select an audience type');
             isValid = false;
+        } else {
+            // Additional validation for specific recipient types
+            const recipientValue = recipientType.value;
+            
+            // Validate chapter selection
+            if (recipientValue === 'chapter') {
+                const chapterSelect = document.getElementById('chapter');
+                if (!chapterSelect || !chapterSelect.value) {
+                    errors.push('Please select a chapter');
+                    isValid = false;
+                }
+            }
+            
+            // Validate custom recipients
+            if (recipientValue === 'custom') {
+                const checkedMembers = document.querySelectorAll('.member-checkbox:checked').length;
+                if (checkedMembers === 0) {
+                    errors.push('Please select at least one member from the custom selection');
+                    isValid = false;
+                }
+            }
         }
         
         // Update send button state
@@ -879,6 +919,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (sendBtn) {
             sendBtn.disabled = !isValid;
             sendBtn.style.opacity = isValid ? '1' : '0.6';
+            
+            // Update button title for better UX
+            if (!isValid) {
+                sendBtn.title = errors.length > 0 ? errors[0] : 'Please complete all required fields';
+            } else {
+                sendBtn.title = 'Send SMS Campaign';
+            }
         }
         
         // Show/hide errors
@@ -1100,6 +1147,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Trigger change event for other listeners
         radio.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // Trigger validation update
+        validateForm();
     }
     
     // Robust visual update system
@@ -1202,7 +1252,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update live preview with advanced animations
     function updateLivePreview(type, category) {
-        const recipientCountEl = document.getElementById('recipient-count');
+        const recipientCountEl = document.getElementById('preview-recipient-count');
         const descriptionEl = document.getElementById('selection-description');
         const progressBar = document.getElementById('progress-bar');
         const percentageDisplay = document.getElementById('percentage-display');
@@ -1234,7 +1284,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
         }
         
-        // Animate count change
+        // Animate count change for live preview
         if (recipientCountEl) {
             recipientCountEl.style.transform = 'scale(0.8)';
             recipientCountEl.style.opacity = '0.5';
@@ -1244,6 +1294,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 recipientCountEl.style.opacity = '1';
                 recipientCountEl.style.transition = 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
             }, 150);
+        }
+        
+        // Also update cost estimation sidebar
+        const costRecipientEl = document.getElementById('cost-recipient-count');
+        if (costRecipientEl) {
+            costRecipientEl.textContent = count;
         }
         
         // Update description
@@ -1268,7 +1324,10 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Next-Gen Recipient Selection System initialized successfully!');
 
     // Chapter selection
-    document.getElementById('chapter').addEventListener('change', updateCostEstimation);
+    document.getElementById('chapter').addEventListener('change', function() {
+        updateCostEstimation();
+        validateForm();
+    });
 
     // Custom recipients
     const memberCheckboxes = document.querySelectorAll('.member-checkbox');
@@ -1278,19 +1337,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const checked = document.querySelectorAll('.member-checkbox:checked').length;
         selectedCount.textContent = checked;
         updateCostEstimation();
+        validateForm();
     }
     
     memberCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', updateSelectedCount);
     });
 
-    // Select/Clear all buttons
-    document.getElementById('select-all-btn').addEventListener('click', function() {
-        const visibleCheckboxes = document.querySelectorAll('.member-checkbox:not([style*="display: none"])');
-        visibleCheckboxes.forEach(cb => cb.checked = true);
-        updateSelectedCount();
-    });
-    
+    // Clear all button
     document.getElementById('clear-all-btn').addEventListener('click', function() {
         memberCheckboxes.forEach(cb => cb.checked = false);
         updateSelectedCount();
@@ -1367,9 +1421,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('min-age').addEventListener('input', applyFilters);
     document.getElementById('max-age').addEventListener('input', applyFilters);
     
-    // Apply filters button
-    document.getElementById('apply-filters').addEventListener('click', applyFilters);
-    
     // Select all filtered members
     document.getElementById('select-all-filtered').addEventListener('click', function() {
         const visibleCheckboxes = document.querySelectorAll('.member-card:not([style*="display: none"]) .member-checkbox');
@@ -1418,7 +1469,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const estimatedCost = totalSms * costPerSms;
         
         // Animate cost updates
-        animateCostUpdate('recipient-count', recipientCount);
+        animateCostUpdate('cost-recipient-count', recipientCount);
+        animateCostUpdate('preview-recipient-count', recipientCount);
         animateCostUpdate('total-sms', totalSms);
         animateCostUpdate('estimated-cost', `₵${estimatedCost.toFixed(2)}`);
         animateCostUpdate('campaign-cost', `₵${estimatedCost.toFixed(2)}`); // Cedis display
@@ -1586,18 +1638,47 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create progress tracker
         const progressTracker = createProgressTracker();
         
-        fetch('@php echo route("sms.store"); @endphp', {
+        // Debug logging
+        console.log('Sending SMS to:', '{{ route("sms.store") }}');
+        console.log('Form data:', {
+            title: formData.get('title'),
+            message: formData.get('message'),
+            recipient_type: formData.get('recipient_type'),
+            recipient_count: recipientCount
+        });
+        
+        fetch('{{ route("sms.store") }}', {
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}',
+                'Accept': 'application/json'
             }
         })
         .then(response => {
             updateProgressTracker(progressTracker, 'Processing response...', 60);
             
+            console.log('Response status:', response.status);
+            
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json().then(data => {
+                    console.error('Server error:', data);
+                    let errorMsg = data.message || `HTTP error! status: ${response.status}`;
+                    
+                    // Handle validation errors
+                    if (data.errors) {
+                        const errors = Object.values(data.errors).flat();
+                        errorMsg = errors.join(', ');
+                    }
+                    
+                    throw new Error(errorMsg);
+                }).catch(err => {
+                    // If response is not JSON
+                    if (err instanceof SyntaxError) {
+                        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+                    }
+                    throw err;
+                });
             }
             return response.json();
         })
@@ -1613,7 +1694,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Redirect after success animation
                     setTimeout(() => {
-                        window.location.href = '@php echo route("sms.index"); @endphp';
+                        window.location.href = '{{ route("sms.index") }}';
                     }, 2000);
                 } else {
                     showErrorMessage(data.message || 'Unknown error occurred');
@@ -1625,7 +1706,7 @@ document.addEventListener('DOMContentLoaded', function() {
             hideLoadingState(sendBtn, loadingSpinner);
             progressTracker.remove();
             
-            showErrorMessage('Network error. Please check your connection and try again.');
+            showErrorMessage(error.message || 'Network error. Please check your connection and try again.');
         });
     });
     
@@ -1634,7 +1715,7 @@ document.addEventListener('DOMContentLoaded', function() {
             📱 SMS Campaign Confirmation
             
             Recipients: ${recipientCount} members
-            Estimated Cost: GHS ${estimatedCost.toFixed(2)}
+            Estimated Cost: ₵${estimatedCost.toFixed(2)}
             
             Are you sure you want to proceed?
         `;
@@ -1756,8 +1837,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('title').addEventListener('input', validateForm);
     document.getElementById('sender_name').addEventListener('input', validateForm);
     
-    // Initial validation
+    // Initial validation and cost estimation
     validateForm();
+    updateCostEstimation();
 });
 </script>
 @endsection

@@ -94,44 +94,69 @@ class MNotifyService
         try {
             // Format all phone numbers
             $formattedRecipients = array_map([$this, 'formatPhoneNumber'], $recipients);
+            
+            // Pastech API uses comma-separated phone numbers
+            $recipientString = implode(',', $formattedRecipients);
 
-            $response = Http::timeout(60)->post($this->baseUrl . '/sms/quick', [
-                'recipient' => $formattedRecipients,
-                'sender' => $senderId ?? $this->senderId,
-                'message' => $message,
-                'is_schedule' => false,
-                'schedule_date' => ''
-            ], [
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Content-Type' => 'application/json',
+            $url = $this->baseUrl . '/smsapi?' . http_build_query([
+                'key' => $this->apiKey,
+                'to' => $recipientString,
+                'msg' => $message,
+                'sender_id' => $senderId ?? $this->senderId
             ]);
+
+            $response = Http::timeout(60)->get($url);
 
             $responseData = $response->json();
 
-            if ($response->successful() && isset($responseData['code']) && $responseData['code'] === '2000') {
+            Log::info('MNotify Bulk SMS Response', [
+                'status_code' => $response->status(),
+                'response' => $responseData,
+                'recipient_count' => count($recipients),
+                'url' => $url
+            ]);
+
+            // Pastech API uses code '1000' for success (not '2000')
+            $isSuccess = $response->successful() && 
+                         isset($responseData['code']) && 
+                         (($responseData['code'] === '1000') || ($responseData['code'] === 1000));
+
+            if ($isSuccess) {
                 Log::info('Bulk SMS sent successfully', [
                     'recipient_count' => count($recipients),
-                    'message_id' => $responseData['message_id'] ?? null,
+                    'message_id' => $responseData['data']['key'] ?? $responseData['message_id'] ?? null,
+                    'campaign_id' => $responseData['data']['campaign_id'] ?? null,
                     'cost' => $responseData['cost'] ?? null
                 ]);
 
                 return [
                     'success' => true,
-                    'message_id' => $responseData['message_id'] ?? null,
+                    'message_id' => $responseData['data']['key'] ?? $responseData['message_id'] ?? null,
                     'cost' => $responseData['cost'] ?? 0,
                     'recipient_count' => count($recipients),
                     'response' => $responseData
                 ];
             } else {
+                $errorMsg = $responseData['message'] ?? 'Bulk SMS sending failed';
+                
+                // Check for specific error codes
+                if (isset($responseData['code'])) {
+                    $specificError = $this->getPastechErrorMessage($responseData['code']);
+                    if ($specificError) {
+                        $errorMsg = $specificError;
+                    }
+                }
+                
                 Log::error('Bulk SMS sending failed', [
                     'recipient_count' => count($recipients),
                     'response' => $responseData,
-                    'status_code' => $response->status()
+                    'status_code' => $response->status(),
+                    'error' => $errorMsg
                 ]);
 
                 return [
                     'success' => false,
-                    'error' => $responseData['message'] ?? 'Bulk SMS sending failed',
+                    'error' => $errorMsg,
                     'response' => $responseData
                 ];
             }
@@ -155,24 +180,41 @@ class MNotifyService
     public function scheduleSMS($recipients, $message, $scheduleDate, $senderId = null)
     {
         try {
+            // Note: Pastech API may not support scheduling via /smsapi endpoint
+            // This will send immediately for now
+            Log::warning('SMS scheduling requested but may send immediately', [
+                'schedule_date' => $scheduleDate,
+                'recipient_count' => is_array($recipients) ? count($recipients) : 1
+            ]);
+            
+            // Use the bulk SMS method which works
+            return $this->sendBulkSMS(
+                is_array($recipients) ? $recipients : [$recipients],
+                $message,
+                $senderId
+            );
+            
+            /* Original scheduling code - keeping for reference if API supports it later
             $formattedRecipients = is_array($recipients) 
                 ? array_map([$this, 'formatPhoneNumber'], $recipients)
                 : [$this->formatPhoneNumber($recipients)];
 
-            $response = Http::timeout(30)->post($this->baseUrl . '/sms/quick', [
-                'recipient' => $formattedRecipients,
-                'sender' => $senderId ?? $this->senderId,
-                'message' => $message,
-                'is_schedule' => true,
-                'schedule_date' => $scheduleDate
-            ], [
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Content-Type' => 'application/json',
-            ]);
+            $response = Http::timeout(30)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'Content-Type' => 'application/json',
+                ])
+                ->post($this->baseUrl . '/sms/quick', [
+                    'recipient' => $formattedRecipients,
+                    'sender' => $senderId ?? $this->senderId,
+                    'message' => $message,
+                    'is_schedule' => true,
+                    'schedule_date' => $scheduleDate
+                ]);
 
             $responseData = $response->json();
 
-            if ($response->successful() && isset($responseData['code']) && $responseData['code'] === '2000') {
+            if ($response->successful() && isset($responseData['code']) && $responseData['code'] === '1000') {
                 Log::info('SMS scheduled successfully', [
                     'recipient_count' => count($formattedRecipients),
                     'schedule_date' => $scheduleDate,
@@ -192,6 +234,7 @@ class MNotifyService
                     'response' => $responseData
                 ];
             }
+            */
 
         } catch (\Exception $e) {
             Log::error('SMS scheduling error: ' . $e->getMessage());
@@ -208,9 +251,11 @@ class MNotifyService
     public function getDeliveryReport($messageId)
     {
         try {
-            $response = Http::timeout(30)->get($this->baseUrl . '/sms/report/' . $messageId, [], [
-                'Authorization' => 'Bearer ' . $this->apiKey,
-            ]);
+            $response = Http::timeout(30)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                ])
+                ->get($this->baseUrl . '/sms/report/' . $messageId);
 
             $responseData = $response->json();
 
